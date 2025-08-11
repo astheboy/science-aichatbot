@@ -3,14 +3,10 @@ import { functions } from './firebase-config.js';
 
 const getTutorResponseFunction = httpsCallable(functions, 'getTutorResponse');
 
-// teacherCode, userMessage, conversationHistory를 인자로 받습니다.
-export async function callGeminiApi(teacherCode, userMessage, conversationHistory = []) {
+// API 데이터 객체를 인자로 받습니다. (teacherCode, userMessage, conversationHistory, studentName, sessionId)
+export async function callGeminiApi(apiData) {
     try {
-        const result = await getTutorResponseFunction({ 
-            teacherCode: teacherCode, 
-            userMessage: userMessage,
-            conversationHistory: conversationHistory
-        });
+        const result = await getTutorResponseFunction(apiData);
         return result.data.text;
     } catch (error) {
         console.error("Firebase Function 호출 중 오류:", error);

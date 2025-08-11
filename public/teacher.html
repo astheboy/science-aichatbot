@@ -45,180 +45,403 @@
     </div>
 
     <!-- 대시보드 화면 -->
-    <div id="dashboard-screen" class="hidden">
-        <!-- 헤더 -->
-        <header class="bg-white shadow-sm border-b">
-            <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
+    <div id="dashboard-screen" class="hidden min-h-screen bg-gray-50">
+        <div class="flex h-screen">
+            <!-- 좌측 사이드바 -->
+            <aside class="w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col">
+                <!-- 사이드바 헤더 -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800">AI 챗봇 관리</h2>
+                            <p class="text-sm text-gray-500">교사 대시보드</p>
+                        </div>
                     </div>
-                    <h1 class="text-xl font-semibold text-gray-800">AI 챗봇 교사 대시보드</h1>
                 </div>
                 
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <img id="user-photo" class="w-8 h-8 rounded-full" alt="프로필">
-                        <span id="user-name" class="text-gray-700 font-medium"></span>
+                <!-- 내비게이션 메뉴 -->
+                <nav class="flex-1 px-4 py-6">
+                    <ul class="space-y-2">
+                        <li>
+                            <button class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors flex items-center space-x-3 active" data-section="settings">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span>기본 설정</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors flex items-center space-x-3" data-section="prompts">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>프롬프트 설정</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors flex items-center space-x-3" data-section="students">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span>학생 대화 분석</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- 사용자 정보 -->
+                <div class="p-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <img id="user-photo" class="w-10 h-10 rounded-full" alt="프로필">
+                        <div class="flex-1 min-w-0">
+                            <p id="user-name" class="text-sm font-medium text-gray-900 truncate"></p>
+                            <p class="text-xs text-gray-500">교사 계정</p>
+                        </div>
                     </div>
-                    <button id="logout-btn" class="text-gray-500 hover:text-gray-700 px-3 py-1 rounded-md hover:bg-gray-100">
+                    <button id="logout-btn" class="w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
                         로그아웃
                     </button>
                 </div>
-            </div>
-        </header>
+            </aside>
+            
+            <!-- 메인 컨텐츠 영역 -->
+            <main class="flex-1 overflow-y-auto bg-gray-50">
+                <div class="p-8">
 
-        <!-- 메인 컨텐츠 -->
-        <main class="max-w-6xl mx-auto px-4 py-8">
-            <!-- API 키 설정 카드 -->
-            <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-800">Gemini API 키 설정</h2>
-                        <p class="text-gray-600 text-sm mt-1">학생들이 AI 튜터를 사용할 수 있도록 API 키를 등록하세요</p>
-                    </div>
-                    <div id="api-status" class="px-3 py-1 rounded-full text-sm font-medium hidden">
-                        <!-- API 상태가 여기에 표시됩니다 -->
-                    </div>
-                </div>
+                    <!-- 기본 설정 섹션 -->
+                    <div id="settings-section" class="space-y-6">
+                        <!-- API 키 설정 카드 -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">Gemini API 키 설정</h2>
+                                    <p class="text-gray-600 text-sm mt-1">학생들이 AI 튜터를 사용할 수 있도록 API 키를 등록하세요</p>
+                                </div>
+                                <div id="api-status" class="px-3 py-1 rounded-full text-sm font-medium hidden">
+                                    <!-- API 상태가 여기에 표시됩니다 -->
+                                </div>
+                            </div>
 
-                <div id="api-setup-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Google Gemini API 키
-                        </label>
-                        <div class="flex space-x-3">
-                            <textarea 
-                                id="api-key-input"
-                                placeholder="AIzaSy..."
-                                rows="2"
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                            ></textarea>
-                            <button id="save-api-key-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-                                저장
-                            </button>
+                            <div id="api-setup-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Google Gemini API 키
+                                    </label>
+                                    <div class="flex space-x-3">
+                                        <textarea 
+                                            id="api-key-input"
+                                            placeholder="AIzaSy..."
+                                            rows="2"
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        ></textarea>
+                                        <button id="save-api-key-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                            저장
+                                        </button>
+                                    </div>
+                                    <div class="mt-2 flex items-center space-x-4 text-sm text-gray-600">
+                                        <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 hover:underline flex items-center space-x-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                            <span>API 키 발급받기</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="api-configured" class="hidden">
+                                <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-md">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-green-700 font-medium">API 키가 성공적으로 등록되었습니다!</span>
+                                    </div>
+                                    <button id="update-api-key-btn" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                        수정
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mt-2 flex items-center space-x-4 text-sm text-gray-600">
-                            <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 hover:underline flex items-center space-x-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                                <span>API 키 발급받기</span>
-                            </a>
+
+                        <!-- AI 모델 선택 카드 -->
+                        <div id="model-settings-section" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">AI 모델 선택</h2>
+                                    <p class="text-gray-600 text-sm mt-1">사용할 Google Gemini AI 모델을 선택하세요</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        AI 모델 선택
+                                    </label>
+                                    <select id="model-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
+                                        <option value="gemini-2.0-flash-thinking-exp-1219">Gemini 2.0 Flash Thinking</option>
+                                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                                        <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
+                                    </select>
+                                    <div class="mt-2 text-sm text-gray-600">
+                                        <p><strong>추천:</strong> Gemini 2.0 Flash (Experimental)은 최신 모델로 가장 뛰어난 성능을 제공합니다.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3">
+                                    <button id="save-model-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                        모델 저장
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div id="api-configured" class="hidden">
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-md">
-                        <div class="flex items-center space-x-3">
-                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span class="text-green-700 font-medium">API 키가 성공적으로 등록되었습니다!</span>
-                        </div>
-                        <button id="update-api-key-btn" class="text-green-600 hover:text-green-800 text-sm font-medium">
-                            수정
-                        </button>
-                    </div>
-                </div>
-            </div>
+                        <!-- 교사 코드 및 사용법 카드 -->
+                        <div id="teacher-code-section" class="hidden">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- 교사 코드 카드 -->
+                                <div class="bg-white rounded-lg shadow-sm border p-6 card-hover">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">내 교사 코드</h3>
+                                    <div class="bg-gray-50 border rounded-md p-4 mb-4">
+                                        <div class="flex items-center justify-between">
+                                            <code id="teacher-code-display" class="text-lg font-mono font-semibold text-blue-600"></code>
+                                            <button id="copy-code-btn" class="text-gray-500 hover:text-gray-700 p-1 rounded">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600">학생들에게 이 코드를 알려주세요</p>
+                                </div>
 
-            <!-- 프롬프트 설정 카드 -->
-            <div id="prompt-settings-section" class="bg-white rounded-lg shadow-sm border p-6 mb-8 hidden">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-800">AI 튜터 프롬프트 설정</h2>
-                        <p class="text-gray-600 text-sm mt-1">AI 튜터의 역할과 응답 방식을 사용자 정의하세요</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button id="reset-prompt-btn" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
-                            기본값으로 되돌리기
-                        </button>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            사용자 정의 프롬프트
-                        </label>
-                        <textarea 
-                            id="custom-prompt-input"
-                            placeholder="AI 튜터가 어떻게 학생들에게 응답해야 하는지 설명하세요..."
-                            rows="8"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-                        ></textarea>
-                        <div class="mt-2 text-sm text-gray-600">
-                            <p><strong>예시:</strong> "너는 친근하고 격려하는 과학 튜터야. 학생들이 그래비트랙스 실험을 통해 물리학 원리를 이해할 수 있도록 도와줘. 항상 긍정적이고 호기심을 유발하는 질문을 던져줘."</p>
+                                <!-- 사용법 카드 -->
+                                <div class="bg-white rounded-lg shadow-sm border p-6 card-hover">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">학생 사용법 안내</h3>
+                                    <div class="space-y-3 text-sm text-gray-600">
+                                        <div class="flex items-start space-x-2">
+                                            <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">1</span>
+                                            <p>학생들에게 메인 사이트 주소를 알려주세요:<br>
+                                            <a href="https://science-aichatbot.web.app" class="text-blue-600 hover:underline font-medium">science-aichatbot.web.app</a></p>
+                                        </div>
+                                        <div class="flex items-start space-x-2">
+                                            <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">2</span>
+                                            <p>챗봇 영역에서 위의 <strong>교사 코드</strong>를 입력하고 저장하게 하세요</p>
+                                        </div>
+                                        <div class="flex items-start space-x-2">
+                                            <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">3</span>
+                                            <p>이제 학생들이 그래비트랙스 실험에 대해 AI 튜터와 대화할 수 있습니다!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-end space-x-3">
-                        <button id="preview-prompt-btn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
-                            미리보기
-                        </button>
-                        <button id="save-prompt-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-                            저장
-                        </button>
+                    <!-- 프롬프트 설정 섹션 -->
+                    <div id="prompts-section" class="hidden">
+                        <!-- 유형별 프롬프트 설정 카드 -->
+                        <div id="adaptive-prompt-settings-section" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">유형별 AI 튜터 프롬프트 설정</h2>
+                                    <p class="text-gray-600 text-sm mt-1">학생 응답 유형에 따라 다른 AI 튜터 전략을 설정할 수 있습니다</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button id="reset-adaptive-prompts-btn" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
+                                        모두 기본값으로 되돌리기
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <!-- 탭 네비게이션 -->
+                                <div class="border-b border-gray-200">
+                                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm" data-tab="DEFAULT">기본 상황</button>
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="CONCEPT_QUESTION">개념 질문</button>
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="EXPLORATION_DEADLOCK">탐색 교착</button>
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="FAILURE_REPORT">실패 보고</button>
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="SUCCESS_WITHOUT_PRINCIPLE">무사고 성공</button>
+                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="HYPOTHESIS_INQUIRY">가설 제시</button>
+                                    </nav>
+                                </div>
+
+                                <!-- 탭 컨텐트 -->
+                                <div class="prompt-tab-content" data-tab="DEFAULT">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">기본 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">일반적인 상황에서 사용될 AI 튜터의 기본 역할을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-DEFAULT" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="기본 프롬프트를 입력하세요..."></textarea>
+                                </div>
+
+                                <div class="prompt-tab-content hidden" data-tab="CONCEPT_QUESTION">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">개념 질문 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">학생이 "에너지가 뭐예요?", "왜 그래요?" 같은 개념 질문을 할 때의 AI 답변 방식을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-CONCEPT_QUESTION" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="개념 질문에 대한 프롬프트를 입력하세요..."></textarea>
+                                </div>
+
+                                <div class="prompt-tab-content hidden" data-tab="EXPLORATION_DEADLOCK">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">탐색 교착 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">학생이 "어떻게 해야할지 모르겠어요", "막막해요" 같이 막혔을 때의 AI 답변 방식을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-EXPLORATION_DEADLOCK" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="탐색 교착 상황에 대한 프롬프트를 입력하세요..."></textarea>
+                                </div>
+
+                                <div class="prompt-tab-content hidden" data-tab="FAILURE_REPORT">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">실패 보고 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">학생이 "구슬이 떨어졌어요", "실패했어요" 같이 실패를 보고할 때의 AI 답변 방식을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-FAILURE_REPORT" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="실패 보고 상황에 대한 프롬프트를 입력하세요..."></textarea>
+                                </div>
+
+                                <div class="prompt-tab-content hidden" data-tab="SUCCESS_WITHOUT_PRINCIPLE">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">무사고 성공 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">학생이 "성공했어요!", "됐다!" 같이 성공을 알렸지만 원리를 모를 때의 AI 답변 방식을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-SUCCESS_WITHOUT_PRINCIPLE" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="무사고 성공 상황에 대한 프롬프트를 입력하세요..."></textarea>
+                                </div>
+
+                                <div class="prompt-tab-content hidden" data-tab="HYPOTHESIS_INQUIRY">
+                                    <div class="mb-4">
+                                        <h3 class="text-md font-semibold text-gray-800 mb-2">가설 제시 상황 프롬프트</h3>
+                                        <p class="text-sm text-gray-600 mb-3">학생이 "만약 높이를 올리면?", "그래서 그런가요?" 같이 가설을 제시할 때의 AI 답변 방식을 설정합니다.</p>
+                                    </div>
+                                    <textarea id="prompt-HYPOTHESIS_INQUIRY" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="가설 제시 상황에 대한 프롬프트를 입력하세요..."></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 mt-6">
+                                    <button id="save-adaptive-prompts-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                        모든 프롬프트 저장
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- 프롬프트 미리보기 영역 -->
-                <div id="prompt-preview" class="hidden mt-6 p-4 bg-gray-50 border rounded-md">
-                    <h4 class="text-sm font-medium text-gray-800 mb-2">미리보기:</h4>
-                    <div id="prompt-preview-content" class="text-sm text-gray-700 whitespace-pre-wrap"></div>
-                </div>
-            </div>
-
-            <!-- 교사 코드 및 사용법 카드 -->
-            <div id="teacher-code-section" class="hidden">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- 교사 코드 카드 -->
-                    <div class="bg-white rounded-lg shadow-sm border p-6 card-hover">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">내 교사 코드</h3>
-                        <div class="bg-gray-50 border rounded-md p-4 mb-4">
-                            <div class="flex items-center justify-between">
-                                <code id="teacher-code-display" class="text-lg font-mono font-semibold text-blue-600"></code>
-                                <button id="copy-code-btn" class="text-gray-500 hover:text-gray-700 p-1 rounded">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    
+                    <!-- 학생 대화 분석 섹션 -->
+                    <div id="students-section" class="hidden">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">학생 대화 분석</h1>
+                            <p class="text-gray-600 mt-2">학생들의 AI 튜터 대화 기록을 확인하고 분석 결과를 볼 수 있습니다.</p>
+                        </div>
+                        
+                        <!-- 학생 세션 목록 -->
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="p-6 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-lg font-semibold text-gray-800">학생 세션 목록</h2>
+                                    <button id="refresh-sessions-btn" class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
+                                        새로고침
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div id="sessions-loading" class="text-center py-8 hidden">
+                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                    <p class="text-gray-600 mt-2">세션 목록을 불러오는 중...</p>
+                                </div>
+                                
+                                <div id="sessions-empty" class="text-center py-8 hidden">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                     </svg>
-                                </button>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">아직 학생 세션이 없습니다</h3>
+                                    <p class="mt-1 text-sm text-gray-500">학생들이 AI 튜터를 사용하면 여기에 세션이 표시됩니다.</p>
+                                </div>
+                                
+                                <div id="sessions-list" class="space-y-3">
+                                    <!-- 학생 세션 목록이 여기에 동적으로 추가됩니다 -->
+                                </div>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600">학생들에게 이 코드를 알려주세요</p>
+                        
+                        <!-- 선택된 학생의 대화 상세 -->
+                        <div id="conversation-detail" class="hidden mt-6">
+                            <div class="bg-white rounded-lg shadow-sm border">
+                                <div class="p-6 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h2 class="text-lg font-semibold text-gray-800" id="selected-student-name">학생 대화 내용</h2>
+                                            <p class="text-sm text-gray-600" id="selected-session-info">세션 정보</p>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <button id="analyze-conversation-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+                                                AI 분석 생성
+                                            </button>
+                                            <button id="close-conversation-btn" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                                                닫기
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-6 space-y-8">
+                                    <!-- 대화 기록 -->
+                                    <div>
+                                        <h3 class="text-md font-semibold text-gray-800 mb-4">대화 기록</h3>
+                                        <div id="conversation-messages" class="max-h-96 overflow-y-auto bg-gray-50 rounded-lg p-4 space-y-3">
+                                            <!-- 대화 메시지들이 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- AI 분석 결과 -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h3 class="text-md font-semibold text-gray-800">AI 분석 결과</h3>
+                                            <div class="flex items-center space-x-2" id="analysis-actions" style="display: none;">
+                                                <button id="copy-analysis-btn" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium flex items-center space-x-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    <span>복사</span>
+                                                </button>
+                                                <button id="download-analysis-btn" class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 font-medium flex items-center space-x-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                    </svg>
+                                                    <span>CSV 다운로드</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="analysis-content" class="bg-gray-50 rounded-lg p-4 min-h-32 whitespace-pre-wrap">
+                                            <p class="text-gray-600 italic">분석을 생성하려면 'AI 분석 생성' 버튼을 클릭하세요.</p>
+                                        </div>
+                                        
+                                        <div id="analysis-loading" class="hidden bg-gray-50 rounded-lg p-4 min-h-32 flex items-center justify-center">
+                                            <div class="text-center">
+                                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                                <p class="text-gray-600 mt-2">AI가 대화를 분석하고 있습니다...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 사용법 카드 -->
-                    <div class="bg-white rounded-lg shadow-sm border p-6 card-hover">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">학생 사용법 안내</h3>
-                        <div class="space-y-3 text-sm text-gray-600">
-                            <div class="flex items-start space-x-2">
-                                <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">1</span>
-                                <p>학생들에게 메인 사이트 주소를 알려주세요:<br>
-                                <a href="https://science-aichatbot.web.app" class="text-blue-600 hover:underline font-medium">science-aichatbot.web.app</a></p>
-                            </div>
-                            <div class="flex items-start space-x-2">
-                                <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">2</span>
-                                <p>챗봇 영역에서 위의 <strong>교사 코드</strong>를 입력하고 저장하게 하세요</p>
-                            </div>
-                            <div class="flex items-start space-x-2">
-                                <span class="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">3</span>
-                                <p>이제 학생들이 그래비트랙스 실험에 대해 AI 튜터와 대화할 수 있습니다!</p>
-                            </div>
-                        </div>
+                    <!-- 상태 메시지 -->
+                    <div id="status-message" class="mt-6 p-4 rounded-md hidden">
+                        <!-- 상태 메시지가 여기에 표시됩니다 -->
                     </div>
                 </div>
-            </div>
-
-            <!-- 상태 메시지 -->
-            <div id="status-message" class="mt-6 p-4 rounded-md hidden">
-                <!-- 상태 메시지가 여기에 표시됩니다 -->
-            </div>
-        </main>
+            </main>
     </div>
 
     <script type="module">
@@ -233,8 +456,12 @@
 
         // Firebase Functions
         const updateTeacherApiKey = httpsCallable(functions, 'updateTeacherApiKey');
-        const getTeacherInfo = httpsCallable(functions, 'getTeacherInfo');
-        const updateTeacherPrompt = httpsCallable(functions, 'updateTeacherPrompt');
+        const getTeacherSettings = httpsCallable(functions, 'getTeacherSettings');
+        const updateTeacherModel = httpsCallable(functions, 'updateTeacherModel');
+        const updateTeacherPrompts = httpsCallable(functions, 'updateTeacherPrompts');
+        const getStudentSessions = httpsCallable(functions, 'getStudentSessions');
+        const getStudentConversation = httpsCallable(functions, 'getStudentConversation');
+        const analyzeStudentConversations = httpsCallable(functions, 'analyzeStudentConversations');
 
         // DOM 요소들
         const loginScreen = document.getElementById('login-screen');
@@ -257,14 +484,22 @@
         const copyCodeBtn = document.getElementById('copy-code-btn');
         const statusMessage = document.getElementById('status-message');
         
-        // 프롬프트 설정 요소들
-        const promptSettingsSection = document.getElementById('prompt-settings-section');
-        const customPromptInput = document.getElementById('custom-prompt-input');
-        const savePromptBtn = document.getElementById('save-prompt-btn');
-        const previewPromptBtn = document.getElementById('preview-prompt-btn');
-        const resetPromptBtn = document.getElementById('reset-prompt-btn');
-        const promptPreview = document.getElementById('prompt-preview');
-        const promptPreviewContent = document.getElementById('prompt-preview-content');
+        // 새로운 설정 요소들
+        const modelSettingsSection = document.getElementById('model-settings-section');
+        const modelSelect = document.getElementById('model-select');
+        const saveModelBtn = document.getElementById('save-model-btn');
+        
+        const adaptivePromptSettingsSection = document.getElementById('adaptive-prompt-settings-section');
+        const saveAdaptivePromptsBtn = document.getElementById('save-adaptive-prompts-btn');
+        const resetAdaptivePromptsBtn = document.getElementById('reset-adaptive-prompts-btn');
+        
+        // 탭 버튼들
+        const promptTabBtns = document.querySelectorAll('.prompt-tab-btn');
+        const promptTabContents = document.querySelectorAll('.prompt-tab-content');
+        
+        // 전역 변수들
+        let currentSettings = null;
+        let currentTab = 'DEFAULT';
 
         // Google 로그인
         googleLoginBtn.addEventListener('click', async () => {
@@ -343,53 +578,9 @@
             }
         });
 
-        // 프롬프트 저장
-        savePromptBtn.addEventListener('click', async () => {
-            const prompt = customPromptInput.value.trim();
-            if (!prompt) {
-                showStatus('프롬프트를 입력해주세요.', 'error');
-                return;
-            }
+        // 이전 버전 프롬프트 저장 기능 삭제됨
 
-            try {
-                savePromptBtn.textContent = '저장 중...';
-                savePromptBtn.disabled = true;
-
-                await updateTeacherPrompt({ prompt });
-                
-                showStatus('프롬프트가 성공적으로 저장되었습니다!', 'success');
-                promptPreview.classList.add('hidden');
-                
-            } catch (error) {
-                console.error('프롬프트 저장 실패:', error);
-                showStatus(`저장 실패: ${error.message}`, 'error');
-            } finally {
-                savePromptBtn.textContent = '저장';
-                savePromptBtn.disabled = false;
-            }
-        });
-
-        // 프롬프트 미리보기
-        previewPromptBtn.addEventListener('click', () => {
-            const prompt = customPromptInput.value.trim();
-            if (!prompt) {
-                showStatus('먼저 프롬프트를 입력해주세요.', 'error');
-                return;
-            }
-
-            promptPreviewContent.textContent = prompt;
-            promptPreview.classList.remove('hidden');
-        });
-
-        // 프롬프트 초기화
-        resetPromptBtn.addEventListener('click', () => {
-            const defaultPrompt = "너는 친근하고 격려하는 과학 튜터야. 학생들이 그래비트랙스(GraviTrax) 실험을 통해 물리학 원리를 이해할 수 있도록 도와줘. 항상 긍정적이고 호기심을 유발하는 질문을 던져줘. 학생들의 질문에 대해 직접적인 답을 주기보다는, 스스로 생각해볼 수 있도록 힌트를 제공해줘.";
-            
-            if (confirm('프롬프트를 기본값으로 되돌리시겠습니까?')) {
-                customPromptInput.value = defaultPrompt;
-                promptPreview.classList.add('hidden');
-            }
-        });
+        // 이전 버전 프롬프트 미리보기 및 초기화 기능 삭제됨
 
         // 인증 상태 변경 감지
         onAuthStateChanged(auth, async (user) => {
@@ -414,29 +605,28 @@
             }
         });
 
-        // 교사 정보 로드
+        // 교사 설정 로드
         async function loadTeacherInfo() {
             try {
-                const result = await getTeacherInfo();
+                const result = await getTeacherSettings();
                 const data = result.data;
+                currentSettings = data;
                 
                 if (data.hasApiKey) {
                     // API 키가 등록됨
                     apiSetupForm.classList.add('hidden');
                     apiConfigured.classList.remove('hidden');
                     teacherCodeSection.classList.remove('hidden');
-                    promptSettingsSection.classList.remove('hidden');
+                    modelSettingsSection.classList.remove('hidden');
+                    adaptivePromptSettingsSection.classList.remove('hidden');
                     
                     teacherCodeDisplay.textContent = data.teacherCode;
                     
-                    // 기존 프롬프트 데이터 로드
-                    if (data.customPrompt) {
-                        customPromptInput.value = data.customPrompt;
-                    } else {
-                        // 기본 프롬프트 설정
-                        const defaultPrompt = "너는 친근하고 격려하는 과학 튜터야. 학생들이 그래비트랙스(GraviTrax) 실험을 통해 물리학 원리를 이해할 수 있도록 도와줘. 항상 긍정적이고 호기심을 유발하는 질문을 던져줘. 학생들의 질문에 대해 직접적인 답을 주기보다는, 스스로 생각해볼 수 있도록 힌트를 제공해줘.";
-                        customPromptInput.value = defaultPrompt;
-                    }
+                    // 모델 선택 박스 설정
+                    modelSelect.value = data.modelName || 'gemini-2.0-flash-exp';
+                    
+                    // 유형별 프롬프트 로드
+                    loadPromptTabs(data.customPrompts, data.defaultPrompts);
                     
                     apiStatus.textContent = 'API 연결됨';
                     apiStatus.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700';
@@ -447,7 +637,8 @@
                     apiSetupForm.classList.remove('hidden');
                     apiConfigured.classList.add('hidden');
                     teacherCodeSection.classList.add('hidden');
-                    promptSettingsSection.classList.add('hidden');
+                    modelSettingsSection.classList.add('hidden');
+                    adaptivePromptSettingsSection.classList.add('hidden');
                     
                     apiStatus.textContent = 'API 미설정';
                     apiStatus.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700';
@@ -459,6 +650,117 @@
                 showStatus('정보를 불러오는데 실패했습니다.', 'error');
             }
         }
+        
+        // 탭 버튼 이벤트 리스너
+        promptTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.dataset.tab);
+            });
+        });
+        
+        // 탭 전환
+        function switchTab(tabId) {
+            currentTab = tabId;
+            
+            // 탭 버튼 스타일 업데이트
+            promptTabBtns.forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.className = 'prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm';
+                } else {
+                    btn.className = 'prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm';
+                }
+            });
+            
+            // 탭 컨텐트 보이기/숨기기
+            promptTabContents.forEach(content => {
+                if (content.dataset.tab === tabId) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+        }
+        
+        // 프롬프트 탭 로드
+        function loadPromptTabs(customPrompts, defaultPrompts) {
+            const promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+            
+            promptTypes.forEach(type => {
+                const textarea = document.getElementById(`prompt-${type}`);
+                if (textarea) {
+                    const customPrompt = customPrompts[type];
+                    const defaultPrompt = defaultPrompts[type];
+                    textarea.value = customPrompt || defaultPrompt || '';
+                }
+            });
+        }
+        
+        // AI 모델 저장
+        saveModelBtn.addEventListener('click', async () => {
+            const selectedModel = modelSelect.value;
+            if (!selectedModel) {
+                showStatus('모델을 선택해주세요.', 'error');
+                return;
+            }
+        
+            try {
+                saveModelBtn.textContent = '저장 중...';
+                saveModelBtn.disabled = true;
+        
+                await updateTeacherModel({ modelName: selectedModel });
+                
+                showStatus(`AI 모델이 ${selectedModel}로 업데이트되었습니다!`, 'success');
+                
+            } catch (error) {
+                console.error('모델 저장 실패:', error);
+                showStatus(`저장 실패: ${error.message}`, 'error');
+            } finally {
+                saveModelBtn.textContent = '모델 저장';
+                saveModelBtn.disabled = false;
+            }
+        });
+        
+        // 유형별 프롬프트 저장
+        saveAdaptivePromptsBtn.addEventListener('click', async () => {
+            const promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+            const prompts = {};
+            
+            // 모든 프롬프트 수집
+            for (const type of promptTypes) {
+                const textarea = document.getElementById(`prompt-${type}`);
+                if (textarea && textarea.value.trim()) {
+                    prompts[type] = textarea.value.trim();
+                }
+            }
+            
+            try {
+                saveAdaptivePromptsBtn.textContent = '저장 중...';
+                saveAdaptivePromptsBtn.disabled = true;
+        
+                await updateTeacherPrompts({ prompts });
+                
+                showStatus('모든 프롬프트가 성공적으로 저장되었습니다!', 'success');
+                
+            } catch (error) {
+                console.error('유형별 프롬프트 저장 실패:', error);
+                showStatus(`저장 실패: ${error.message}`, 'error');
+            } finally {
+                saveAdaptivePromptsBtn.textContent = '모든 프롬프트 저장';
+                saveAdaptivePromptsBtn.disabled = false;
+            }
+        });
+        
+        // 유형별 프롬프트 초기화
+        resetAdaptivePromptsBtn.addEventListener('click', () => {
+            if (!confirm('모든 프롬프트를 기본값으로 되돌리시겠습니까?')) {
+                return;
+            }
+            
+            if (currentSettings && currentSettings.defaultPrompts) {
+                loadPromptTabs({}, currentSettings.defaultPrompts);
+                showStatus('모든 프롬프트가 기본값으로 되돌리경습니다.', 'info');
+            }
+        });
 
         // 상태 메시지 표시
         function showStatus(message, type, duration = 5000) {
@@ -483,6 +785,439 @@
                     return 'bg-gray-100 text-gray-800 border border-gray-300';
             }
         }
+        
+        // === SPA 네비게이션 기능 ===
+        
+        // 네비게이션 요소들
+        const navItems = document.querySelectorAll('.nav-item');
+        const settingsSection = document.getElementById('settings-section');
+        const promptsSection = document.getElementById('prompts-section');
+        const studentsSection = document.getElementById('students-section');
+        
+        // 현재 활성 섹션
+        let currentSection = 'settings';
+        
+        // 네비게이션 클릭 이벤트
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.dataset.section;
+                switchSection(section);
+            });
+        });
+        
+        // 섹션 전환 함수
+        function switchSection(sectionName) {
+            currentSection = sectionName;
+            
+            // 네비게이션 버튼 활성화 상태 업데이트
+            navItems.forEach(item => {
+                if (item.dataset.section === sectionName) {
+                    item.classList.add('active');
+                    item.classList.add('bg-blue-50', 'text-blue-600');
+                } else {
+                    item.classList.remove('active');
+                    item.classList.remove('bg-blue-50', 'text-blue-600');
+                }
+            });
+            
+            // 섹션 보이기/숨기기
+            settingsSection.classList.add('hidden');
+            promptsSection.classList.add('hidden');
+            studentsSection.classList.add('hidden');
+            
+            switch (sectionName) {
+                case 'settings':
+                    settingsSection.classList.remove('hidden');
+                    break;
+                case 'prompts':
+                    promptsSection.classList.remove('hidden');
+                    // 프롬프트 섹션에서 adaptivePromptSettingsSection을 표시
+                    if (currentSettings && currentSettings.hasApiKey) {
+                        adaptivePromptSettingsSection.classList.remove('hidden');
+                    }
+                    break;
+                case 'students':
+                    studentsSection.classList.remove('hidden');
+                    if (currentSettings && currentSettings.hasApiKey) {
+                        loadStudentSessions();
+                    }
+                    break;
+            }
+        }
+        
+        // === 학생 분석 기능 ===
+        
+        // 학생 분석 관련 요소들
+        const refreshSessionsBtn = document.getElementById('refresh-sessions-btn');
+        const sessionsLoading = document.getElementById('sessions-loading');
+        const sessionsEmpty = document.getElementById('sessions-empty');
+        const sessionsList = document.getElementById('sessions-list');
+        const conversationDetail = document.getElementById('conversation-detail');
+        const selectedStudentName = document.getElementById('selected-student-name');
+        const selectedSessionInfo = document.getElementById('selected-session-info');
+        const conversationMessages = document.getElementById('conversation-messages');
+        const analysisContent = document.getElementById('analysis-content');
+        const analysisLoading = document.getElementById('analysis-loading');
+        const analyzeConversationBtn = document.getElementById('analyze-conversation-btn');
+        const closeConversationBtn = document.getElementById('close-conversation-btn');
+        
+        // 현재 선택된 세션 정보
+        let currentSelectedSession = null;
+        
+        // 새로고침 버튼 이벤트
+        refreshSessionsBtn.addEventListener('click', () => {
+            loadStudentSessions();
+        });
+        
+        // 대화 닫기 버튼 이벤트
+        closeConversationBtn.addEventListener('click', () => {
+            conversationDetail.classList.add('hidden');
+            currentSelectedSession = null;
+        });
+        
+        // 분석 결과 복사/다운로드 버튼
+        const copyAnalysisBtn = document.getElementById('copy-analysis-btn');
+        const downloadAnalysisBtn = document.getElementById('download-analysis-btn');
+        const analysisActions = document.getElementById('analysis-actions');
+        
+        // 전역 변수로 분석 데이터 저장
+        let currentAnalysisData = null;
+
+        // AI 분석 생성 버튼 이벤트
+        analyzeConversationBtn.addEventListener('click', async () => {
+            if (!currentSelectedSession) return;
+            
+            try {
+                analysisContent.classList.add('hidden');
+                analysisLoading.classList.remove('hidden');
+                analyzeConversationBtn.disabled = true;
+                analysisActions.style.display = 'none';
+                
+                const result = await analyzeStudentConversations({
+                    sessionId: currentSelectedSession.sessionId
+                });
+                
+                // 분석 데이터 저장 (기존 분석인지 확인)
+                const generatedTime = result.data.isExistingAnalysis && result.data.generatedAt
+                    ? new Date(result.data.generatedAt).toLocaleString('ko-KR')
+                    : new Date().toLocaleString('ko-KR');
+                
+                currentAnalysisData = {
+                    analysis: result.data.analysis,
+                    sessionInfo: result.data.sessionInfo,
+                    generatedAt: generatedTime,
+                    isExistingAnalysis: result.data.isExistingAnalysis || false
+                };
+                
+                // 분석 결과 표시 (마크다운 없이 순수 텍스트로)
+                analysisContent.textContent = result.data.analysis;
+                
+                // 기존 분석인 경우 사용자에게 알림
+                if (result.data.isExistingAnalysis) {
+                    showStatus(`기존 분석 결과를 불러왔습니다. (생성일시: ${generatedTime})`, 'info');
+                } else {
+                    showStatus('새로운 AI 분석이 생성되었습니다!', 'success');
+                }
+                
+                analysisLoading.classList.add('hidden');
+                analysisContent.classList.remove('hidden');
+                analysisActions.style.display = 'flex';
+                
+            } catch (error) {
+                console.error('분석 생성 실패:', error);
+                showStatus(`분석 생성 실패: ${error.message}`, 'error');
+                
+                analysisLoading.classList.add('hidden');
+                analysisContent.classList.remove('hidden');
+            } finally {
+                analyzeConversationBtn.disabled = false;
+            }
+        });
+        
+        // 분석 결과 복사 버튼 이벤트
+        copyAnalysisBtn.addEventListener('click', async () => {
+            if (!currentAnalysisData) {
+                showStatus('복사할 분석 결과가 없습니다.', 'error');
+                return;
+            }
+            
+            try {
+                const textToCopy = `${currentAnalysisData.sessionInfo.studentName} 학생 영재성 평가 분석 (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
+                
+                await navigator.clipboard.writeText(textToCopy);
+                showStatus('분석 결과가 클립보드에 복사되었습니다!', 'success');
+            } catch (error) {
+                // 클립보드 API가 지원되지 않는 경우
+                const textArea = document.createElement('textarea');
+                textArea.value = `${currentAnalysisData.sessionInfo.studentName} 학생 영재성 평가 분석 (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showStatus('분석 결과가 클립보드에 복사되었습니다!', 'success');
+            }
+        });
+        
+        // CSV 다운로드 버튼 이벤트
+        downloadAnalysisBtn.addEventListener('click', () => {
+            if (!currentAnalysisData) {
+                showStatus('다운로드할 분석 결과가 없습니다.', 'error');
+                return;
+            }
+            
+            try {
+                // CSV 형식으로 데이터 변환
+                const csvData = convertAnalysisToCSV(currentAnalysisData);
+                
+                // Blob 생성 및 다운로드
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `${currentAnalysisData.sessionInfo.studentName}_영재성평가_${new Date().toISOString().slice(0, 10)}.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('CSV 파일이 다운로드되었습니다!', 'success');
+                
+            } catch (error) {
+                console.error('CSV 다운로드 오류:', error);
+                showStatus('CSV 다운로드 중 오류가 발생했습니다.', 'error');
+            }
+        });
+        
+        // 분석 결과를 CSV 형식으로 변환하는 함수
+        function convertAnalysisToCSV(analysisData) {
+            const { analysis, sessionInfo, generatedAt } = analysisData;
+            
+            // CSV 헤더
+            const headers = [
+                '학생명',
+                '세션ID',
+                '대화횟수',
+                '응답유형',
+                '분석생성시각',
+                '분석내용'
+            ];
+            
+            // CSV 데이터 행
+            const row = [
+                escapeCSVValue(sessionInfo.studentName),
+                escapeCSVValue(sessionInfo.sessionId),
+                sessionInfo.conversationCount,
+                escapeCSVValue(sessionInfo.responseTypes.join(', ')),
+                escapeCSVValue(generatedAt),
+                escapeCSVValue(analysis)
+            ];
+            
+            // CSV 문자열 생성
+            const csvContent = [headers.join(','), row.join(',')].join('\n');
+            
+            // BOM 추가로 한글 깨짐 방지
+            return '\uFEFF' + csvContent;
+        }
+        
+        // CSV 값 이스케이프 함수
+        function escapeCSVValue(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            
+            const stringValue = String(value);
+            
+            // 콤마, 따옴표, 줄바꿈이 포함된 경우 따옴표로 감싸고 내부 따옴표를 이스케이프
+            if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                return '"' + stringValue.replace(/"/g, '""') + '"';
+            }
+            
+            return stringValue;
+        }
+        
+        // 학생 세션 목록 로드
+        async function loadStudentSessions() {
+            try {
+                sessionsLoading.classList.remove('hidden');
+                sessionsEmpty.classList.add('hidden');
+                sessionsList.innerHTML = '';
+                
+                const result = await getStudentSessions();
+                const sessions = result.data.sessions || [];
+                
+                sessionsLoading.classList.add('hidden');
+                
+                if (sessions.length === 0) {
+                    sessionsEmpty.classList.remove('hidden');
+                    return;
+                }
+                
+                // 세션 목록 렌더링
+                sessions.forEach(session => {
+                    const sessionElement = createSessionElement(session);
+                    sessionsList.appendChild(sessionElement);
+                });
+                
+            } catch (error) {
+                console.error('세션 목록 로드 실패:', error);
+                showStatus('학생 세션 목록을 불러오는데 실패했습니다.', 'error');
+                sessionsLoading.classList.add('hidden');
+                sessionsEmpty.classList.remove('hidden');
+            }
+        }
+        
+        // 세션 요소 생성
+        function createSessionElement(session) {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-50 rounded-lg p-4 hover:bg-gray-100 cursor-pointer transition-colors';
+            
+            // 날짜 처리 개선
+            let lastActive = '시간 정보 없음';
+            if (session.lastActive) {
+                try {
+                    const date = new Date(session.lastActive);
+                    if (!isNaN(date.getTime())) {
+                        lastActive = date.toLocaleString('ko-KR');
+                    }
+                } catch (error) {
+                    console.log('날짜 파싱 오류:', error);
+                }
+            }
+            
+            const messageCount = session.messageCount || 0;
+            
+            div.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">${session.studentName}</h4>
+                        <p class="text-sm text-gray-600">마지막 활동: ${lastActive}</p>
+                        <p class="text-sm text-gray-500">대화 메시지 수: ${messageCount}개</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </div>
+            `;
+            
+            // 클릭 이벤트 추가
+            div.addEventListener('click', () => {
+                loadStudentConversation(session);
+            });
+            
+            return div;
+        }
+        
+        // 학생 대화 상세 로드
+        async function loadStudentConversation(session) {
+            try {
+                currentSelectedSession = session;
+                
+                // 세션 정보 표시
+                selectedStudentName.textContent = `${session.studentName}의 대화`;
+                
+                // 날짜 처리 개선
+                let lastActiveText = '시간 정보 없음';
+                if (session.lastActive) {
+                    try {
+                        const date = new Date(session.lastActive);
+                        if (!isNaN(date.getTime())) {
+                            lastActiveText = date.toLocaleString('ko-KR');
+                        }
+                    } catch (error) {
+                        console.log('날짜 파싱 오류:', error);
+                    }
+                }
+                
+                selectedSessionInfo.textContent = `마지막 활동: ${lastActiveText}`;
+                
+                // 대화 내용 로드 중 표시
+                conversationMessages.innerHTML = '<p class="text-gray-600 text-center py-4">대화 내용을 불러오는 중...</p>';
+                analysisContent.innerHTML = '<p class="text-gray-600 italic">분석을 생성하려면 \'AI 분석 생성\' 버튼을 클릭하세요.</p>';
+                
+                conversationDetail.classList.remove('hidden');
+                
+                // 대화 내용 로드
+                const result = await getStudentConversation({
+                    sessionId: session.sessionId
+                });
+                
+                const conversations = result.data.conversations || [];
+                
+                // 대화 메시지 렌더링
+                conversationMessages.innerHTML = '';
+                
+                if (conversations.length === 0) {
+                    conversationMessages.innerHTML = '<p class="text-gray-600 text-center py-4">아직 대화가 없습니다.</p>';
+                    return;
+                }
+                
+                conversations.forEach(conv => {
+                    const messageElement = createMessageElement(conv);
+                    conversationMessages.appendChild(messageElement);
+                });
+                
+            } catch (error) {
+                console.error('대화 내용 로드 실패:', error);
+                showStatus('대화 내용을 불러오는데 실패했습니다.', 'error');
+                conversationMessages.innerHTML = '<p class="text-red-600 text-center py-4">대화 내용을 불러올 수 없습니다.</p>';
+            }
+        }
+        
+        // 메시지 요소 생성
+        function createMessageElement(conversation) {
+            const div = document.createElement('div');
+            div.className = 'space-y-2';
+            
+            // 메시지 타임스탬프 처리 개선
+            let timestamp = '시간 정보 없음';
+            if (conversation.timestamp) {
+                try {
+                    const date = new Date(conversation.timestamp);
+                    if (!isNaN(date.getTime())) {
+                        timestamp = date.toLocaleString('ko-KR');
+                    }
+                } catch (error) {
+                    console.log('메시지 날짜 파싱 오류:', error);
+                }
+            }
+            
+            div.innerHTML = `
+                <!-- 학생 메시지 -->
+                <div class="flex justify-end">
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 bg-blue-500 text-white rounded-lg">
+                        <p class="text-sm">${conversation.userMessage}</p>
+                        <p class="text-xs text-blue-100 mt-1">${timestamp}</p>
+                    </div>
+                </div>
+                
+                <!-- AI 응답 -->
+                <div class="flex justify-start">
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 bg-gray-200 text-gray-800 rounded-lg">
+                        <p class="text-sm whitespace-pre-wrap">${conversation.aiResponse}</p>
+                        ${conversation.responseType ? `<p class="text-xs text-gray-600 mt-1">응답 유형: ${conversation.responseType}</p>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        // 기존 loadTeacherInfo 함수 수정하여 섹션별 UI 업데이트
+        const originalLoadTeacherInfo = loadTeacherInfo;
+        loadTeacherInfo = async function() {
+            await originalLoadTeacherInfo();
+            
+            // 현재 섹션에 따라 UI 업데이트
+            if (currentSection === 'prompts') {
+                if (currentSettings && currentSettings.hasApiKey) {
+                    adaptivePromptSettingsSection.classList.remove('hidden');
+                }
+            }
+        };
     </script>
 </body>
 </html>

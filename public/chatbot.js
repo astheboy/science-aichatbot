@@ -7,9 +7,15 @@ const typingIndicator = document.getElementById('typing-indicator');
 const teacherCodeInput = document.getElementById('teacher-code-input');
 const saveTeacherCodeBtn = document.getElementById('save-teacher-code-btn');
 const teacherCodeStatus = document.getElementById('teacher-code-status');
+const studentNameSection = document.getElementById('student-name-section');
+const studentNameInput = document.getElementById('student-name-input');
+const saveStudentNameBtn = document.getElementById('save-student-name-btn');
+const studentNameStatus = document.getElementById('student-name-status');
 
 let conversationHistory = [];
 let teacherCode = '';
+let studentName = '';
+let sessionId = '';
 
 const intentPatterns = {
     Concept_Question: new RegExp('뭐예요|뭔가요|궁금|알려줘|설명|위치에너지|운동에너지|개념|원리'),
@@ -21,9 +27,11 @@ const intentPatterns = {
 
 export function initChatbot() {
     saveTeacherCodeBtn.addEventListener('click', saveTeacherCode);
+    saveStudentNameBtn.addEventListener('click', saveStudentName);
     chatForm.addEventListener('submit', handleChatSubmit);
 
     initializeTutorState();
+    initializeStudentNameState();
 }
 
 function initializeTutorState() {
@@ -55,6 +63,15 @@ function saveTeacherCode() {
         saveTeacherCodeBtn.textContent = '저장';
         teacherCodeStatus.textContent = '새로운 교사 코드를 입력하고 저장해주세요.';
         teacherCodeStatus.className = 'text-xs text-center text-gray-500';
+        // Reset student name section when changing teacher code
+        studentName = '';
+        sessionId = '';
+        localStorage.removeItem(`studentName_${teacherCode}`);
+        studentNameInput.value = '';
+        studentNameInput.disabled = true; // Disable when no teacher code
+        saveStudentNameBtn.textContent = '저장';
+        studentNameStatus.textContent = '교사 코드 저장 후 이름을 입력하세요.';
+        studentNameStatus.className = 'text-xs text-center text-gray-400';
         return;
     }
 
@@ -64,8 +81,65 @@ function saveTeacherCode() {
         teacherCode = code;
         alert('교사 코드가 저장되었습니다.');
         initializeTutorState();
+        // Enable and update student name section after teacher code is saved
+        initializeStudentNameState();
     } else {
         alert('교사 코드를 입력해주세요.');
+    }
+}
+
+function initializeStudentNameState() {
+    // Always show student name section
+    studentNameSection.classList.remove('hidden');
+    
+    if (teacherCode) {
+        studentName = localStorage.getItem(`studentName_${teacherCode}`);
+        if (studentName) {
+            studentNameInput.value = studentName;
+            studentNameInput.disabled = true;
+            saveStudentNameBtn.textContent = '변경';
+            studentNameStatus.textContent = `안녕하세요, ${studentName}님! 학습 기록이 저장됩니다.`;
+            studentNameStatus.className = 'text-xs text-center text-green-600';
+            generateSessionId();
+        } else {
+            studentNameInput.disabled = false; // Enable input when teacher code exists
+            saveStudentNameBtn.textContent = '저장';
+            studentNameStatus.textContent = '학습 기록을 위해 이름을 입력해주세요.';
+            studentNameStatus.className = 'text-xs text-center text-gray-500';
+        }
+    } else {
+        saveStudentNameBtn.textContent = '저장';
+        studentNameStatus.textContent = '교사 코드 저장 후 이름을 입력하세요.';
+        studentNameStatus.className = 'text-xs text-center text-gray-400';
+        studentNameInput.disabled = true; // Disable until teacher code is entered
+    }
+}
+
+function saveStudentName() {
+    if (saveStudentNameBtn.textContent === '변경') {
+        studentNameInput.disabled = false;
+        studentNameInput.value = '';
+        studentNameInput.focus();
+        saveStudentNameBtn.textContent = '저장';
+        studentNameStatus.textContent = '새로운 이름을 입력하고 저장해주세요.';
+        studentNameStatus.className = 'text-xs text-center text-gray-500';
+        return;
+    }
+
+    const name = studentNameInput.value.trim();
+    if (name) {
+        localStorage.setItem(`studentName_${teacherCode}`, name);
+        studentName = name;
+        alert('이름이 저장되었습니다. 이제 대화 기록이 저장됩니다!');
+        initializeStudentNameState();
+    } else {
+        alert('이름을 입력해주세요.');
+    }
+}
+
+function generateSessionId() {
+    if (!sessionId) {
+        sessionId = `${teacherCode}_${studentName}_${Date.now()}`;
     }
 }
 
@@ -87,7 +161,19 @@ async function handleChatSubmit(e) {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 
     try {
-        const aiResponseText = await callGeminiApi(teacherCode, userInput, conversationHistory);
+        const apiData = {
+            teacherCode: teacherCode,
+            userMessage: userInput,
+            conversationHistory: conversationHistory
+        };
+        
+        // 학생 이름과 세션 ID가 있으면 추가
+        if (studentName && sessionId) {
+            apiData.studentName = studentName;
+            apiData.sessionId = sessionId;
+        }
+        
+        const aiResponseText = await callGeminiApi(apiData);
         displayAiMessage(aiResponseText);
         conversationHistory.push({ role: 'model', parts: [{ text: aiResponseText }] });
     } catch (error) {
@@ -172,7 +258,7 @@ ${turn.parts[0].text}`;
         generationConfig: {
             "temperature": 0.7,
             "topP": 0.9,
-            "maxOutputTokens": 150
+            "maxOutputTokens": 300
         }
     };
     return promptObject;
