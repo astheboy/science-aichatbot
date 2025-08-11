@@ -1,0 +1,45 @@
+# Firebase
+.firebase/
+.firebaserc
+firebase.json
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Firebase private key
+functions/serviceAccountKey.json
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Firebase Functions
+functions/lib/
+functions/.runtimeconfig.json
+
+# Build outputs
+dist/
+build/

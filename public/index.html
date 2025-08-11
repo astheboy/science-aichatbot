@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그래비트랙스 에너지 탐험</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="min-h-screen flex flex-col lg:flex-row">
+        
+        <!-- Main Content -->
+        <main class="w-full lg:w-3/5 xl:w-2/3 p-6 sm:p-8 lg:p-12 lg:overflow-y-auto" style="height: 100vh;">
+            <div class="max-w-4xl mx-auto">
+                <header class="mb-12 text-center">
+                    <div class="inline-block bg-blue-500 text-white rounded-full px-4 py-1 text-sm font-bold mb-4">
+                        에너지 탐험 시리즈
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
+                        그래비트랙스 에너지 탐험
+                    </h1>
+                    <p class="text-2xl sm:text-3xl text-blue-600 mt-2">위치에너지가 운동에너지로!</p>
+                </header>
+
+                <div class="space-y-12">
+                    
+                    <!-- Learning Objectives -->
+                    <section id="learning-objectives" class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center text-gray-800">
+                            <i data-lucide="target" class="w-7 h-7 mr-3 text-blue-500"></i>
+                            오늘의 학습 목표
+                        </h2>
+                        <ul class="space-y-4 text-lg">
+                            <!-- JS will populate this -->
+                        </ul>
+                    </section>
+
+                    <!-- Track Guide -->
+                    <section class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="bg-white p-8 rounded-2xl shadow-lg h-full border border-gray-100">
+                             <h2 class="text-2xl font-bold mb-4 flex items-center text-gray-800">
+                                <i data-lucide="blocks" class="w-7 h-7 mr-3 text-green-500"></i>
+                                기본 트랙 만들기
+                            </h2>
+                            <p class="mb-4 text-gray-600">
+                                '변인 통제' 학습을 위해, 먼저 아래 그림처럼 기본 트랙을 만들어 보세요. 모든 탐험의 출발점이에요!
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                <li>시작 타일 1개</li>
+                                <li>직선 트랙 3개</li>
+                                <li>기둥 타일 6개</li>
+                                <li>기본 받침대 1개</li>
+                            </ul>
+                        </div>
+                        <div class="rounded-2xl overflow-hidden shadow-lg">
+                            <img src="https://r2.flowith.net/files/o/1754873463363-gravitrax_basic_track_realistic_photo_index_1@1024x1024.png" alt="그래비트랙스 기본 트랙 예시" class="w-full h-full object-cover">
+                        </div>
+                    </section>
+
+                    <!-- Energy Principle -->
+                    <section class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center text-gray-800">
+                            <i data-lucide="bar-chart-3" class="w-7 h-7 mr-3 text-yellow-500"></i>
+                            에너지 전환의 원리
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <p class="md:w-1/2 text-gray-600 text-lg">
+                                높은 곳에 있는 구슬은 '위치에너지'를 가져요. 이 구슬이 굴러 내려오면, 위치에너지는 움직이는 에너지인 '운동에너지'로 변신해요! 출발 높이가 높을수록 더 많은 위치에너지가 운동에너지로 바뀌어서, 구슬은 더 빠르고 강력해진답니다.
+                            </p>
+                            <div class="md:w-1/2">
+                                 <img src="https://r2.flowith.net/files/o/1754873562300-energy_transformation_diagram_for_gifted_elementary_students_index_0@1024x1024.png" alt="에너지 전환 원리 다이어그램" class="w-full rounded-lg">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Deeper Inquiry -->
+                    <section id="inquiry-questions" class="bg-blue-50 p-8 rounded-2xl border-2 border-blue-200">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center text-gray-800">
+                            <i data-lucide="sparkles" class="w-7 h-7 mr-3 text-blue-500"></i>
+                            심화 탐구 질문
+                        </h2>
+                        <ul class="space-y-4 text-lg list-none">
+                            <!-- JS will populate this -->
+                        </ul>
+                    </section>
+                </div>
+                <footer class="text-center mt-12 text-gray-400">
+                    <p>Neo's Digital Lab | Gifted Education Prototype</p>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <a href="/teacher.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <span>교사용 페이지</span>
+                        </a>
+                    </div>
+                </footer>
+            </div>
+        </main>
+        
+        <!-- AI Tutor Chatbot -->
+        <aside class="w-full lg:w-2/5 xl:w-1/3 bg-white border-l border-gray-200 flex flex-col" style="height: 100vh;">
+            <div class="p-4 border-b border-gray-200 bg-gray-50 space-y-3">
+                <div class="flex items-center justify-center">
+                    <i data-lucide="bot" class="w-6 h-6 mr-3 text-blue-600"></i>
+                    <h2 class="text-xl font-bold text-gray-800">AI 튜터 'G-Tutor'</h2>
+                </div>
+                <div id="teacher-code-section" class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="teacher-code-input" placeholder="교사 코드를 입력하세요 (예: class2024)" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                        <button id="save-teacher-code-btn" class="bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 text-sm font-semibold transition-colors flex-shrink-0">저장</button>
+                    </div>
+                    <p id="teacher-code-status" class="text-xs text-center text-gray-500">G-Tutor와 대화하려면 교사 코드가 필요해요.</p>
+                </div>
+            </div>
+            <div id="chat-window" class="flex-1 p-6 overflow-y-auto">
+                <!-- Chat messages will be appended here -->
+            </div>
+             <div id="typing-indicator" class="px-6 py-2 text-gray-500" style="display: none;">
+                G-Tutor가 생각 중...
+            </div>
+            <div class="p-4 border-t border-gray-200 bg-white">
+                <form id="chat-form" class="flex items-center space-x-3">
+                    <input type="text" id="chat-input" placeholder="여기에 질문을 입력하세요..." class="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                    <button type="submit" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform transform active:scale-95">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+    </div>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

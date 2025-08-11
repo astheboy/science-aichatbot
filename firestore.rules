@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // teacher_keys 컬렉션은 서버측 함수만 접근 가능
+    match /teacher_keys/{document} {
+      allow read, write: if false; // 클라이언트 접근 차단
+    }
+    
+    // 다른 모든 문서는 읽기만 허용 (필요에 따라 수정)
+    match /{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
