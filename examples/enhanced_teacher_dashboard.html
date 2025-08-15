@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교사 대시보드 - 범용 AI 교육 플랫폼</title>
+    <link type="text/css" rel="stylesheet" href="/css/style.css?v=2.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-chalkboard-teacher"></i> AI 교육 튜터 관리</h1>
+            <div class="header-actions">
+                <span id="user-email" class="user-info"></span>
+                <button id="logout-btn" class="btn btn-secondary">로그아웃</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- 과목 및 교육 맥락 설정 카드 -->
+            <div class="card">
+                <h2><i class="fas fa-book"></i> 과목 및 교육 맥락 설정</h2>
+                
+                <div class="subject-selection-container">
+                    <div class="form-group">
+                        <label for="subject-select">과목 선택:</label>
+                        <select id="subject-select" class="form-input">
+                            <option value="science">과학</option>
+                            <option value="math">수학</option>
+                            <option value="art">미술</option>
+                            <option value="language">국어</option>
+                            <option value="history">사회/역사</option>
+                            <option value="english">영어</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="topic-input">세부 주제:</label>
+                        <input type="text" id="topic-input" class="form-input" 
+                               placeholder="예: 그래비트랙스, 분수 계산, 수채화 등">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="grade-input">학급:</label>
+                        <input type="text" id="grade-input" class="form-input" 
+                               placeholder="예: 초등 5학년, 중학교 2학년">
+                    </div>
+                </div>
+
+                <div class="learning-context-container">
+                    <h3>학습 맥락 상세 설정</h3>
+                    <div class="form-group">
+                        <label for="current-phase">수업 단계:</label>
+                        <input type="text" id="current-phase" class="form-input" 
+                               placeholder="예: 도입, 전개, 정리">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="current-mission">현재 활동:</label>
+                        <input type="text" id="current-mission" class="form-input" 
+                               placeholder="예: 탐구 실험, 문제 해결, 작품 감상">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target-concept">목표 개념:</label>
+                        <input type="text" id="target-concept" class="form-input" 
+                               placeholder="예: 에너지 전환, 확률 개념, 색채 조화">
+                    </div>
+                </div>
+
+                <div class="template-actions">
+                    <button id="load-template-btn" class="btn btn-primary">
+                        <i class="fas fa-download"></i> 과목별 기본 템플릿 불러오기
+                    </button>
+                    <button id="save-settings-btn" class="btn btn-success">
+                        <i class="fas fa-save"></i> 설정 저장
+                    </button>
+                </div>
+            </div>
+
+            <!-- 프롬프트 관리 카드 -->
+            <div class="card">
+                <h2><i class="fas fa-comments"></i> AI 튜터 프롬프트 관리</h2>
+                
+                <div class="prompt-management-tabs">
+                    <div class="tab-headers">
+                        <button class="tab-header active" data-tab="default">기본 응답</button>
+                        <button class="tab-header" data-tab="concept">개념 질문</button>
+                        <button class="tab-header" data-tab="deadlock">탐색 교착</button>
+                        <button class="tab-header" data-tab="failure">실패 보고</button>
+                        <button class="tab-header" data-tab="success">성공 보고</button>
+                        <button class="tab-header" data-tab="hypothesis">가설 제시</button>
+                    </div>
+
+                    <div class="tab-contents">
+                        <div class="tab-content active" data-tab="default">
+                            <h4>기본 응답 프롬프트 (DEFAULT)</h4>
+                            <textarea id="prompt-default" class="prompt-textarea" rows="6"
+                                placeholder="학생이 일반적인 대화를 할 때의 AI 응답 스타일을 설정하세요..."></textarea>
+                        </div>
+                        
+                        <div class="tab-content" data-tab="concept">
+                            <h4>개념 질문 프롬프트 (CONCEPT_QUESTION)</h4>
+                            <p class="prompt-description">학생이 "이게 뭐에요?", "왜 그래요?" 같은 개념 질문을 할 때</p>
+                            <textarea id="prompt-concept-question" class="prompt-textarea" rows="6"
+                                placeholder="개념을 설명할 때의 접근 방식을 설정하세요..."></textarea>
+                        </div>
+                        
+                        <div class="tab-content" data-tab="deadlock">
+                            <h4>탐색 교착 프롬프트 (EXPLORATION_DEADLOCK)</h4>
+                            <p class="prompt-description">학생이 "모르겠어요", "막막해요" 같이 막힐 때</p>
+                            <textarea id="prompt-exploration-deadlock" class="prompt-textarea" rows="6"
+                                placeholder="학생이 막힐 때 도움을 주는 방식을 설정하세요..."></textarea>
+                        </div>
+                        
+                        <div class="tab-content" data-tab="failure">
+                            <h4>실패 보고 프롬프트 (FAILURE_REPORT)</h4>
+                            <p class="prompt-description">학생이 "틀렸어요", "실패했어요" 같이 실패를 보고할 때</p>
+                            <textarea id="prompt-failure-report" class="prompt-textarea" rows="6"
+                                placeholder="실패 상황에서 격려하고 학습으로 연결하는 방식을 설정하세요..."></textarea>
+                        </div>
+                        
+                        <div class="tab-content" data-tab="success">
+                            <h4>성공 보고 프롬프트 (SUCCESS_WITHOUT_PRINCIPLE)</h4>
+                            <p class="prompt-description">학생이 "됐어요!", "성공했어요!" 같이 성공을 보고할 때</p>
+                            <textarea id="prompt-success-without-principle" class="prompt-textarea" rows="6"
+                                placeholder="성공을 원리 이해로 연결하는 방식을 설정하세요..."></textarea>
+                        </div>
+                        
+                        <div class="tab-content" data-tab="hypothesis">
+                            <h4>가설 제시 프롬프트 (HYPOTHESIS_INQUIRY)</h4>
+                            <p class="prompt-description">학생이 "만약 이렇게 하면..." 같은 가설을 제시할 때</p>
+                            <textarea id="prompt-hypothesis-inquiry" class="prompt-textarea" rows="6"
+                                placeholder="학생의 가설을 격려하고 탐구를 심화하는 방식을 설정하세요..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prompt-actions">
+                    <button id="reset-prompts-btn" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> 기본값으로 초기화
+                    </button>
+                    <button id="preview-prompts-btn" class="btn btn-info">
+                        <i class="fas fa-eye"></i> 프롬프트 미리보기
+                    </button>
+                    <button id="update-prompts-btn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 프롬프트 업데이트
+                    </button>
+                </div>
+            </div>
+
+            <!-- API 키 및 모델 설정 카드 (기존과 동일) -->
+            <div class="card">
+                <h2><i class="fas fa-key"></i> API 키 및 AI 모델 설정</h2>
+                
+                <div class="form-group">
+                    <label for="api-key">Google AI API 키:</label>
+                    <input type="password" id="api-key" class="form-input" placeholder="Google AI Studio에서 발급받은 API 키를 입력하세요">
+                </div>
+                
+                <div class="form-group">
+                    <label for="model-select">AI 모델 선택:</label>
+                    <select id="model-select" class="form-input">
+                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (실험)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                </div>
+                
+                <button id="update-api-key-btn" class="btn btn-primary">API 키 및 모델 저장</button>
+            </div>
+
+            <!-- 교사 코드 및 링크 정보 카드 (기존과 동일) -->
+            <div class="card" id="teacher-info-card" style="display: none;">
+                <h2><i class="fas fa-info-circle"></i> 교사 정보</h2>
+                <div class="info-item">
+                    <span class="info-label">교사 코드:</span>
+                    <span id="teacher-code" class="info-value"></span>
+                    <button id="copy-code-btn" class="btn btn-small btn-secondary">복사</button>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">학생용 링크:</span>
+                    <span id="student-link" class="info-value"></span>
+                    <button id="copy-link-btn" class="btn btn-small btn-secondary">복사</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 미리보기 모달 -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>프롬프트 미리보기</h3>
+                <span class="close" id="close-preview-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="preview-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/enhanced-teacher-dashboard.js"></script>
+</body>
+</html>
