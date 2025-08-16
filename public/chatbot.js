@@ -17,19 +17,6 @@ let lessonCode = "";
 let studentName = "";
 let sessionId = "";
 
-const intentPatterns = {
-  Concept_Question: new RegExp(
-    "뭐예요|뭔가요|궁금|알려줘|설명|위치에너지|운동에너지|개념|원리"
-  ),
-  Causal_Inquiry: new RegExp(
-    "왜 안되지|왜 그럴까|떨어졌어|멈췄어|~해서 그런가|만약.*할까"
-  ),
-  Solution_Request: new RegExp(
-    "모르겠어|어떻게|어떡해|막혔어|방법|힌트|뭘 해야"
-  ),
-  Process_Sharing: new RegExp("됐다|성공|해결|되네|실패|망했어|안돼"),
-  Inquiry_Expansion: new RegExp("만약.*라면|다른 방법|~말고|~해도 돼"),
-};
 
 export function initChatbot() {
   saveLessonCodeBtn.addEventListener("click", saveLessonCode);
@@ -246,61 +233,3 @@ function displayAiMessage(message, isFirst = false) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-function getIntent(message) {
-  for (const intent in intentPatterns) {
-    if (intentPatterns[intent].test(message)) {
-      return intent;
-    }
-  }
-  return "Fallback";
-}
-
-function generatePrompt(intent, message, history) {
-  const systemInstruction = `너는 초등 영재 학생을 위한 '그래비트랙스 물리 탐구 AI 튜터'야. 너의 이름은 'G-Tutor'이다. 너의 역할은 학생의 자기주도적 문제 해결을 돕는 '소크라테스식 질문자'이다.
-
-### 너의 핵심 규칙 ###
-1. 절대로 정답이나 해결 방법을 직접 알려주면 안 된다. 예를 들어, '높이를 올리세요'와 같은 직접적인 지시는 금지된다.
-2. 너의 모든 답변은 반드시 학생의 다음 생각을 유도하는 '질문' 형태여야 한다.
-3. 학생의 실패를 '중요한 단서'로 칭찬하고, 긍정적인 탐구 태도를 격려해야 한다.
-4. 대화의 목표는 학생이 스스로 '높은 위치에너지가 큰 운동에너지로 전환된다'는 원리를 깨닫게 하는 것이다.
-5. 학생의 발화에서 '높이', '속도', '힘'과 같은 단서가 나오면, 이를 '위치에너지', '운동에너지'와 같은 과학 용어와 연결하는 질문을 던져라.
-6. 친절하고 격려하는 동료 탐험가 같은 말투를 사용하라. 한국어로만 대답해야 한다.`;
-
-  const studentFacingHistory = history.slice(-6);
-
-  const contents = studentFacingHistory.map((turn, index) => {
-    if (index === 0) {
-      const userTextWithSystemPrompt = `${systemInstruction}
-
-### 현재 학습 맥락 ###
-- 수업 단계: 전개 (활동3 - 인지적 갈등 유발 미션)
-- 현재 미션: 낮은 출발점에서 시작하여 끊어진 레일(2칸 너비)을 점프해서 건너기
-
-### 학생의 현재 발화 ###
-${turn.parts[0].text}`;
-      return { role: "user", parts: [{ text: userTextWithSystemPrompt }] };
-    }
-    return turn;
-  });
-
-  if (studentFacingHistory.length === 0) {
-    contents.push({
-      role: "user",
-      parts: [
-        {
-          text: `${systemInstruction}\n\n### 학생의 현재 발화 ###\n${message}`,
-        },
-      ],
-    });
-  }
-
-  const promptObject = {
-    contents: contents,
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.9,
-      maxOutputTokens: 300,
-    },
-  };
-  return promptObject;
-}

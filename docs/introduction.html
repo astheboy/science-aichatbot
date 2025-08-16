@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 교육 플랫폼 - 교사를 위한 스마트 학습 도구</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section:nth-child(even) {
+            background-color: white;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        /* Steps */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+
+        .step h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        /* Benefits */
+        .benefits {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .benefits h2 {
+            color: white;
+        }
+
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .benefit-item h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* CTA */
+        .cta {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: #ccc;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1.1rem;
+            }
+
+            .nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>🤖 AI 교육 플랫폼</h1>
+            <p>교사와 학생을 위한 인공지능 기반 맞춤형 학습 도구</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <ul>
+                <li><a href="#features">주요 기능</a></li>
+                <li><a href="#how-to-use">사용 방법</a></li>
+                <li><a href="#benefits">교육적 효과</a></li>
+                <li><a href="#subjects">지원 과목</a></li>
+                <li><a href="#start">시작하기</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2>✨ 주요 기능</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>과목별 맞춤 AI 튜터</h3>
+                    <p>국어, 수학, 사회, 과학 각 과목의 특성에 맞는 AI 튜터가 학생들의 학습을 도와줍니다. 교육학적 이론에 기반한 체계적인 피드백을 제공합니다.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>수업 관리 시스템</h3>
+                    <p>QR코드를 통한 간편한 수업 참여, 실시간 학생 참여 현황 모니터링, 수업별 체계적인 데이터 수집이 가능합니다.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>학습 분석 도구</h3>
+                    <p>학생들의 대화 내용을 분석하여 학습 수준, 참여도, 사고 패턴을 파악하고 개별 맞춤 학습 방향을 제시합니다.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>맞춤형 프롬프트 설정</h3>
+                    <p>교사가 직접 AI 튜터의 대화 스타일과 교육 방향을 설정할 수 있어, 수업 목표에 맞는 개성 있는 AI 튜터를 만들 수 있습니다.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>모바일 최적화</h3>
+                    <p>스마트폰, 태블릿, 데스크톱 등 모든 기기에서 원활하게 작동하여 언제 어디서나 학습이 가능합니다.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>안전한 학습 환경</h3>
+                    <p>교사 승인 하에만 접근 가능한 통제된 학습 환경으로, 학생들의 안전한 AI 학습 경험을 보장합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section id="how-to-use" class="section">
+        <div class="container">
+            <h2>📋 사용 방법</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>교사 로그인</h4>
+                    <p>구글 계정으로 간편하게 로그인하고 API 키를 설정합니다.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>수업 생성</h4>
+                    <p>새 수업을 생성하고 과목을 선택한 후 QR코드를 생성합니다.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>학생 참여</h4>
+                    <p>학생들이 QR코드를 스캔하여 AI 튜터와 대화를 시작합니다.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h4>실시간 모니터링</h4>
+                    <p>교사 대시보드에서 학생들의 학습 현황을 실시간으로 확인합니다.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h4>학습 분석</h4>
+                    <p>AI 분석 결과를 통해 각 학생의 학습 상태를 파악하고 피드백합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits">
+        <div class="container">
+            <h2>🎓 교육적 효과</h2>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <h4>🎯 개별 맞춤 학습</h4>
+                    <p>각 학생의 수준과 특성에 맞는 개별화된 학습 경험을 제공합니다.</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>💬 소크라테스식 대화</h4>
+                    <p>질문과 대화를 통한 능동적 학습으로 사고력을 키워줍니다.</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>📊 데이터 기반 교육</h4>
+                    <p>객관적인 학습 데이터를 바탕으로 한 과학적 교육 방법을 제공합니다.</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>⏰ 24시간 학습 지원</h4>
+                    <p>언제든지 접근 가능한 AI 튜터로 지속적인 학습을 지원합니다.</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>🔍 학습 과정 가시화</h4>
+                    <p>학습 과정과 사고 패턴을 시각적으로 분석하여 학습 효과를 극대화합니다.</p>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>🎪 흥미로운 학습</h4>
+                    <p>AI와의 대화형 학습으로 학생들의 참여도와 흥미를 높입니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subjects Section -->
+    <section id="subjects" class="section">
+        <div class="container">
+            <h2>📚 지원 과목</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3>국어</h3>
+                    <p>읽기 이해력, 문학 감상, 창의적 글쓰기 등 언어 능력 향상을 위한 맞춤형 AI 튜터</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔢</div>
+                    <h3>수학</h3>
+                    <p>수학적 사고력, 문제 해결 능력, 논리적 추론을 기르는 체계적 수학 학습 지원</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>사회</h3>
+                    <p>비판적 사고, 다양한 관점 이해, 사회 현상 분석 능력을 기르는 사회과 교육</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h3>과학</h3>
+                    <p>과학적 탐구력, 실험 설계, 가설 검증을 통한 체험적 과학 학습</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="start" class="cta">
+        <div class="container">
+            <h2>🚀 지금 바로 시작해보세요!</h2>
+            <p>AI 교육 플랫폼으로 더 효과적이고 재미있는 수업을 만들어보세요.</p>
+            <a href="../teacher.html" class="cta-button">교사 대시보드 시작하기</a>
+            <br><br>
+            <p style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.8;">
+                ※ 사용을 위해서는 Google Gemini API 키가 필요합니다.<br>
+                API 키는 <a href="https://makersuite.google.com/app/apikey" style="color: #fff;">Google AI Studio</a>에서 무료로 발급받을 수 있습니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 AI 교육 플랫폼. 교육의 미래를 만들어갑니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Apply animation to feature cards and steps
+        document.querySelectorAll('.feature-card, .step, .benefit-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
