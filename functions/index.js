@@ -3,109 +3,54 @@ const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+// 새로운 JSON 기반 시스템 모듈
+const SubjectLoader = require('./lib/subjectLoader');
+const ResponseAnalyzer = require('./lib/responseAnalyzer');
+const PromptBuilder = require('./lib/promptBuilder');
+
 // 글로벌 설정
 setGlobalOptions({ region: "asia-northeast3" });
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// 학생 응답 유형 분석 함수
-function analyzeStudentResponse(userMessage) {
-    const message = userMessage.toLowerCase().trim();
-    
-    // 개념 질문 패턴
-    const conceptQuestionPatterns = [
-        /(무엇|뭐|뭘).*[이에]?요?\?*$/, 
-        /왜.*[이에]?요?\?*$/, 
-        /.*[이란|이게|란] 뭐/, 
-        /(알려|설명).*주[세시]/, 
-        /(에너지|위치에너지|운동에너지|힘|속도).*[이가] 뭐/
-    ];
-    
-    // 탐색 교착상태 패턴
-    const explorationDeadlockPatterns = [
-        /어떻게.*해야.*모르겠/, 
-        /뭘.*바꿔야/, 
-        /안.*되나.*봐/, 
-        /막막/, 
-        /포기/, 
-        /못.*하겠/, 
-        /안.*돼/
-    ];
-    
-    // 실패 보고 패턴
-    const failureReportPatterns = [
-        /구슬이.*떨어짐/, 
-        /점프.*못/, 
-        /지나가/, 
-        /닿지.*않/, 
-        /멈췄/, 
-        /실패/, 
-        /안.*움직임/
-    ];
-    
-    // 원리 미연결 성공 패턴
-    const successWithoutPrinciplePatterns = [
-        /성공/, 
-        /됐다/, 
-        /되네/, 
-        /건너갔/, 
-        /(높게|높이).*만드니까.*됐/, 
-        /드디어.*됐/
-    ];
-    
-    // 가설 기반 질문 패턴
-    const hypothesisInquiryPatterns = [
-        /만약.*하면/, 
-        /.*해서.*그런가/, 
-        /.*[면서].*될까/, 
-        /경사를.*하면/, 
-        /높이를.*하면/, 
-        /무거우면.*더/
-    ];
-    
-    // 패턴 매칭으로 응답 유형 분석
-    if (conceptQuestionPatterns.some(pattern => pattern.test(message))) {
-        return 'CONCEPT_QUESTION';
+// 애플리케이션 시작 시 모든 과목 설정 미리 로드
+SubjectLoader.preloadAllConfigs().catch(console.error);
+
+// JSON 기반 학생 응답 분석 함수 (호환성 유지를 위한 래퍼)
+async function analyzeStudentResponse(userMessage, subject = 'science', conversationHistory = []) {
+    try {
+        const analysisResult = await ResponseAnalyzer.analyzeStudentResponse(userMessage, subject, conversationHistory);
+        return analysisResult.type; // 기존 함수와의 호환성을 위해 타입만 반환
+    } catch (error) {
+        console.error('응답 분석 오류:', error);
+        return 'DEFAULT';
     }
-    if (explorationDeadlockPatterns.some(pattern => pattern.test(message))) {
-        return 'EXPLORATION_DEADLOCK';
-    }
-    if (failureReportPatterns.some(pattern => pattern.test(message))) {
-        return 'FAILURE_REPORT';
-    }
-    if (successWithoutPrinciplePatterns.some(pattern => pattern.test(message))) {
-        return 'SUCCESS_WITHOUT_PRINCIPLE';
-    }
-    if (hypothesisInquiryPatterns.some(pattern => pattern.test(message))) {
-        return 'HYPOTHESIS_INQUIRY';
-    }
-    
-    return 'DEFAULT';
 }
 
-// 응답 유형별 프롬프트 가져오기
-function getPromptByResponseType(responseType, customPrompts) {
-    const defaultPrompts = {
-        'DEFAULT': "너는 친근하고 격려하는 과학 튜터야. 학생들이 그래비트랙스(GraviTrax) 실험을 통해 물리학 원리를 이해할 수 있도록 도와줘. 항상 긍정적이고 호기심을 유발하는 질문을 던져줘. 학생들의 질문에 대해 직접적인 답을 주기보다는, 스스로 생각해볼 수 있도록 힌트를 제공해줘.",
+// 응답 유형별 프롬프트 가져오기 (호환성 유지를 위한 래퍼)
+async function getPromptByResponseType(responseType, customPrompts, subject = 'science') {
+    try {
+        // 커스텀 프롬프트가 있으면 우선 사용
+        if (customPrompts && customPrompts[responseType]) {
+            return customPrompts[responseType];
+        }
         
-        'CONCEPT_QUESTION': "너는 개념을 직관적으로 설명하는 과학 튜터야. 학생이 개념에 대해 질문했을 때는 롤러코스터, 미끄럼틀 같은 일상적인 비유를 사용해서 설명하고, 그 다음에 '그렇다면 우리 실험에서는 어떨까?'라는 식으로 연결 질문을 던져줘. 절대 바로 정답을 말하지 말고, 학생이 스스로 깨달을 수 있도록 단계적 힌트를 제공해줘.",
+        // JSON 설정에서 프롬프트 가져오기
+        const responseTypeConfig = await SubjectLoader.getResponseTypeConfig(subject, responseType);
         
-        'EXPLORATION_DEADLOCK': "너는 막힌 상황을 돌파하도록 돕는 탐구 가이드야. 학생이 막막해할 때는 '괜찮다, 모든 과학자들이 겪는 과정이다'라고 격려하고, 바꿀 수 있는 변인들(높이, 경사, 길이, 트랙 모양 등)을 하나씩 제시해서 탐색 방향을 안내해줘. 학생이 직접 선택하게 하고, '어떤 것부터 바꿔볼까?'라는 식으로 주도권을 학생에게 줘.",
+        if (responseTypeConfig.sample_prompts && responseTypeConfig.sample_prompts.length > 0) {
+            return responseTypeConfig.sample_prompts[0]; // 첫 번째 샘플 프롬프트 사용
+        }
         
-        'FAILURE_REPORT': "너는 실패를 중요한 단서로 바꾸는 탐정 튜터야. 학생이 실패 상황을 보고했을 때는 '아주 중요한 단서다!'라고 긍정적으로 반응하고, 그 실패가 일어난 구체적인 순간과 원인을 깊이 관찰하도록 유도해줘. '왜 그렇게 됐을까?' '무엇이 부족했을까?'라는 질문으로 학생 스스로 원인을 추론하게 도와줘.",
+        // 폴백: 기본 전략 사용
+        return responseTypeConfig.prompt_strategy || '학생과 친근하고 교육적인 대화를 나누어 주세요.';
         
-        'SUCCESS_WITHOUT_PRINCIPLE': "너는 성공을 과학적 원리로 연결하는 교사야. 학생이 성공했다고 할 때는 먼저 축하하고, 그 다음 '단지 높여서 성공한 걸까?'라고 물으며 현상 이면의 과학 원리를 탐구하게 유도해줘. '높이'→'위치에너지', '빨라짐'→'운동에너지'로 점진적으로 과학 용어를 도입하되, 학생이 먼저 현상을 설명하게 한 후에 용어를 제시해줘.",
-        
-        'HYPOTHESIS_INQUIRY': "너는 과학적 사고를 칭찬하고 심화시키는 멘토야. 학생이 가설을 제시했을 때는 '훌륭한 과학적 사고다!'라고 크게 격려하고, 그 가설을 검증할 구체적인 실험 방법을 학생 스스로 설계하게 도와줘. '어떻게 확인해볼 수 있을까?' '결과를 어떻게 비교할까?'라는 질문으로 실험 설계 능력을 기르게 해줘."
-    };
-    
-    // 커스텀 프롬프트가 있으면 우선 사용, 없으면 기본 프롬프트 사용
-    if (customPrompts && customPrompts[responseType]) {
-        return customPrompts[responseType];
+    } catch (error) {
+        console.error('프롬프트 선택 오류:', error);
+        // 오류 시 기본 프롬프트 반환
+        return "너는 친근하고 격려하는 교육 튜터야. 학생들이 학습을 통해 스스로 답을 찾을 수 있도록 도와줘.";
     }
-    
-    return defaultPrompts[responseType] || defaultPrompts['DEFAULT'];
 }
 
 // 기본 프롬프트 함수 (호환성 유지)
@@ -113,60 +58,26 @@ function getDefaultPrompt() {
     return getPromptByResponseType('DEFAULT', null);
 }
 
-// 전체 프롬프트 생성 함수
-function buildFullPrompt(customPrompt, userMessage, conversationHistory = []) {
-    const systemInstruction = `${customPrompt}
-
-### 너의 핵심 규칙 ###
-1. 절대로 정답이나 해결 방법을 직접 알려주면 안 된다. 예를 들어, '높이를 올리세요'와 같은 직접적인 지시는 금지된다.
-2. 너의 모든 답변은 반드시 학생의 다음 생각을 유도하는 '질문' 형태여야 한다.
-3. 학생의 실패를 '중요한 단서'로 칭찬하고, 긍정적인 탐구 태도를 격려해야 한다.
-4. 대화의 목표는 학생이 스스로 '높은 위치에너지가 큰 운동에너지로 전환된다'는 원리를 깨닫게 하는 것이다.
-5. 학생의 발화에서 '높이', '속도', '힘'과 같은 단서가 나오면, 이를 '위치에너지', '운동에너지'와 같은 과학 용어와 연결하는 질문을 던져라.
-6. 친절하고 격려하는 동료 탐험가 같은 말투를 사용하라. 한국어로만 대답해야 한다.
-7. **중요**: 답변에 마크다운 문법(*, **, #, ## 등)을 사용하지 말고 순수한 텍스트로만 작성해라.`;
-
-    const recentHistory = conversationHistory.slice(-6);
-    const contents = [];
-
-    // 시스템 지시사항과 첫 사용자 메시지 결합
-    if (recentHistory.length === 0) {
-        contents.push({ 
-            role: 'user', 
-            parts: [{ 
-                text: `${systemInstruction}
-
-### 현재 학습 맥락 ###
-- 수업 단계: 전개 (활동3 - 인지적 갈등 유발 미션)
-- 현재 미션: 낮은 출발점에서 시작하여 끊어진 레일(2칸 너비)을 점프해서 건너기
-
-### 학생의 현재 발화 ###
-${userMessage}` 
-            }] 
-        });
-    } else {
-        // 대화 이력이 있는 경우
-        recentHistory.forEach((turn, index) => {
-            if (index === 0) {
-                const userTextWithSystemPrompt = `${systemInstruction}
-
-### 현재 학습 맥락 ###
-- 수업 단계: 전개 (활동3 - 인지적 갈등 유발 미션)
-- 현재 미션: 낮은 출발점에서 시작하여 끊어진 레일(2칸 너비)을 점프해서 건너기
-
-### 학생의 현재 발화 ###
-${turn.parts[0].text}`;
-                contents.push({ role: 'user', parts: [{ text: userTextWithSystemPrompt }] });
-            } else {
-                contents.push(turn);
-            }
-        });
+// 전체 프롬프트 생성 함수 (JSON 시스템 사용)
+async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}) {
+    try {
+        // 새로운 JSON 기반 프롬프트 생성 시스템 사용
+        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData);
+    } catch (error) {
+        console.error('프롬프트 생성 오류:', error);
         
-        // 현재 사용자 메시지 추가
-        contents.push({ role: 'user', parts: [{ text: userMessage }] });
+        // 오류 시 폴백 프롬프트 사용
+        const fallbackInstruction = `너는 친근하고 격려하는 교육 튜터야. 학생들이 학습을 통해 스스로 답을 찾을 수 있도록 도와줘. 
+항상 긍정적이고 호기심을 유발하는 질문을 던져주고, 직접적인 답을 주기보다는 스스로 생각해볼 수 있도록 힌트를 제공해줘.
+한국어로만 대답하고, 마크다운 문법을 사용하지 말아줘.`;
+        
+        return [{
+            role: 'user',
+            parts: [{
+                text: `${fallbackInstruction}\n\n### 학생의 발화 ###\n${userMessage}`
+            }]
+        }];
     }
-
-    return contents;
 }
 
 exports.getTutorResponse = onCall(async (request) => {
@@ -198,21 +109,21 @@ exports.getTutorResponse = onCall(async (request) => {
         throw new HttpsError('internal', '해당 교사의 API 키가 등록되지 않았습니다.');
       }
 
-      // 2. 학생 응답 유형 분석
-      const responseType = analyzeStudentResponse(userMessage);
-      console.log(`학생 응답 유형 분석: ${responseType}`);
+      // 2. JSON 기반 학생 응답 분석 시스템 사용
+      const subject = teacherData.subject || 'science';
+      const analysisResult = await ResponseAnalyzer.analyzeStudentResponse(userMessage, subject, conversationHistory);
+      const responseType = analysisResult.type;
+      console.log(`응답 분석 결과 (${subject}): ${responseType} (신뢰도: ${analysisResult.confidence})`);
       
-      // 3. 교사의 커스텀 프롬프트와 모델 설정 가져오기
-      const customPrompts = teacherData.customPrompts || {}; // 유형별 커스텀 프롬프트
-      const adaptivePrompt = getPromptByResponseType(responseType, customPrompts);
+      // 3. 교사 설정과 모델 정보 가져오기
       const modelName = teacherData.modelName || 'gemini-2.0-flash-exp';
-
-      // 4. 가져온 API 키와 모델로 Gemini를 호출합니다.
+      
+      // 4. JSON 기반 프롬프트 생성 시스템 사용
+      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData);
+      
+      // 5. Gemini API 호출
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: modelName });
-      
-      // 5. 적응적 프롬프트를 사용하여 최종 프롬프트 생성
-      const fullPrompt = buildFullPrompt(adaptivePrompt, userMessage, conversationHistory);
       
       const result = await model.generateContent({
         contents: fullPrompt,
