@@ -131,7 +131,7 @@ exports.getTutorResponse = onCall(async (request) => {
       console.log(`응답 분석 결과 (${subject}): ${responseType} (신뢰도: ${analysisResult.confidence})`);
       
       // 4. 교사 설정과 모델 정보 가져오기
-      const modelName = teacherData.modelName || 'gemini-2.0-flash-exp';
+      const modelName = teacherData.modelName || 'gemini-2.0-flash';
       
       // 5. JSON 기반 프롬프트 생성 시스템 사용 (과목 정보 추가)
       const teacherDataWithSubject = {
@@ -275,7 +275,7 @@ exports.getTeacherInfo = onCall(async (request) => {
         hasApiKey: !!teacherData.apiKey,
         teacherCode: teacherData.teacherCode,
         customPrompt: teacherData.customPrompt || '',
-        modelName: teacherData.modelName || 'gemini-1.5-flash'
+        modelName: teacherData.modelName || 'gemini-2.0-flash'
       };
       
     } catch (error) {
@@ -342,11 +342,10 @@ exports.updateTeacherModel = onCall(async (request) => {
 
     // 사용 가능한 모델 목록 (최신 Gemini 2.0 모델 포함)
     const availableModels = [
-        'gemini-2.0-flash-exp',
-        'gemini-2.0-flash-thinking-exp-1219',  
-        'gemini-1.5-flash',
-        'gemini-1.5-pro',
-        'gemini-1.0-pro'
+        
+        'gemini-2.5-flash-lite',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite'
     ];
 
     if (!availableModels.includes(modelName)) {
@@ -529,16 +528,15 @@ exports.getTeacherSettings = onCall(async (request) => {
       return {
         hasApiKey: !!teacherData.apiKey,
         teacherCode: teacherData.teacherCode,
-        modelName: teacherData.modelName || 'gemini-2.0-flash-exp',
+        modelName: teacherData.modelName || 'gemini-2.0-flash',
         customPrompts: teacherData.customPrompts || {},
         defaultPrompts: defaultPrompts,
         supportedSubjects: SubjectLoader.getSupportedSubjects(),
         availableModels: [
-          'gemini-2.0-flash-exp',
-          'gemini-2.0-flash-thinking-exp-1219',
-          'gemini-1.5-flash',
-          'gemini-1.5-pro',
-          'gemini-1.0-pro'
+          
+          'gemini-2.5-flash-lite',
+          'gemini-2.0-flash',
+          'gemini-2.0-flash-lite'
         ]
       };
       
@@ -548,9 +546,10 @@ exports.getTeacherSettings = onCall(async (request) => {
     }
 });
 
-// 교사별 학생 대화 세션 목록 조회
+// 교사별 학생 대화 세션 목록 조회 (수업별 필터링 지원)
 exports.getStudentSessions = onCall(async (request) => {
-    const { auth } = request;
+    const { data, auth } = request;
+    const { lessonId } = data || {}; // 선택적 매개변수
     
     if (!auth) {
       throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
@@ -573,10 +572,17 @@ exports.getStudentSessions = onCall(async (request) => {
       const teacherData = teacherDoc.data();
       const teacherCode = teacherData.teacherCode;
       
-      // 해당 교사의 학생 세션들 가져오기
-      const sessionsSnapshot = await db.collection('sessions')
-        .where('teacherCode', '==', teacherCode)
-        .orderBy('lastActivity', 'desc')
+      // 세션 쿼리 생성 (수업별 필터링 지원)
+      let sessionsQuery = db.collection('sessions')
+        .where('teacherCode', '==', teacherCode);
+      
+      // lessonId가 제공된 경우 해당 수업의 학생들만 필터링
+      if (lessonId) {
+        console.log('수업별 세션 필터링 적용:', lessonId);
+        sessionsQuery = sessionsQuery.where('lessonId', '==', lessonId);
+      }
+      
+      const sessionsSnapshot = await sessionsQuery
         .limit(100)
         .get();
       
@@ -588,10 +594,14 @@ exports.getStudentSessions = onCall(async (request) => {
           studentName: sessionData.studentName,
           messageCount: sessionData.messageCount || 0,
           lastActivity: sessionData.lastActivity,
-          responseTypes: sessionData.responseTypes || []
+          responseTypes: sessionData.responseTypes || [],
+          lessonId: sessionData.lessonId,
+          lessonTitle: sessionData.lessonTitle,
+          lessonCode: sessionData.lessonCode
         });
       });
       
+      console.log(`세션 조회 완료: 총 ${sessions.length}개 세션 반환 (lessonId: ${lessonId || '전체'})`);
       return { sessions: sessions };
       
     } catch (error) {
@@ -735,7 +745,7 @@ exports.generateStudentAnalysis = onCall(async (request) => {
       }).join('\n');
       
       // 분석용 프롬프트 생성
-      const analysisPrompt = `당신은 교육 전문가입니다. 다음은 한 학생이 그래비트랙스 물리 실험에서 AI 튜터와 나눈 대화 기록입니다.
+      const analysisPrompt = `당신은 교육 전문가입니다. 다음은 한 학생이 AI 튜터와 나눈 대화 기록입니다.
 
 학생 이름: ${session.studentName}
 총 대화 횟수: ${conversations.length}회
@@ -830,7 +840,7 @@ exports.analyzeStudentConversations = onCall(async (request) => {
       const teacherData = teacherDoc.data();
       const teacherCode = teacherData.teacherCode;
       const apiKey = teacherData.apiKey;
-      const modelName = teacherData.modelName || 'gemini-2.0-flash-exp';
+      const modelName = teacherData.modelName || 'gemini-2.0-flash';
       
       // 1. 먼저 기존 분석 결과가 있는지 확인
       const existingAnalysisSnapshot = await db.collection('conversation_analyses')
@@ -904,7 +914,7 @@ exports.analyzeStudentConversations = onCall(async (request) => {
       }).join('\n');
       
       // 영재성 평가를 위한 성장 추적 중심 분석 프롬프트
-      const giftedAnalysisPrompt = `학생의 그래비트랙스 실험 AI 튜터 대화를 분석하여 성장 가능성과 발달 단계를 평가해주세요.
+      const giftedAnalysisPrompt = `학생의 AI 튜터 대화를 분석하여 성장 가능성과 발달 단계를 평가해주세요.
 
 학생 정보:
 - 학생 이름: ${sessionData.studentName}
@@ -926,7 +936,7 @@ ${conversationText}
 
 현재 주요 단계와 도달한 최고 단계를 분석해주세요.
 
-2. 과학적 사고 발달 지표
+2. 사고 발달 지표
 구체적 조작기에서 형식적 조작기로의 전환 분석:
 - 구체적 경험 의존도: 5점 만점으로 평가 (구체적 경험에 얼마나 의존하는가)
 - 추상적 사고 능력: 5점 만점으로 평가 (개념과 원리를 추상적으로 사고하는 능력)
@@ -937,7 +947,7 @@ ${conversationText}
 - 중기 성장 목표 (학기 단위): 학기 말까지 도달 가능한 수준
 - 장기 발달 방향 (학년 단위): 향후 1년간의 발달 전망
 
-4. 영재성 지표 분석
+4. 사고 과정 분석
 - 창의적 사고: 독창적이고 유연한 문제해결 접근을 보이는가
 - 논리적 추론: 체계적이고 논리적인 사고 과정을 보이는가
 - 호기심과 탐구심: 지속적이고 깊이 있는 질문을 하는가
@@ -948,7 +958,6 @@ ${conversationText}
 - 현재 수준에 맞는 도전 과제: 구체적인 활동 제안
 - 다음 단계 발달을 위한 비계 설정: 교사가 제공해야 할 지원
 - 동기 부여 방안: 학생의 흥미와 관심을 유지하는 방법
-- 영재교육 연계 제안: 필요시 영재교육 프로그램 참여 권장 여부
 
 각 항목을 구체적인 대화 예시를 들어 분석하고, 교사가 실제 교육에 활용할 수 있는 실용적인 제안을 포함해주세요.
 
@@ -1113,6 +1122,20 @@ exports.getLessons = onCall(async (request) => {
     try {
       const userId = auth.uid;
       
+      // userId로 교사 정보 찾기
+      const querySnapshot = await db.collection('teacher_keys')
+        .where('userId', '==', userId)
+        .limit(1)
+        .get();
+        
+      if (querySnapshot.empty) {
+        throw new HttpsError('not-found', '교사 정보를 찾을 수 없습니다.');
+      }
+      
+      const teacherDoc = querySnapshot.docs[0];
+      const teacherData = teacherDoc.data();
+      const teacherCode = teacherData.teacherCode;
+      
       // 인덱스 불필요하게 단순 쿼리로 변경 - teacherId만 필터링하고 클라이언트에서 정렬
       const lessonsSnapshot = await db.collection('lessons')
         .where('teacherId', '==', userId)
@@ -1120,10 +1143,28 @@ exports.getLessons = onCall(async (request) => {
         .get();
       
       const lessons = [];
-      lessonsSnapshot.forEach(doc => {
+      
+      // 각 수업별로 실시간 학생 수 계산
+      for (const doc of lessonsSnapshot.docs) {
         const lessonData = doc.data();
         // 활성 수업만 필터링 (서버에서)
         if (lessonData.isActive === true) {
+          
+          // 해당 수업의 고유 학생 수를 실시간으로 계산
+          const sessionQuery = await db.collection('sessions')
+            .where('teacherCode', '==', teacherCode)
+            .where('lessonId', '==', doc.id)
+            .get();
+          
+          // 고유 학생 이름으로 중복 제거
+          const uniqueStudents = new Set();
+          sessionQuery.forEach(sessionDoc => {
+            const sessionData = sessionDoc.data();
+            if (sessionData.studentName) {
+              uniqueStudents.add(sessionData.studentName);
+            }
+          });
+          
           lessons.push({
             id: doc.id,
             title: lessonData.title,
@@ -1131,11 +1172,11 @@ exports.getLessons = onCall(async (request) => {
             description: lessonData.description,
             lessonCode: lessonData.lessonCode,
             createdAt: lessonData.createdAt,
-            studentCount: lessonData.studentCount || 0,
+            studentCount: uniqueStudents.size, // 실시간 계산된 학생 수
             isActive: lessonData.isActive
           });
         }
-      });
+      }
       
       // 클라이언트에서 정렬하는 대신 서버에서 정렬
       lessons.sort((a, b) => {
@@ -1144,6 +1185,8 @@ exports.getLessons = onCall(async (request) => {
         if (!b.createdAt) return -1;
         return b.createdAt.toMillis() - a.createdAt.toMillis();
       });
+      
+      console.log(`수업 목록 조회 완료: 총 ${lessons.length}개 수업`);
       
       // 최대 50개로 제한
       return { lessons: lessons.slice(0, 50) };
