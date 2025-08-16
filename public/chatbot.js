@@ -1,227 +1,262 @@
-import { callGeminiApi } from './api.js';
+import { callGeminiApi } from "./api.js";
 
-const chatWindow = document.getElementById('chat-window');
-const chatForm = document.getElementById('chat-form');
-const chatInput = document.getElementById('chat-input');
-const typingIndicator = document.getElementById('typing-indicator');
-const teacherCodeInput = document.getElementById('teacher-code-input');
-const saveTeacherCodeBtn = document.getElementById('save-teacher-code-btn');
-const teacherCodeStatus = document.getElementById('teacher-code-status');
-const studentNameSection = document.getElementById('student-name-section');
-const studentNameInput = document.getElementById('student-name-input');
-const saveStudentNameBtn = document.getElementById('save-student-name-btn');
-const studentNameStatus = document.getElementById('student-name-status');
+const chatWindow = document.getElementById("chat-window");
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const typingIndicator = document.getElementById("typing-indicator");
+const lessonCodeInput = document.getElementById("lesson-code-input");
+const saveLessonCodeBtn = document.getElementById("save-lesson-code-btn");
+const lessonCodeStatus = document.getElementById("lesson-code-status");
+const studentNameSection = document.getElementById("student-name-section");
+const studentNameInput = document.getElementById("student-name-input");
+const saveStudentNameBtn = document.getElementById("save-student-name-btn");
+const studentNameStatus = document.getElementById("student-name-status");
 
 let conversationHistory = [];
-let teacherCode = '';
-let studentName = '';
-let sessionId = '';
+let lessonCode = "";
+let studentName = "";
+let sessionId = "";
 
 const intentPatterns = {
-    Concept_Question: new RegExp('뭐예요|뭔가요|궁금|알려줘|설명|위치에너지|운동에너지|개념|원리'),
-    Causal_Inquiry: new RegExp('왜 안되지|왜 그럴까|떨어졌어|멈췄어|~해서 그런가|만약.*할까'),
-    Solution_Request: new RegExp('모르겠어|어떻게|어떡해|막혔어|방법|힌트|뭘 해야'),
-    Process_Sharing: new RegExp('됐다|성공|해결|되네|실패|망했어|안돼'),
-    Inquiry_Expansion: new RegExp('만약.*라면|다른 방법|~말고|~해도 돼'),
+  Concept_Question: new RegExp(
+    "뭐예요|뭔가요|궁금|알려줘|설명|위치에너지|운동에너지|개념|원리"
+  ),
+  Causal_Inquiry: new RegExp(
+    "왜 안되지|왜 그럴까|떨어졌어|멈췄어|~해서 그런가|만약.*할까"
+  ),
+  Solution_Request: new RegExp(
+    "모르겠어|어떻게|어떡해|막혔어|방법|힌트|뭘 해야"
+  ),
+  Process_Sharing: new RegExp("됐다|성공|해결|되네|실패|망했어|안돼"),
+  Inquiry_Expansion: new RegExp("만약.*라면|다른 방법|~말고|~해도 돼"),
 };
 
 export function initChatbot() {
-    saveTeacherCodeBtn.addEventListener('click', saveTeacherCode);
-    saveStudentNameBtn.addEventListener('click', saveStudentName);
-    chatForm.addEventListener('submit', handleChatSubmit);
+  saveLessonCodeBtn.addEventListener("click", saveLessonCode);
+  saveStudentNameBtn.addEventListener("click", saveStudentName);
+  chatForm.addEventListener("submit", handleChatSubmit);
 
-    initializeTutorState();
-    initializeStudentNameState();
+  // URL 파라미터 확인
+  handleUrlParameters();
+  
+  initializeTutorState();
+  initializeStudentNameState();
+}
+
+function handleUrlParameters() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const lessonFromUrl = urlParams.get('lesson');
+  
+  if (lessonFromUrl) {
+    lessonCodeInput.value = lessonFromUrl.toUpperCase();
+    lessonCodeInput.readOnly = true;
+    lessonCodeInput.style.backgroundColor = '#e9ecef'; // 읽기 전용 표시
+    saveLessonCodeBtn.click(); // 자동으로 저장
+  }
 }
 
 function initializeTutorState() {
-    teacherCode = localStorage.getItem('teacherCode');
-    if (teacherCode) {
-        teacherCodeInput.value = teacherCode;
-        teacherCodeInput.disabled = true;
-        saveTeacherCodeBtn.textContent = '변경';
-        teacherCodeStatus.textContent = '교사 코드가 연결되었습니다.';
-        teacherCodeStatus.className = 'text-xs text-center text-green-600';
-        if (conversationHistory.length === 0) {
-            displayAiMessage("그래비트랙스 탐험을 시작해볼까? 트랙을 만들다가 궁금하거나 어려운 점이 생기면 나에게 무엇이든 물어봐!", true);
-        }
-    } else {
-        saveTeacherCodeBtn.textContent = '저장';
-        teacherCodeStatus.textContent = 'G-Tutor와 대화하려면 교사 코드가 필요해요.';
-        teacherCodeStatus.className = 'text-xs text-center text-gray-500';
-        if (conversationHistory.length === 0) {
-            displayAiMessage("안녕하세요! G-Tutor와 대화를 시작하려면, 먼저 선생님께서 알려주신 교사 코드를 입력하고 저장해주세요.", true);
-        }
+  lessonCode = localStorage.getItem("lessonCode");
+  if (lessonCode) {
+    lessonCodeInput.value = lessonCode;
+    lessonCodeInput.disabled = true;
+    saveLessonCodeBtn.textContent = "변경";
+    lessonCodeStatus.textContent = "수업 코드가 연결되었습니다.";
+    lessonCodeStatus.className = "text-xs text-center text-green-600";
+    if (conversationHistory.length === 0) {
+      displayAiMessage(
+        "공부를 하다가 궁금하거나 어려운 점이 생기면 나에게 무엇이든 물어봐!",
+        true
+      );
     }
+  } else {
+    saveLessonCodeBtn.textContent = "저장";
+    lessonCodeStatus.textContent =
+      "AI 튜터와 대화하려면 수업 코드가 필요해요.";
+    lessonCodeStatus.className = "text-xs text-center text-gray-500";
+    if (conversationHistory.length === 0) {
+      displayAiMessage(
+        "안녕하세요! AI 튜터와 대화를 시작하려면, 먼저 선생님께서 알려주신 수업 코드를 입력하고 저장해주세요.",
+        true
+      );
+    }
+  }
 }
 
-function saveTeacherCode() {
-    if (saveTeacherCodeBtn.textContent === '변경') {
-        teacherCodeInput.disabled = false;
-        teacherCodeInput.value = '';
-        teacherCodeInput.focus();
-        saveTeacherCodeBtn.textContent = '저장';
-        teacherCodeStatus.textContent = '새로운 교사 코드를 입력하고 저장해주세요.';
-        teacherCodeStatus.className = 'text-xs text-center text-gray-500';
-        // Reset student name section when changing teacher code
-        studentName = '';
-        sessionId = '';
-        localStorage.removeItem(`studentName_${teacherCode}`);
-        studentNameInput.value = '';
-        studentNameInput.disabled = true; // Disable when no teacher code
-        saveStudentNameBtn.textContent = '저장';
-        studentNameStatus.textContent = '교사 코드 저장 후 이름을 입력하세요.';
-        studentNameStatus.className = 'text-xs text-center text-gray-400';
-        return;
-    }
+function saveLessonCode() {
+  if (saveLessonCodeBtn.textContent === "변경") {
+    lessonCodeInput.disabled = false;
+    lessonCodeInput.readOnly = false;
+    lessonCodeInput.style.backgroundColor = '';
+    lessonCodeInput.value = "";
+    lessonCodeInput.focus();
+    saveLessonCodeBtn.textContent = "저장";
+    lessonCodeStatus.textContent = "새로운 수업 코드를 입력하고 저장해주세요.";
+    lessonCodeStatus.className = "text-xs text-center text-gray-500";
+    // Reset student name section when changing lesson code
+    studentName = "";
+    sessionId = "";
+    localStorage.removeItem(`studentName_${lessonCode}`);
+    studentNameInput.value = "";
+    studentNameInput.disabled = true; // Disable when no lesson code
+    saveStudentNameBtn.textContent = "저장";
+    studentNameStatus.textContent = "수업 코드 저장 후 이름을 입력하세요.";
+    studentNameStatus.className = "text-xs text-center text-gray-400";
+    return;
+  }
 
-    const code = teacherCodeInput.value.trim();
-    if (code) {
-        localStorage.setItem('teacherCode', code);
-        teacherCode = code;
-        alert('교사 코드가 저장되었습니다.');
-        initializeTutorState();
-        // Enable and update student name section after teacher code is saved
-        initializeStudentNameState();
-    } else {
-        alert('교사 코드를 입력해주세요.');
-    }
+  const code = lessonCodeInput.value.trim().toUpperCase();
+  if (code) {
+    localStorage.setItem("lessonCode", code);
+    lessonCode = code;
+    alert("수업 코드가 저장되었습니다.");
+    initializeTutorState();
+    // Enable and update student name section after lesson code is saved
+    initializeStudentNameState();
+  } else {
+    alert("수업 코드를 입력해주세요.");
+  }
 }
 
 function initializeStudentNameState() {
-    // Always show student name section
-    studentNameSection.classList.remove('hidden');
-    
-    if (teacherCode) {
-        studentName = localStorage.getItem(`studentName_${teacherCode}`);
-        if (studentName) {
-            studentNameInput.value = studentName;
-            studentNameInput.disabled = true;
-            saveStudentNameBtn.textContent = '변경';
-            studentNameStatus.textContent = `안녕하세요, ${studentName}님! 학습 기록이 저장됩니다.`;
-            studentNameStatus.className = 'text-xs text-center text-green-600';
-            generateSessionId();
-        } else {
-            studentNameInput.disabled = false; // Enable input when teacher code exists
-            saveStudentNameBtn.textContent = '저장';
-            studentNameStatus.textContent = '학습 기록을 위해 이름을 입력해주세요.';
-            studentNameStatus.className = 'text-xs text-center text-gray-500';
-        }
+  // Always show student name section
+  studentNameSection.classList.remove("hidden");
+
+  if (lessonCode) {
+    studentName = localStorage.getItem(`studentName_${lessonCode}`);
+    if (studentName) {
+      studentNameInput.value = studentName;
+      studentNameInput.disabled = true;
+      saveStudentNameBtn.textContent = "변경";
+      studentNameStatus.textContent = `안녕하세요, ${studentName}님! 학습 기록이 저장됩니다.`;
+      studentNameStatus.className = "text-xs text-center text-green-600";
+      generateSessionId();
     } else {
-        saveStudentNameBtn.textContent = '저장';
-        studentNameStatus.textContent = '교사 코드 저장 후 이름을 입력하세요.';
-        studentNameStatus.className = 'text-xs text-center text-gray-400';
-        studentNameInput.disabled = true; // Disable until teacher code is entered
+      studentNameInput.disabled = false; // Enable input when lesson code exists
+      saveStudentNameBtn.textContent = "저장";
+      studentNameStatus.textContent = "학습 기록을 위해 이름을 입력해주세요.";
+      studentNameStatus.className = "text-xs text-center text-gray-500";
     }
+  } else {
+    saveStudentNameBtn.textContent = "저장";
+    studentNameStatus.textContent = "수업 코드 저장 후 이름을 입력하세요.";
+    studentNameStatus.className = "text-xs text-center text-gray-400";
+    studentNameInput.disabled = true; // Disable until lesson code is entered
+  }
 }
 
 function saveStudentName() {
-    if (saveStudentNameBtn.textContent === '변경') {
-        studentNameInput.disabled = false;
-        studentNameInput.value = '';
-        studentNameInput.focus();
-        saveStudentNameBtn.textContent = '저장';
-        studentNameStatus.textContent = '새로운 이름을 입력하고 저장해주세요.';
-        studentNameStatus.className = 'text-xs text-center text-gray-500';
-        return;
-    }
+  if (saveStudentNameBtn.textContent === "변경") {
+    studentNameInput.disabled = false;
+    studentNameInput.value = "";
+    studentNameInput.focus();
+    saveStudentNameBtn.textContent = "저장";
+    studentNameStatus.textContent = "새로운 이름을 입력하고 저장해주세요.";
+    studentNameStatus.className = "text-xs text-center text-gray-500";
+    return;
+  }
 
-    const name = studentNameInput.value.trim();
-    if (name) {
-        localStorage.setItem(`studentName_${teacherCode}`, name);
-        studentName = name;
-        alert('이름이 저장되었습니다. 이제 대화 기록이 저장됩니다!');
-        initializeStudentNameState();
-    } else {
-        alert('이름을 입력해주세요.');
-    }
+  const name = studentNameInput.value.trim();
+  if (name) {
+    localStorage.setItem(`studentName_${lessonCode}`, name);
+    studentName = name;
+    alert("이름이 저장되었습니다. 이제 대화 기록이 저장됩니다!");
+    initializeStudentNameState();
+  } else {
+    alert("이름을 입력해주세요.");
+  }
 }
 
 function generateSessionId() {
-    if (!sessionId) {
-        sessionId = `${teacherCode}_${studentName}_${Date.now()}`;
-    }
+  if (!sessionId) {
+    sessionId = `${lessonCode}_${studentName}_${Date.now()}`;
+  }
 }
 
 async function handleChatSubmit(e) {
-    e.preventDefault();
-    const userInput = chatInput.value.trim();
-    if (!userInput) return;
+  e.preventDefault();
+  const userInput = chatInput.value.trim();
+  if (!userInput) return;
 
-    if (!teacherCode) {
-        displayAiMessage("아이고! 교사 코드를 먼저 저장해야 대화를 시작할 수 있어요.");
-        teacherCodeInput.focus();
-        return;
+  if (!lessonCode) {
+    displayAiMessage(
+      "아이고! 수업 코드를 먼저 저장해야 대화를 시작할 수 있어요."
+    );
+    lessonCodeInput.focus();
+    return;
+  }
+
+  displayUserMessage(userInput);
+  conversationHistory.push({ role: "user", parts: [{ text: userInput }] });
+  chatInput.value = "";
+  typingIndicator.style.display = "block";
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  try {
+    const apiData = {
+      lessonCode: lessonCode,
+      userMessage: userInput,
+      conversationHistory: conversationHistory,
+    };
+
+    // 학생 이름과 세션 ID가 있으면 추가
+    if (studentName && sessionId) {
+      apiData.studentName = studentName;
+      apiData.sessionId = sessionId;
     }
 
-    displayUserMessage(userInput);
-    conversationHistory.push({ role: 'user', parts: [{ text: userInput }] });
-    chatInput.value = '';
-    typingIndicator.style.display = 'block';
+    const aiResponseText = await callGeminiApi(apiData);
+    displayAiMessage(aiResponseText);
+    conversationHistory.push({
+      role: "model",
+      parts: [{ text: aiResponseText }],
+    });
+  } catch (error) {
+    console.error("Error fetching AI response:", error);
+    displayAiMessage(`이런, 지금은 연결이 어려운 것 같아요. ${error.message}`);
+  } finally {
+    typingIndicator.style.display = "none";
     chatWindow.scrollTop = chatWindow.scrollHeight;
-
-    try {
-        const apiData = {
-            teacherCode: teacherCode,
-            userMessage: userInput,
-            conversationHistory: conversationHistory
-        };
-        
-        // 학생 이름과 세션 ID가 있으면 추가
-        if (studentName && sessionId) {
-            apiData.studentName = studentName;
-            apiData.sessionId = sessionId;
-        }
-        
-        const aiResponseText = await callGeminiApi(apiData);
-        displayAiMessage(aiResponseText);
-        conversationHistory.push({ role: 'model', parts: [{ text: aiResponseText }] });
-    } catch (error) {
-        console.error('Error fetching AI response:', error);
-        displayAiMessage(`이런, 지금은 연결이 어려운 것 같아요. ${error.message}`);
-    } finally {
-        typingIndicator.style.display = 'none';
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+  }
 }
 
 function displayUserMessage(message) {
-    const messageElement = document.createElement('div');
-    messageElement.className = 'chat-message user-message';
-    messageElement.innerHTML = `<p>${message}</p>`;
-    chatWindow.appendChild(messageElement);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+  const messageElement = document.createElement("div");
+  messageElement.className = "chat-message user-message";
+  messageElement.innerHTML = `<p>${message}</p>`;
+  chatWindow.appendChild(messageElement);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 function displayAiMessage(message, isFirst = false) {
-    const messageElement = document.createElement('div');
-    messageElement.className = 'chat-message ai-message';
-    
-    const avatar = `<div class="avatar"><i data-lucide="bot"></i></div>`;
-    
-    messageElement.innerHTML = `
+  const messageElement = document.createElement("div");
+  messageElement.className = "chat-message ai-message";
+
+  const avatar = `<div class="avatar"><i data-lucide="bot"></i></div>`;
+
+  messageElement.innerHTML = `
         <div class="message-content">
-            ${isFirst || conversationHistory.length === 0 ? avatar : ''}
+            ${isFirst || conversationHistory.length === 0 ? avatar : ""}
             <p>${message}</p>
         </div>
     `;
-    
-    chatWindow.appendChild(messageElement);
-    lucide.createIcons();
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  chatWindow.appendChild(messageElement);
+  lucide.createIcons();
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 function getIntent(message) {
-    for (const intent in intentPatterns) {
-        if (intentPatterns[intent].test(message)) {
-            return intent;
-        }
+  for (const intent in intentPatterns) {
+    if (intentPatterns[intent].test(message)) {
+      return intent;
     }
-    return 'Fallback';
+  }
+  return "Fallback";
 }
 
 function generatePrompt(intent, message, history) {
-    const systemInstruction = `너는 초등 영재 학생을 위한 '그래비트랙스 물리 탐구 AI 튜터'야. 너의 이름은 'G-Tutor'이다. 너의 역할은 학생의 자기주도적 문제 해결을 돕는 '소크라테스식 질문자'이다.
+  const systemInstruction = `너는 초등 영재 학생을 위한 '그래비트랙스 물리 탐구 AI 튜터'야. 너의 이름은 'G-Tutor'이다. 너의 역할은 학생의 자기주도적 문제 해결을 돕는 '소크라테스식 질문자'이다.
 
 ### 너의 핵심 규칙 ###
 1. 절대로 정답이나 해결 방법을 직접 알려주면 안 된다. 예를 들어, '높이를 올리세요'와 같은 직접적인 지시는 금지된다.
@@ -231,11 +266,11 @@ function generatePrompt(intent, message, history) {
 5. 학생의 발화에서 '높이', '속도', '힘'과 같은 단서가 나오면, 이를 '위치에너지', '운동에너지'와 같은 과학 용어와 연결하는 질문을 던져라.
 6. 친절하고 격려하는 동료 탐험가 같은 말투를 사용하라. 한국어로만 대답해야 한다.`;
 
-    const studentFacingHistory = history.slice(-6); 
+  const studentFacingHistory = history.slice(-6);
 
-    const contents = studentFacingHistory.map((turn, index) => {
-        if (index === 0) {
-            const userTextWithSystemPrompt = `${systemInstruction}
+  const contents = studentFacingHistory.map((turn, index) => {
+    if (index === 0) {
+      const userTextWithSystemPrompt = `${systemInstruction}
 
 ### 현재 학습 맥락 ###
 - 수업 단계: 전개 (활동3 - 인지적 갈등 유발 미션)
@@ -243,23 +278,29 @@ function generatePrompt(intent, message, history) {
 
 ### 학생의 현재 발화 ###
 ${turn.parts[0].text}`;
-            return { role: 'user', parts: [{ text: userTextWithSystemPrompt }] };
-        }
-        return turn;
-    });
-
-    if (studentFacingHistory.length === 0) {
-        contents.push({ role: 'user', parts: [{ text: `${systemInstruction}\n\n### 학생의 현재 발화 ###\n${message}` }] });
+      return { role: "user", parts: [{ text: userTextWithSystemPrompt }] };
     }
+    return turn;
+  });
 
+  if (studentFacingHistory.length === 0) {
+    contents.push({
+      role: "user",
+      parts: [
+        {
+          text: `${systemInstruction}\n\n### 학생의 현재 발화 ###\n${message}`,
+        },
+      ],
+    });
+  }
 
-    const promptObject = {
-        contents: contents,
-        generationConfig: {
-            "temperature": 0.7,
-            "topP": 0.9,
-            "maxOutputTokens": 300
-        }
-    };
-    return promptObject;
+  const promptObject = {
+    contents: contents,
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.9,
+      maxOutputTokens: 300,
+    },
+  };
+  return promptObject;
 }

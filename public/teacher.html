@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>교사 대시보드 - AI 챗봇</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        // QRCode 라이브러리 로딩 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('QRious library loaded:', typeof QRious !== 'undefined');
+        });
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; }
@@ -74,6 +81,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
                                 <span>기본 설정</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors flex items-center space-x-3" data-section="lessons">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                <span>수업 관리</span>
                             </button>
                         </li>
                         <li>
@@ -246,8 +261,148 @@
                         </div>
                     </div>
                     
+                    <!-- 수업 관리 섹션 -->
+                    <div id="lessons-section" class="hidden">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">수업 관리</h1>
+                            <p class="text-gray-600 mt-2">AI 튜터를 활용한 수업을 생성하고 QR코드로 학생들과 공유하세요.</p>
+                        </div>
+                        
+                        <!-- 새 수업 생성 카드 -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">새 수업 생성</h2>
+                                    <p class="text-gray-600 text-sm mt-1">과목을 선택하고 수업 제목을 입력하여 새로운 수업을 만드세요.</p>
+                                </div>
+                            </div>
+                            
+                            <form id="create-lesson-form" class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            수업 제목
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="lesson-title-input"
+                                            placeholder="예: 분수의 나눗셈, 조선시대 문화" 
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            과목 선택
+                                        </label>
+                                        <select 
+                                            id="lesson-subject-select" 
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                        >
+                                            <option value="">과목을 선택하세요</option>
+                                            <option value="korean">국어</option>
+                                            <option value="math">수학</option>
+                                            <option value="social">사회</option>
+                                            <option value="science">과학</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        수업 설명 (선택사항)
+                                    </label>
+                                    <textarea 
+                                        id="lesson-description-input"
+                                        rows="3"
+                                        placeholder="학생들에게 전달할 수업 안내 메시지를 입력하세요."
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button 
+                                        type="submit" 
+                                        id="create-lesson-btn"
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                                    >
+                                        수업 생성
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- 활성 수업 목록 -->
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="p-6 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-lg font-semibold text-gray-800">내 수업 목록</h2>
+                                    <button id="refresh-lessons-btn" class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
+                                        새로고침
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div id="lessons-loading" class="text-center py-8 hidden">
+                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                    <p class="text-gray-600 mt-2">수업 목록을 불러오는 중...</p>
+                                </div>
+                                
+                                <div id="lessons-empty" class="text-center py-8 hidden">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">아직 생성된 수업이 없습니다</h3>
+                                    <p class="mt-1 text-sm text-gray-500">위에서 새 수업을 생성해보세요.</p>
+                                </div>
+                                
+                                <div id="lessons-list" class="space-y-4">
+                                    <!-- 수업 목록이 여기에 동적으로 추가됩니다 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- 프롬프트 설정 섹션 -->
                     <div id="prompts-section" class="hidden">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">AI 튜터 프롬프트 설정</h1>
+                            <p class="text-gray-600 mt-2">과목별로 학생 응답 유형에 따라 다른 AI 튜터 전략을 설정할 수 있습니다.</p>
+                        </div>
+                        
+                        <!-- 과목 선택 카드 -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">과목 선택</h2>
+                                    <p class="text-gray-600 text-sm mt-1">먼저 설정할 과목을 선택해주세요</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <label class="block text-sm font-medium text-gray-700">과목 선택</label>
+                                <select id="prompt-subject-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                                    <option value="">과목을 선택하세요</option>
+                                    <option value="korean">국어</option>
+                                    <option value="math">수학</option>
+                                    <option value="social">사회</option>
+                                    <option value="science">과학</option>
+                                </select>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2">선택한 과목에 맞는 학생 응답 유형별 프롬프트를 설정할 수 있습니다.</p>
+                        </div>
+                        
+                        <!-- 선택 안내 메시지 -->
+                        <div id="no-subject-selected" class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">과목을 선택해주세요</h3>
+                            <p class="mt-1 text-sm text-gray-500">위에서 과목을 선택하시면 해당 과목의 AI 튜터 프롬프트 설정이 나타납니다.</p>
+                        </div>
+
                         <!-- 유형별 프롬프트 설정 카드 -->
                         <div id="adaptive-prompt-settings-section" class="bg-white rounded-lg shadow-sm border p-6 hidden">
                             <div class="flex items-center justify-between mb-6">
@@ -263,66 +418,14 @@
                             </div>
 
                             <div class="space-y-6">
-                                <!-- 탭 네비게이션 -->
+                                <!-- 동적 탭 네비게이션과 컨텐츠가 여기에 생성됩니다 -->
                                 <div class="border-b border-gray-200">
                                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm" data-tab="DEFAULT">기본 상황</button>
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="CONCEPT_QUESTION">개념 질문</button>
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="EXPLORATION_DEADLOCK">탐색 교착</button>
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="FAILURE_REPORT">실패 보고</button>
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="SUCCESS_WITHOUT_PRINCIPLE">무사고 성공</button>
-                                        <button class="prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="HYPOTHESIS_INQUIRY">가설 제시</button>
+                                        <!-- 동적 탭 버튼들이 여기에 생성됩니다 -->
                                     </nav>
                                 </div>
-
-                                <!-- 탭 컨텐트 -->
-                                <div class="prompt-tab-content" data-tab="DEFAULT">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">기본 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">일반적인 상황에서 사용될 AI 튜터의 기본 역할을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-DEFAULT" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="기본 프롬프트를 입력하세요..."></textarea>
-                                </div>
-
-                                <div class="prompt-tab-content hidden" data-tab="CONCEPT_QUESTION">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">개념 질문 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">학생이 "에너지가 뭐예요?", "왜 그래요?" 같은 개념 질문을 할 때의 AI 답변 방식을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-CONCEPT_QUESTION" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="개념 질문에 대한 프롬프트를 입력하세요..."></textarea>
-                                </div>
-
-                                <div class="prompt-tab-content hidden" data-tab="EXPLORATION_DEADLOCK">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">탐색 교착 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">학생이 "어떻게 해야할지 모르겠어요", "막막해요" 같이 막혔을 때의 AI 답변 방식을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-EXPLORATION_DEADLOCK" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="탐색 교착 상황에 대한 프롬프트를 입력하세요..."></textarea>
-                                </div>
-
-                                <div class="prompt-tab-content hidden" data-tab="FAILURE_REPORT">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">실패 보고 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">학생이 "구슬이 떨어졌어요", "실패했어요" 같이 실패를 보고할 때의 AI 답변 방식을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-FAILURE_REPORT" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="실패 보고 상황에 대한 프롬프트를 입력하세요..."></textarea>
-                                </div>
-
-                                <div class="prompt-tab-content hidden" data-tab="SUCCESS_WITHOUT_PRINCIPLE">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">무사고 성공 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">학생이 "성공했어요!", "됐다!" 같이 성공을 알렸지만 원리를 모를 때의 AI 답변 방식을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-SUCCESS_WITHOUT_PRINCIPLE" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="무사고 성공 상황에 대한 프롬프트를 입력하세요..."></textarea>
-                                </div>
-
-                                <div class="prompt-tab-content hidden" data-tab="HYPOTHESIS_INQUIRY">
-                                    <div class="mb-4">
-                                        <h3 class="text-md font-semibold text-gray-800 mb-2">가설 제시 상황 프롬프트</h3>
-                                        <p class="text-sm text-gray-600 mb-3">학생이 "만약 높이를 올리면?", "그래서 그런가요?" 같이 가설을 제시할 때의 AI 답변 방식을 설정합니다.</p>
-                                    </div>
-                                    <textarea id="prompt-HYPOTHESIS_INQUIRY" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="가설 제시 상황에 대한 프롬프트를 입력하세요..."></textarea>
-                                </div>
+                                
+                                <!-- 동적 탭 컨텐츠들이 여기에 생성됩니다 -->
                                 
                                 <div class="flex justify-end space-x-3 mt-6">
                                     <button id="save-adaptive-prompts-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
@@ -459,6 +562,9 @@
         const getTeacherSettings = httpsCallable(functions, 'getTeacherSettings');
         const updateTeacherModel = httpsCallable(functions, 'updateTeacherModel');
         const updateTeacherPrompts = httpsCallable(functions, 'updateTeacherPrompts');
+        const getSubjectResponseTypes = httpsCallable(functions, 'getSubjectResponseTypes');
+        const createLesson = httpsCallable(functions, 'createLesson');
+        const getLessons = httpsCallable(functions, 'getLessons');
         const getStudentSessions = httpsCallable(functions, 'getStudentSessions');
         const getStudentConversation = httpsCallable(functions, 'getStudentConversation');
         const analyzeStudentConversations = httpsCallable(functions, 'analyzeStudentConversations');
@@ -500,6 +606,229 @@
         // 전역 변수들
         let currentSettings = null;
         let currentTab = 'DEFAULT';
+        let currentSubjectResponseTypes = null;
+        let currentSelectedSubject = '';
+        
+        // 프롬프트 설정 관련 요소들
+        const promptSubjectSelect = document.getElementById('prompt-subject-select');
+        
+        // 과목 선택 이벤트 핸들러
+        promptSubjectSelect.addEventListener('change', async (e) => {
+            const selectedSubject = e.target.value;
+            if (selectedSubject) {
+                // 선택 안내 메시지 숨김
+                document.getElementById('no-subject-selected').classList.add('hidden');
+                // 프롬프트 설정 카드 표시
+                adaptivePromptSettingsSection.classList.remove('hidden');
+                
+                await loadSubjectResponseTypes(selectedSubject);
+            } else {
+                // 과목 선택 해제 시 기본 상태로 돌아감
+                document.getElementById('no-subject-selected').classList.remove('hidden');
+                adaptivePromptSettingsSection.classList.add('hidden');
+                clearPromptTabs();
+            }
+        });
+        
+    // 과목 이름 매핑
+    const subjectNames = {
+        'korean': '국어',
+        'math': '수학',
+        'science': '과학',
+        'social': '사회'
+    };
+
+    // 과목별 응답 유형 로드 및 탭 생성
+    async function loadSubjectResponseTypes(subject) {
+        try {
+            showStatus('과목별 응답 유형을 불러오는 중...', 'info', 2000);
+            
+            const result = await getSubjectResponseTypes({ subject });
+            console.log('받은 응답 유형 데이터:', result.data);
+            
+            // responseTypes 처리 - 객체인 경우 배열로 변환
+            let responseTypes = result.data.responseTypes;
+            
+            if (!responseTypes) {
+                console.error('responseTypes가 존재하지 않습니다:', result.data);
+                showStatus('과목별 응답 유형 데이터가 존재하지 않습니다.', 'error');
+                clearPromptTabs();
+                return;
+            }
+            
+            // responseTypes가 객체인 경우 배열로 변환
+            if (!Array.isArray(responseTypes) && typeof responseTypes === 'object') {
+                console.log('responseTypes가 객체 형태입니다. 배열로 변환합니다:', responseTypes);
+                responseTypes = Object.keys(responseTypes).map(key => {
+                    const responseType = responseTypes[key];
+                    return {
+                        id: key,
+                        name: responseType.name || key,
+                        description: responseType.description || '',
+                        examples: responseType.examples || []
+                    };
+                });
+                console.log('변환된 responseTypes 배열:', responseTypes);
+            }
+            
+            // 배열이 아닌 경우 에러
+            if (!Array.isArray(responseTypes)) {
+                console.error('responseTypes를 배열로 변환할 수 없습니다:', responseTypes);
+                showStatus('과목별 응답 유형 데이터 형식이 올바르지 않습니다.', 'error');
+                clearPromptTabs();
+                return;
+            }
+            
+            // 빈 배열 체크
+            if (responseTypes.length === 0) {
+                console.warn('responseTypes가 빈 배열입니다.');
+                showStatus('해당 과목에 대한 응답 유형이 없습니다.', 'error');
+                clearPromptTabs();
+                return;
+            }
+            
+            currentSubjectResponseTypes = responseTypes;
+            currentSelectedSubject = subject;
+            
+            // 동적으로 탭 생성
+            generateDynamicTabs(currentSubjectResponseTypes);
+            
+            // 생성된 탭들에 기존 프롬프트 데이터 로드
+            // 과목별 기본 프롬프트는 result.data.defaultPrompts에서 제공됨
+            const subjectDefaultPrompts = result.data.defaultPrompts || {};
+            console.log('과목별 기본 프롬프트:', subjectDefaultPrompts);
+            
+            // 커스텀 프롬프트는 현재 과목에 맞게 필터링하여 사용
+            const allCustomPrompts = currentSettings ? currentSettings.customPrompts || {} : {};
+            // 현재 과목에 맞는 커스텀 프롬프트가 있는지 확인
+            const customPrompts = allCustomPrompts[subject] || {};
+            console.log('현재 과목의 커스텀 프롬프트:', customPrompts);
+            
+            loadPromptTabs(customPrompts, subjectDefaultPrompts);
+            
+            // 첫 번째 탭으로 전환
+            if (currentSubjectResponseTypes.length > 0) {
+                const firstTabId = currentSubjectResponseTypes[0].id;
+                switchTab(firstTabId);
+            }
+            
+            const subjectDisplayName = subjectNames[subject] || subject;
+            showStatus(`${subjectDisplayName} 과목의 응답 유형이 로드되었습니다.`, 'success', 2000);
+                
+            } catch (error) {
+                console.error('과목별 응답 유형 로드 실패:', error);
+                showStatus('과목별 응답 유형을 불러오는데 실패했습니다.', 'error');
+                clearPromptTabs();
+            }
+        }
+        
+        // 동적 탭 생성
+        function generateDynamicTabs(responseTypes) {
+            // responseTypes 매개변수 검증
+            if (!Array.isArray(responseTypes)) {
+                console.error('generateDynamicTabs: responseTypes가 배열이 아닙니다:', responseTypes);
+                return;
+            }
+            
+            if (responseTypes.length === 0) {
+                console.warn('generateDynamicTabs: responseTypes가 빈 배열입니다.');
+                return;
+            }
+            
+            const tabNavContainer = document.querySelector('[aria-label="Tabs"]');
+            if (!tabNavContainer) {
+                console.error('generateDynamicTabs: 탭 네비게이션 컨테이너를 찾을 수 없습니다.');
+                return;
+            }
+            
+            const tabContentContainer = tabNavContainer.parentElement?.parentElement;
+            if (!tabContentContainer) {
+                console.error('generateDynamicTabs: 탭 컨텐츠 컨테이너를 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 기존 탭 제거
+            tabNavContainer.innerHTML = '';
+            
+            // 기존 탭 컨텐츠 제거 (첫 번째 탭 네비게이션과 저장 버튼 제외)
+            const existingContents = tabContentContainer.querySelectorAll('.prompt-tab-content');
+            existingContents.forEach(content => content.remove());
+            
+            let isFirstTab = true;
+            responseTypes.forEach(responseType => {
+                // responseType 객체 검증
+                if (!responseType || typeof responseType !== 'object') {
+                    console.warn('generateDynamicTabs: 잘못된 responseType:', responseType);
+                    return;
+                }
+                
+                if (!responseType.id || !responseType.name) {
+                    console.warn('generateDynamicTabs: responseType에 필수 필드가 없습니다:', responseType);
+                    return;
+                }
+                // 탭 버튼 생성
+                const tabButton = document.createElement('button');
+                tabButton.className = isFirstTab 
+                    ? 'prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm'
+                    : 'prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm';
+                tabButton.setAttribute('data-tab', responseType.id);
+                tabButton.textContent = responseType.name;
+                
+                tabButton.addEventListener('click', () => {
+                    switchTab(responseType.id);
+                });
+                
+                tabNavContainer.appendChild(tabButton);
+                
+                // 탭 컨텐츠 생성
+                const tabContent = document.createElement('div');
+                tabContent.className = isFirstTab ? 'prompt-tab-content' : 'prompt-tab-content hidden';
+                tabContent.setAttribute('data-tab', responseType.id);
+                
+                tabContent.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">${responseType.name} 프롬프트</h3>
+                        <p class="text-sm text-gray-600 mb-3">${responseType.description}</p>
+                        ${responseType.examples && responseType.examples.length > 0 ? `
+                            <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
+                                <p class="text-xs font-medium text-blue-800 mb-2">다른 예시 프롬프트들:</p>
+                                <div class="text-xs text-blue-700">
+                                    ${responseType.examples.slice(1).map((example, idx) => `<p class="mb-1">• ${example}</p>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <textarea id="prompt-${responseType.id}" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" placeholder="${responseType.name}에 대한 프롬프트를 입력하세요..."></textarea>
+                `;
+                
+                // 저장 버튼 앞에 삽입
+                const saveButtonContainer = tabContentContainer.querySelector('.flex.justify-end');
+                tabContentContainer.insertBefore(tabContent, saveButtonContainer);
+                
+                isFirstTab = false;
+            });
+            
+            // 전역 탭 요소 참조 업데이트
+            window.promptTabBtns = document.querySelectorAll('.prompt-tab-btn');
+            window.promptTabContents = document.querySelectorAll('.prompt-tab-content');
+        }
+        
+        // 탭 초기화
+        function clearPromptTabs() {
+            const tabNavContainer = document.querySelector('[aria-label="Tabs"]');
+            const tabContentContainer = tabNavContainer.parentElement.parentElement;
+            
+            // 탭 네비게이션 초기화
+            tabNavContainer.innerHTML = '<p class="text-sm text-gray-500">과목을 선택하면 해당 과목의 응답 유형별 프롬프트를 설정할 수 있습니다.</p>';
+            
+            // 탭 컨텐츠 제거
+            const existingContents = tabContentContainer.querySelectorAll('.prompt-tab-content');
+            existingContents.forEach(content => content.remove());
+            
+            currentSubjectResponseTypes = null;
+            currentSelectedSubject = '';
+            currentTab = null;
+        }
 
         // Google 로그인
         googleLoginBtn.addEventListener('click', async () => {
@@ -611,6 +940,7 @@
                 const result = await getTeacherSettings();
                 const data = result.data;
                 currentSettings = data;
+                console.log('교사 설정 로드:', data);
                 
                 if (data.hasApiKey) {
                     // API 키가 등록됨
@@ -618,15 +948,19 @@
                     apiConfigured.classList.remove('hidden');
                     teacherCodeSection.classList.remove('hidden');
                     modelSettingsSection.classList.remove('hidden');
-                    adaptivePromptSettingsSection.classList.remove('hidden');
+                    
+                    // 선택 안내 메시지를 보이도록 설정
+                    document.getElementById('no-subject-selected').classList.remove('hidden');
+                    // 과목이 선택되기 전까지는 프롬프트 탭 컨테이너 숨김
+                    adaptivePromptSettingsSection.classList.add('hidden');
                     
                     teacherCodeDisplay.textContent = data.teacherCode;
                     
                     // 모델 선택 박스 설정
                     modelSelect.value = data.modelName || 'gemini-2.0-flash-exp';
                     
-                    // 유형별 프롬프트 로드
-                    loadPromptTabs(data.customPrompts, data.defaultPrompts);
+                    // 과목이 선택되지 않은 상태에서는 프롬프트 탭을 초기화
+                    clearPromptTabs();
                     
                     apiStatus.textContent = 'API 연결됨';
                     apiStatus.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700';
@@ -658,12 +992,16 @@
             });
         });
         
-        // 탭 전환
+        // 탭 전환 - 동적으로 생성된 탭들을 위해 실시간으로 요소를 찾아서 처리
         function switchTab(tabId) {
             currentTab = tabId;
             
+            // 현재 DOM에서 탭 버튼들을 다시 조회
+            const currentTabBtns = document.querySelectorAll('.prompt-tab-btn');
+            const currentTabContents = document.querySelectorAll('.prompt-tab-content');
+            
             // 탭 버튼 스타일 업데이트
-            promptTabBtns.forEach(btn => {
+            currentTabBtns.forEach(btn => {
                 if (btn.dataset.tab === tabId) {
                     btn.className = 'prompt-tab-btn whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm';
                 } else {
@@ -672,7 +1010,7 @@
             });
             
             // 탭 컨텐트 보이기/숨기기
-            promptTabContents.forEach(content => {
+            currentTabContents.forEach(content => {
                 if (content.dataset.tab === tabId) {
                     content.classList.remove('hidden');
                 } else {
@@ -681,17 +1019,18 @@
             });
         }
         
-        // 프롬프트 탭 로드
-        function loadPromptTabs(customPrompts, defaultPrompts) {
-            const promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+        // 프롬프트 탭 로드 - 동적 탭과 기본 탭 모두 지원
+        function loadPromptTabs(customPrompts = {}, defaultPrompts = {}) {
+            // 전체 textarea 요소들을 찾아서 처리
+            const allTextareas = document.querySelectorAll('textarea[id^="prompt-"]');
             
-            promptTypes.forEach(type => {
-                const textarea = document.getElementById(`prompt-${type}`);
-                if (textarea) {
-                    const customPrompt = customPrompts[type];
-                    const defaultPrompt = defaultPrompts[type];
-                    textarea.value = customPrompt || defaultPrompt || '';
-                }
+            allTextareas.forEach(textarea => {
+                const promptId = textarea.id.replace('prompt-', '');
+                const customPrompt = customPrompts[promptId];
+                const defaultPrompt = defaultPrompts[promptId];
+                
+                // 커스텀 프롬프트가 있으면 사용, 없으면 기본 프롬프트 사용
+                textarea.value = customPrompt || defaultPrompt || '';
             });
         }
         
@@ -722,7 +1061,15 @@
         
         // 유형별 프롬프트 저장
         saveAdaptivePromptsBtn.addEventListener('click', async () => {
-            const promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+            // 동적 응답 유형 또는 기본 유형 사용
+            let promptTypes;
+            if (currentSubjectResponseTypes && currentSubjectResponseTypes.length > 0) {
+                promptTypes = currentSubjectResponseTypes.map(rt => rt.id);
+            } else {
+                // 기본 타입들 (과목 선택이 안 된 경우)
+                promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+            }
+            
             const prompts = {};
             
             // 모든 프롬프트 수집
@@ -733,13 +1080,20 @@
                 }
             }
             
+            // 과목이 선택되지 않았다면 경고
+            if (!currentSelectedSubject) {
+                showStatus('과목을 먼저 선택해주세요.', 'error');
+                return;
+            }
+            
             try {
                 saveAdaptivePromptsBtn.textContent = '저장 중...';
                 saveAdaptivePromptsBtn.disabled = true;
         
-                await updateTeacherPrompts({ prompts });
+                await updateTeacherPrompts({ prompts, subject: currentSelectedSubject });
                 
-                showStatus('모든 프롬프트가 성공적으로 저장되었습니다!', 'success');
+            const subjectDisplayName = subjectNames[currentSelectedSubject] || currentSelectedSubject;
+            showStatus(`${subjectDisplayName} 과목의 모든 프롬프트가 성공적으로 저장되었습니다!`, 'success');
                 
             } catch (error) {
                 console.error('유형별 프롬프트 저장 실패:', error);
@@ -756,9 +1110,31 @@
                 return;
             }
             
-            if (currentSettings && currentSettings.defaultPrompts) {
-                loadPromptTabs({}, currentSettings.defaultPrompts);
-                showStatus('모든 프롬프트가 기본값으로 되돌리경습니다.', 'info');
+            if (!currentSelectedSubject) {
+                showStatus('과목을 먼저 선택해주세요.', 'error');
+                return;
+            }
+            
+            // 동적 응답 유형에 따른 기본값 설정
+            if (currentSubjectResponseTypes && currentSubjectResponseTypes.length > 0) {
+                currentSubjectResponseTypes.forEach(rt => {
+                    const textarea = document.getElementById(`prompt-${rt.id}`);
+                    if (textarea) {
+                        textarea.value = ''; // 또는 기본 프롬프트가 있다면 설정
+                    }
+                });
+                const subjectDisplayName = subjectNames[currentSelectedSubject] || currentSelectedSubject;
+                showStatus(`${subjectDisplayName} 과목의 모든 프롬프트가 기본값으로 되돌렸습니다.`, 'info');
+            } else if (currentSettings && currentSettings.defaultPrompts) {
+                // 기본 유형들 사용
+                const promptTypes = ['DEFAULT', 'CONCEPT_QUESTION', 'EXPLORATION_DEADLOCK', 'FAILURE_REPORT', 'SUCCESS_WITHOUT_PRINCIPLE', 'HYPOTHESIS_INQUIRY'];
+                promptTypes.forEach(type => {
+                    const textarea = document.getElementById(`prompt-${type}`);
+                    if (textarea) {
+                        textarea.value = currentSettings.defaultPrompts[type] || '';
+                    }
+                });
+                showStatus('모든 프롬프트가 기본값으로 되돌렸습니다.', 'info');
             }
         });
 
@@ -791,6 +1167,7 @@
         // 네비게이션 요소들
         const navItems = document.querySelectorAll('.nav-item');
         const settingsSection = document.getElementById('settings-section');
+        const lessonsSection = document.getElementById('lessons-section');
         const promptsSection = document.getElementById('prompts-section');
         const studentsSection = document.getElementById('students-section');
         
@@ -822,12 +1199,19 @@
             
             // 섹션 보이기/숨기기
             settingsSection.classList.add('hidden');
+            lessonsSection.classList.add('hidden');
             promptsSection.classList.add('hidden');
             studentsSection.classList.add('hidden');
             
             switch (sectionName) {
                 case 'settings':
                     settingsSection.classList.remove('hidden');
+                    break;
+                case 'lessons':
+                    lessonsSection.classList.remove('hidden');
+                    if (currentSettings && currentSettings.hasApiKey) {
+                        loadLessons();
+                    }
                     break;
                 case 'prompts':
                     promptsSection.classList.remove('hidden');
@@ -1204,6 +1588,402 @@
             `;
             
             return div;
+        }
+        
+        // === 수업 관리 기능 ===
+        
+        // 수업 관리 관련 요소들
+        const createLessonForm = document.getElementById('create-lesson-form');
+        const lessonTitleInput = document.getElementById('lesson-title-input');
+        const lessonSubjectSelect = document.getElementById('lesson-subject-select');
+        const lessonDescriptionInput = document.getElementById('lesson-description-input');
+        const createLessonBtn = document.getElementById('create-lesson-btn');
+        const refreshLessonsBtn = document.getElementById('refresh-lessons-btn');
+        const lessonsLoading = document.getElementById('lessons-loading');
+        const lessonsEmpty = document.getElementById('lessons-empty');
+        const lessonsList = document.getElementById('lessons-list');
+        
+        // 새 수업 생성 폼 제출
+        createLessonForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = lessonTitleInput.value.trim();
+            const subject = lessonSubjectSelect.value;
+            const description = lessonDescriptionInput.value.trim();
+            
+            if (!title || !subject) {
+                showStatus('수업 제목과 과목을 모두 입력해주세요.', 'error');
+                return;
+            }
+            
+            try {
+                createLessonBtn.textContent = '생성 중...';
+                createLessonBtn.disabled = true;
+                
+                const result = await createLesson({
+                    title,
+                    subject,
+                    description: description || null
+                });
+                
+                showStatus('새 수업이 성공적으로 생성되었습니다!', 'success');
+                
+                // 폼 리셋
+                createLessonForm.reset();
+                
+                // 수업 목록 새로고침
+                await loadLessons();
+                
+            } catch (error) {
+                console.error('수업 생성 실패:', error);
+                showStatus(`수업 생성 실패: ${error.message}`, 'error');
+            } finally {
+                createLessonBtn.textContent = '수업 생성';
+                createLessonBtn.disabled = false;
+            }
+        });
+        
+        // 수업 목록 새로고침 버튼
+        refreshLessonsBtn.addEventListener('click', () => {
+            loadLessons();
+        });
+        
+        // 수업 목록 로드
+        async function loadLessons() {
+            try {
+                lessonsLoading.classList.remove('hidden');
+                lessonsEmpty.classList.add('hidden');
+                lessonsList.innerHTML = '';
+                
+                const result = await getLessons();
+                const lessons = result.data.lessons || [];
+                
+                lessonsLoading.classList.add('hidden');
+                
+                if (lessons.length === 0) {
+                    lessonsEmpty.classList.remove('hidden');
+                    return;
+                }
+                
+                // 수업 목록 렌더링
+                lessons.forEach(lesson => {
+                    const lessonElement = createLessonElement(lesson);
+                    lessonsList.appendChild(lessonElement);
+                });
+                
+            } catch (error) {
+                console.error('수업 목록 로드 실패:', error);
+                showStatus('수업 목록을 불러오는데 실패했습니다.', 'error');
+                lessonsLoading.classList.add('hidden');
+                lessonsEmpty.classList.remove('hidden');
+            }
+        }
+        
+        // 과목 이름 매핑은 상단에서 이미 선언됨
+        
+        // 수업 요소 생성
+        function createLessonElement(lesson) {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-50 rounded-lg p-6 border border-gray-200 hover:border-blue-300 transition-colors';
+            
+            // 생성일 포맷팅
+            let createdAtText = '생성일 정보 없음';
+            if (lesson.createdAt) {
+                try {
+                    const date = new Date(lesson.createdAt);
+                    if (!isNaN(date.getTime())) {
+                        createdAtText = date.toLocaleString('ko-KR');
+                    }
+                } catch (error) {
+                    console.log('날짜 파싱 오류:', error);
+                }
+            }
+            
+            const subjectName = subjectNames[lesson.subject] || lesson.subject;
+            
+            div.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <h3 class="text-lg font-semibold text-gray-900">${lesson.title}</h3>
+                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">${subjectName}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${lesson.description || '설명이 없습니다.'}</p>
+                        <div class="flex items-center space-x-4 text-xs text-gray-500">
+                            <span>생성일: ${createdAtText}</span>
+                            <span>수업 코드: <code class="bg-gray-200 px-1 rounded font-mono">${lesson.lessonCode}</code></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <button class="copy-lesson-code-btn text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 font-medium" data-code="${lesson.lessonCode}">
+                            수업 코드 복사
+                        </button>
+                        <button class="show-qr-btn text-sm bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200 font-medium" data-lesson-id="${lesson.id}" data-code="${lesson.lessonCode}" data-title="${lesson.title}">
+                            QR 코드 보기
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        참여 학생: <span class="font-medium">${lesson.studentCount || 0}명</span>
+                    </div>
+                </div>
+            `;
+            
+            // 수업 코드 복사 버튼 이벤트
+            const copyBtn = div.querySelector('.copy-lesson-code-btn');
+            copyBtn.addEventListener('click', async () => {
+                const code = copyBtn.dataset.code;
+                try {
+                    await navigator.clipboard.writeText(code);
+                    showStatus('수업 코드가 클립보드에 복사되었습니다!', 'success');
+                } catch (error) {
+                    // 클립보드 API가 지원되지 않는 경우
+                    const textArea = document.createElement('textarea');
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('수업 코드가 클립보드에 복사되었습니다!', 'success');
+                }
+            });
+            
+            // QR 코드 보기 버튼 이벤트
+            const qrBtn = div.querySelector('.show-qr-btn');
+            qrBtn.addEventListener('click', () => {
+                showQRCodeModal({
+                    lessonCode: qrBtn.dataset.code,
+                    title: qrBtn.dataset.title
+                });
+            });
+            
+            return div;
+        }
+        
+        // QR 코드 모달 생성 및 표시
+        function showQRCodeModal(lesson) {
+            // 기존 모달이 있으면 제거
+            const existingModal = document.getElementById('qr-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 모달 HTML 생성
+            const modal = document.createElement('div');
+            modal.id = 'qr-modal';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4 max-h-full overflow-y-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">${lesson.title}</h3>
+                        <button id="close-qr-modal" class="text-gray-400 hover:text-gray-600 p-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <h4 class="text-lg font-medium text-gray-700 mb-3">📱 QR 코드로 수업 참여</h4>
+                            <div id="qr-code-container" class="flex justify-center mb-4 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" title="클릭하면 크게 볼 수 있습니다">
+                                <!-- QR 코드가 여기에 생성됩니다 -->
+                            </div>
+                            <button id="enlarge-qr-btn" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 font-medium mb-4 flex items-center space-x-2 mx-auto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                </svg>
+                                <span>크게 보기</span>
+                            </button>
+                        </div>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                            <p class="text-sm text-blue-700 mb-2 font-medium">수업 코드</p>
+                            <code class="text-xl font-mono font-bold text-blue-800">${lesson.lessonCode}</code>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm text-gray-600 mb-6">
+                            <p class="font-medium">📋 사용 방법</p>
+                            <p>• QR 코드를 스캔하거나</p>
+                            <p>• 학생이 직접 수업 코드를 입력하면 참여 가능합니다</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="copy-lesson-code-btn" class="bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 font-medium flex items-center justify-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>코드 복사</span>
+                            </button>
+                            <button id="copy-lesson-link-btn" class="bg-green-600 text-white px-4 py-3 rounded-md hover:bg-green-700 font-medium flex items-center justify-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.1a3.994 3.994 0 011.536-2.846"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 10-5.656-5.656l-1.1 1.1a3.994 3.994 0 01-2.846 1.536"></path>
+                                </svg>
+                                <span>링크 복사</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 확대 QR 코드 모달 -->
+                <div id="enlarged-qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-60">
+                    <div class="bg-white rounded-lg p-8 max-w-sm w-full mx-4 text-center">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">QR 코드</h4>
+                            <button id="close-enlarged-qr" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="enlarged-qr-container" class="mb-4">
+                            <!-- 확대된 QR 코드가 여기에 생성됩니다 -->
+                        </div>
+                        <p class="text-sm text-gray-600">QR 코드를 스캔하여 수업에 참여하세요</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // QR 코드 생성
+            const qrContainer = document.getElementById('qr-code-container');
+            const canvas = document.createElement('canvas');
+            
+            // 메인 사이트 URL + 수업 코드를 포함한 링크 생성
+            const lessonUrl = `https://science-aichatbot.web.app/?lesson=${lesson.lessonCode}`;
+            
+            // QRious 라이브러리가 로드될 때까지 기다리기
+            const generateQR = () => {
+                if (typeof QRious === 'undefined') {
+                    // QRious가 아직 로드되지 않았으면 100ms 후 재시도
+                    setTimeout(generateQR, 100);
+                    return;
+                }
+                
+                try {
+                    const qr = new QRious({
+                        element: canvas,
+                        value: lessonUrl,
+                        size: 240,
+                        background: '#ffffff',
+                        foreground: '#1f2937'
+                    });
+                    qrContainer.appendChild(canvas);
+                } catch (error) {
+                    console.error('QR 코드 생성 오류:', error);
+                    qrContainer.innerHTML = '<p class="text-red-600">QR 코드 생성에 실패했습니다.</p>';
+                }
+            };
+            
+            generateQR();
+            
+            // 모달 닫기
+            const closeBtn = document.getElementById('close-qr-modal');
+            closeBtn.addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            // 모달 배경 클릭시 닫기
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+            
+            // QR 코드 컨테이너 클릭으로 확대
+            qrContainer.addEventListener('click', showEnlargedQR);
+            
+            // QR 코드 확대 버튼
+            const enlargeBtn = document.getElementById('enlarge-qr-btn');
+            enlargeBtn.addEventListener('click', showEnlargedQR);
+            
+            function showEnlargedQR() {
+                const enlargedModal = document.getElementById('enlarged-qr-modal');
+                const enlargedContainer = document.getElementById('enlarged-qr-container');
+                
+                // 확대된 QR 코드 생성
+                enlargedContainer.innerHTML = '';
+                const enlargedCanvas = document.createElement('canvas');
+                
+                const generateEnlargedQR = () => {
+                    if (typeof QRious === 'undefined') {
+                        setTimeout(generateEnlargedQR, 100);
+                        return;
+                    }
+                    
+                    try {
+                        const enlargedQr = new QRious({
+                            element: enlargedCanvas,
+                            value: lessonUrl,
+                            size: 320,
+                            background: '#ffffff',
+                            foreground: '#1f2937'
+                        });
+                        enlargedContainer.appendChild(enlargedCanvas);
+                    } catch (error) {
+                        console.error('확대 QR 코드 생성 오류:', error);
+                        enlargedContainer.innerHTML = '<p class="text-red-600">QR 코드 생성에 실패했습니다.</p>';
+                    }
+                };
+                
+                generateEnlargedQR();
+                
+                enlargedModal.classList.remove('hidden');
+            }
+            
+            // 확대 모달 닫기
+            const closeEnlargedBtn = document.getElementById('close-enlarged-qr');
+            closeEnlargedBtn.addEventListener('click', () => {
+                document.getElementById('enlarged-qr-modal').classList.add('hidden');
+            });
+            
+            // 확대 모달 배경 클릭시 닫기
+            document.getElementById('enlarged-qr-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'enlarged-qr-modal') {
+                    document.getElementById('enlarged-qr-modal').classList.add('hidden');
+                }
+            });
+            
+            // 수업 코드 복사
+            const copyCodeBtn = document.getElementById('copy-lesson-code-btn');
+            copyCodeBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(lesson.lessonCode);
+                    showStatus('수업 코드가 클립보드에 복사되었습니다!', 'success');
+                } catch (error) {
+                    // 클립보드 API가 지원되지 않는 경우
+                    const textArea = document.createElement('textarea');
+                    textArea.value = lesson.lessonCode;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('수업 코드가 클립보드에 복사되었습니다!', 'success');
+                }
+            });
+            
+            // 수업 링크 복사
+            const copyLinkBtn = document.getElementById('copy-lesson-link-btn');
+            copyLinkBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(lessonUrl);
+                    showStatus('수업 링크가 클립보드에 복사되었습니다!', 'success');
+                } catch (error) {
+                    // 클립보드 API가 지원되지 않는 경우
+                    const textArea = document.createElement('textarea');
+                    textArea.value = lessonUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('수업 링크가 클립보드에 복사되었습니다!', 'success');
+                }
+            });
         }
         
         // 기존 loadTeacherInfo 함수 수정하여 섹션별 UI 업데이트
