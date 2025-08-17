@@ -471,8 +471,12 @@ exports.getSubjectResponseTypes = onCall(async (request) => {
         responseTypeInfo[typeKey] = {
           name: typeConfig.name,
           description: typeConfig.description,
-          examples: typeConfig.sample_prompts || []
+          examples: typeConfig.sample_prompts || [],
+          patterns: typeConfig.patterns || []
         };
+        
+        // 디버깅을 위한 로그
+        console.log(`${subject} - ${typeKey}: patterns =`, typeConfig.patterns || []);
         
         // 기본 프롬프트 (ai_tutor_prompt 사용, 없으면 sample_prompts 첫 번째, 그것도 없으면 기본값)
         if (typeConfig.ai_tutor_prompt) {
@@ -810,7 +814,7 @@ ${conversationText}
     }
 });
 
-// 영재성 평가를 위한 학생 대화 분석
+// 사고 과정 평가를 위한 학생 대화 분석
 exports.analyzeStudentConversations = onCall(async (request) => {
     const { data, auth } = request;
     const { sessionId } = data;
