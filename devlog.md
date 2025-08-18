@@ -1,9 +1,18 @@
-# AI 교육 플랫폼 개발 로그
+# Science AI Chatbot 개발 로그
 
 ## 프로젝트 개요
-- **프로젝트명**: AI Chatbot Teacher Code - 교사용 AI 교육 플랫폼
-- **기술 스택**: Firebase (Hosting, Functions, Firestore, Authentication), HTML/CSS/JavaScript, Google AI (Gemini)
-- **개발 기간**: 2025년 8월 ~ 현재 진행중
+
+**프로젝트명**: 그래비트랙스(GraviTrax) AI 튜터 챗봇 → AI 교육 플랫폼  
+**목적**: 초등학생들의 물리학 실험 학습을 돕는 AI 튜터 시스템에서 범용 AI 교육 플랫폼으로 진화  
+**기술 스택**: 
+- Frontend: HTML5, CSS3, JavaScript (ES6+)
+- Backend: Firebase Functions (Node.js)
+- Database: Firebase Firestore  
+- AI: Google Gemini API
+- Authentication: Firebase Authentication (Google OAuth)
+- Hosting: Firebase Hosting
+
+**개발 기간**: 2025년 1월 ~ 현재 진행중
 
 ## 주요 기능 목록
 
@@ -26,7 +35,144 @@
 - **모달 기반 상호작용**: QR 코드 확대, 보고서 상세보기 등
 - **캐시 버스팅**: 배포 시 CSS 캐시 문제 해결
 
+## 시스템 아키텍처
+
+### 주요 컴포넌트
+1. **학생용 챗봇 인터페이스** (`index.html`, `chatbot.js`)
+   - 교사 코드 입력 시스템
+   - 실시간 AI 대화 기능
+   - 대화 히스토리 관리
+
+2. **교사용 대시보드** (`teacher.html`)
+   - Google OAuth 로그인
+   - API 키 등록 및 관리
+   - 커스텀 프롬프트 편집
+   - 모델 선택 (향후 확장)
+
+3. **관리자용 페이지** (`admin.html`)
+   - 수동 교사 등록 (레거시 지원)
+
+### Firebase Functions
+- `getTutorResponse`: 교사별 커스텀 프롬프트로 AI 응답 생성
+- `updateTeacherApiKey`: 교사 API 키 등록/업데이트  
+- `getTeacherInfo`: 교사 정보 조회
+- `updateTeacherPrompt`: 교사 프롬프트 편집
+- `updateTeacherModel`: 교사 모델 선택 (백엔드 준비됨)
+- `addTeacher`: 레거시 교사 등록
+
 ## 개발 단계별 기록
+
+### Phase 0: 초기 개발 (2025년 1월)
+
+#### 2025년 1월 11일 - 프롬프트 시스템 전면 개편
+
+**문제 상황**
+- 교사가 설정한 커스텀 프롬프트가 실제로 사용되지 않음
+- `chatbot.js`의 하드코딩된 프롬프트만 사용되는 상태
+- 교사별 맞춤화 불가능
+
+**해결 방안**
+1. **백엔드 `getTutorResponse` 함수 완전 재작성**
+   ```javascript
+   // 기존: promptObject를 그대로 전달
+   // 개선: userMessage와 conversationHistory를 받아 서버에서 프롬프트 생성
+   const { teacherCode, userMessage, conversationHistory } = data;
+   ```
+
+2. **교사별 프롬프트 시스템 구현**
+   ```javascript
+   const customPrompt = teacherData.customPrompt || getDefaultPrompt();
+   const fullPrompt = buildFullPrompt(customPrompt, userMessage, conversationHistory);
+   ```
+
+3. **프론트엔드 API 호출 단순화**
+   ```javascript
+   // 기존: 복잡한 프롬프트 생성 로직
+   // 개선: 간단한 메시지 전달
+   await callGeminiApi(teacherCode, userInput, conversationHistory);
+   ```
+
+**새로운 기능 추가**
+
+1. **교사 프롬프트 편집 UI**
+- 8줄 텍스트 영역으로 충분한 편집 공간 제공
+- 실시간 미리보기 기능
+- 기본값 되돌리기 원클릭 기능
+
+2. **모델 선택 시스템 (백엔드 완료)**
+- 지원 모델: `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-1.0-pro`
+- 기본 모델: `gemini-1.5-flash` (속도와 비용 최적화)
+- 교사별 독립적 모델 선택 가능
+
+3. **기본 프롬프트 시스템**
+```javascript
+function getDefaultPrompt() {
+    return "너는 친근하고 격려하는 과학 튜터야. 학생들이 그래비트랙스(GraviTrax) 실험을 통해 물리학 원리를 이해할 수 있도록 도와줘. 항상 긍정적이고 호기심을 유발하는 질문을 던져줘. 학생들의 질문에 대해 직접적인 답을 주기보다는, 스스로 생각해볼 수 있도록 힌트를 제공해줘.";
+}
+```
+
+#### 데이터베이스 스키마 확장
+```javascript
+// teacher_keys 컬렉션 구조
+{
+  userId: string,           // Firebase Auth UID
+  userEmail: string,        // 교사 이메일
+  apiKey: string,          // Gemini API 키
+  teacherCode: string,     // 학생용 교사 코드
+  customPrompt?: string,   // 커스텀 프롬프트
+  modelName?: string,      // 선택된 모델명
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+#### 2025년 1월 11일 - 적응적 프롬프트 시스템 및 최신 AI 모델 지원
+
+**구현된 응답 유형 분석 시스템:**
+```javascript
+// 6가지 학생 응답 유형 자동 감지
+- CONCEPT_QUESTION: "에너지가 뭐예요?", "왜 그래요?" 
+- EXPLORATION_DEADLOCK: "어떻게 해야 할지 모르겠어요", "막막해요"
+- FAILURE_REPORT: "구슬이 떨어졌어요", "실패했어요"
+- SUCCESS_WITHOUT_PRINCIPLE: "성공했어요!", "됐다!"
+- HYPOTHESIS_INQUIRY: "만약 높이를 올리면?", "그래서 그런가요?"
+- DEFAULT: 일반적인 상황
+```
+
+**각 유형별 전문화된 AI 튜터 전략:**
+- **개념 질문**: 롤러코스터 등 일상적 비유 → 실험 연결 질문
+- **탐색 교착**: 변인 탐색 안내 및 단계적 방향 제시  
+- **실패 보고**: '중요한 단서' 인정 후 원인 추론 유도
+- **무사고 성공**: 현상 → 과학적 원리 연결 질문
+- **가설 제시**: 실험 설계 능력 강화 지원
+
+**지원 모델 목록 (우선순위 순):**
+```javascript
+const availableModels = [
+    'gemini-2.0-flash-exp',              // 기본 - 최신 고성능
+    'gemini-2.0-flash-thinking-exp-1219', // 사고 남기기 기능
+    'gemini-1.5-flash',                   // 빠른 속도, 저렴한 비용
+    'gemini-1.5-pro',                     // 고품질 응답
+    'gemini-1.0-pro'                      // 안정성
+];
+```
+
+#### 2025년 1월 11일 - 최종 배포 및 UI 개선 완료
+
+**학생 페이지 UI 정리**
+- 학생 챗봇 페이지 하단 푸터에서 "교사 페이지" 링크 제거
+- 저작권 표시를 "Neo's Digital Lab | Gifted Education Prototype"에서 "© 2025 SangCode. All rights reserved."로 변경
+- 학생들에게 더 깔끔하고 집중된 사용자 인터페이스 제공
+
+**실험 제출 현황 페이지 대폭 개선**
+- 개인 리포트: 3열 그리드의 강제 배치로 인한 큰 여백 문제 해결
+- 그룹 리포트: 그룹 카드들을 오름차순으로 정렬 (Group 1, Group 2, ...)
+- QR 코드 모달 기능 추가
+- 모바일 UI 최적화
+
+**캐시 무효화 시스템**
+- 모든 HTML 파일에서 CSS 파일 참조에 쿼리 스트링 추가
+- `styles.css?v=20250111-final` 형태로 캐시 무효화 강제 적용
 
 ### Phase 1: 기본 플랫폼 구축 (2025.08 초)
 - Firebase 프로젝트 초기 설정 및 기본 인프라 구성
@@ -555,5 +701,184 @@
 이번 업데이트를 통해 교사가 AI 튜터의 동작 원리를 더 깊이 이해하고, 자신의 교육 철학과 방법론을 AI 시스템에 효과적으로 반영할 수 있는 **전문적인 교사 도구**로 발전했습니다. 복잡한 기술적 세부사항은 숨기면서도, 교육적으로 의미 있는 정보는 명확히 제공하여 교사의 전문성을 지원하는 균형잡힌 시스템을 구현했습니다.
 
 ---
+
+## 2025년 8월 18일 - 코드 구조 개선 및 functions/lib 모듈 시스템 정비
+
+### 🎯 작업 목표
+프로젝트의 버전 관리를 개선하고, 핵심 비즈니스 로직을 담은 모듈들이 제대로 Git에 포함되도록 하여 협업 및 배포의 안정성을 확보.
+
+### 📋 주요 구현 내용
+
+#### 1. functions/lib 모듈 시스템 Git 포함
+- **문제 발견**: 핵심 비즈니스 로직을 담은 `functions/lib/` 폴더가 `.gitignore`에서 제외되어 있음
+- **모듈 파일 추가**: 다음 3개의 핵심 모듈을 Git에 포함
+  - `promptBuilder.js`: 프롬프트 생성 시스템 (875줄)
+  - `responseAnalyzer.js`: 학생 응답 분석기
+  - `subjectLoader.js`: 과목별 설정 로더
+- **`.gitignore` 수정**: `functions/lib/` 제외 규칙을 제거하고 설명 추가
+
+#### 2. 개발 로그 통합 및 정리
+- **문제**: `/docs/devlog.md`와 최상위 `devlog.md` 두 파일에 중복되고 산재된 개발 기록
+- **해결**: 두 파일을 하나의 포괄적인 개발 로그로 통합
+- **시간순 정리**: 2025년 1월 초기 개발부터 현재까지의 전체 개발 과정을 시간순으로 재구성
+- **내용 보완**: 각 단계별 기술적 성취, 교육적 효과, 해결된 문제점 등을 상세히 기록
+
+#### 3. 코드베이스 아키텍처 문서화
+**핵심 모듈별 역할 명확화:**
+- **promptBuilder.js**: JSON 설정 기반 프롬프트 생성 시스템
+  - 분석 결과와 맥락을 기반으로 최종 프롬프트 생성
+  - 교육학적 맥락 구축 및 대화 맥락 관리
+  - 과목별 특화 규칙 적용
+
+- **responseAnalyzer.js**: 학생 응답 분석 시스템
+  - JSON 기반 패턴 매칭으로 응답 유형 분류
+  - 학습 진행 단계 분석
+  - 맥락 정보 추출
+
+- **subjectLoader.js**: 과목별 설정 관리
+  - JSON 설정 동적 로드
+  - 메모리 캐싱 시스템
+  - 설정 유효성 검증
+
+#### 4. 배포 및 버전 관리 개선
+- **Git 커밋**: 누락된 소스 코드들을 적절한 커밋 메시지와 함께 추가
+- **Firebase 배포**: 업데이트된 코드베이스를 프로덕션에 반영
+- **개발 히스토리 보존**: 기존 개발 과정의 모든 중요한 마일스톤 보존
+
+### 🔧 해결된 기술적 문제들
+
+#### 1. 소스 코드 누락 문제
+- **문제**: 핵심 비즈니스 로직이 Git에서 누락되어 협업 및 배포 시 문제 발생 가능성
+- **해결**: `.gitignore` 수정 및 누락된 파일들을 Git에 추가
+- **결과**: 프로젝트의 완전한 소스 코드가 버전 관리 시스템에 포함됨
+
+#### 2. 개발 문서 중복 및 산재
+- **문제**: 개발 기록이 여러 파일에 분산되어 있어 전체적인 개발 과정 파악 어려움
+- **해결**: 시간순으로 정리된 단일 개발 로그로 통합
+- **결과**: 프로젝트의 전체 발전 과정을 한눈에 파악 가능
+
+#### 3. 아키텍처 문서 부족
+- **문제**: 복잡한 모듈 시스템의 구조와 역할이 명확히 문서화되지 않음
+- **해결**: 각 모듈의 역할과 상호작용을 상세히 문서화
+- **결과**: 새로운 개발자도 쉽게 코드베이스를 이해할 수 있는 문서 완성
+
+### 🎓 프로젝트 성숙도 향상
+
+#### 1. 협업 준비도 개선
+- **완전한 소스 코드 관리**: 모든 핵심 모듈이 Git에 포함되어 협업자들이 완전한 코드베이스에 접근 가능
+- **명확한 문서화**: 프로젝트의 발전 과정과 아키텍처가 체계적으로 문서화됨
+- **일관된 커밋 히스토리**: 의미 있는 커밋 메시지와 함께 체계적인 버전 관리
+
+#### 2. 유지보수성 확보
+- **모듈별 역할 명확화**: 각 모듈의 책임과 인터페이스가 명확히 정의됨
+- **개발 맥락 보존**: 각 기능이 왜, 어떻게 개발되었는지에 대한 상세한 기록
+- **확장 가이드**: 향후 개발 방향과 확장 포인트가 명확히 제시됨
+
+#### 3. 교육적 가치 증대
+- **완전한 개발 사례**: 초기 아이디어부터 완성된 시스템까지의 전체 개발 과정 기록
+- **문제 해결 과정**: 각 단계에서 마주한 기술적 도전과 해결 방안 상세 기록
+- **아키텍처 진화**: 단순한 챗봇에서 복합적인 교육 플랫폼으로의 진화 과정 문서화
+
+### 📚 개발 로그 구조 개선
+
+**새로운 구성:**
+1. **프로젝트 개요**: 목적, 기술 스택, 발전 과정 요약
+2. **시스템 아키텍처**: 주요 컴포넌트와 Firebase Functions 구조
+3. **단계별 개발 기록**: Phase 0(초기) → Phase 3(고도화)까지 시간순 정리
+4. **핵심 구현 내용**: 백엔드, 프론트엔드, JSON 구조 등 기술적 세부사항
+5. **기술적 특징**: 확장성, 성능, UX 측면에서의 특징
+6. **향후 계획**: 단기, 중기, 장기 개발 로드맵
+7. **상세 업데이트 기록**: 각 날짜별 상세한 개발 내용과 성과
+
+### ✅ 완성된 핵심 성과
+- [x] 완전한 소스 코드 버전 관리 체계 구축 ✨ 신규
+- [x] 통합된 개발 문서 시스템 완성 ✨ 개선
+- [x] 모듈 아키텍처 상세 문서화 ✨ 신규
+- [x] 협업 및 유지보수 준비도 확보 ✨ 개선
+- [x] 교육적 가치를 가진 개발 사례 완성 ✨ 신규
+
+### 🚀 기술적 성취
+1. **완전한 코드베이스**: 모든 핵심 모듈이 적절히 버전 관리되는 안정적인 프로젝트 구조
+2. **체계적인 문서화**: 개발 과정과 아키텍처가 명확히 기록된 전문적인 프로젝트 문서
+3. **확장 가능한 구조**: 향후 개발과 유지보수를 위한 명확한 가이드라인과 구조
+4. **교육적 완성도**: 실제 교육 현장에서 활용 가능한 수준의 완성된 AI 교육 플랫폼
+
+### 💡 프로젝트의 의의
+
+이번 정리 작업을 통해 **Science AI Chatbot**이 단순한 실험적 도구에서 다음과 같은 완성된 시스템으로 발전했음을 확인할 수 있습니다:
+
+1. **교육적 완성도**: 실제 교실에서 바로 사용할 수 있는 완성된 AI 교육 도구
+2. **기술적 성숙도**: 확장 가능하고 유지보수가 용이한 전문적인 소프트웨어 아키텍처
+3. **혁신적 접근법**: 교육학 이론과 최신 AI 기술을 성공적으로 융합한 차세대 교육 플랫폼
+4. **실용적 가치**: 월 100원 미만의 운영비로 20명 학급을 지원할 수 있는 경제적 효율성
+
+---
+
+## 배포 정보
+
+- **메인 사이트**: https://science-aichatbot.web.app
+- **교사 대시보드**: https://science-aichatbot.web.app/teacher.html
+- **관리자 페이지**: https://science-aichatbot.web.app/admin.html
+
+## 예상 운영 비용 (월간)
+
+### 시나리오: 1개 학급 (학생 20명), 일 3-5회 AI 피드백
+- **Google Gemini API**: ~$0.05 (약 70원)
+- **Firebase Firestore**: $0 (무료 한도 내)
+- **Firebase Functions**: $0 (무료 한도 내)
+- **Firebase Hosting**: $0 (무료 한도 내)
+
+**총 예상 비용**: 월 100원 미만 (거의 무료)
+
+### 확장 시나리오: 10개 학급 (학생 200명)
+- **총 예상 비용**: 월 $0.5 (약 700원)
+
+## 개발 노하우
+
+### Firebase Functions 개발 팁
+1. **로컬 테스트**: `firebase emulators:start` 활용
+2. **에러 핸들링**: HttpsError 적극 활용으로 클라이언트에 명확한 에러 메시지 전달
+3. **비용 최적화**: 토큰 수 계산하여 API 호출량 관리
+
+### 프론트엔드 개발 팁
+1. **Firebase SDK**: 모듈 방식 import로 번들 크기 최적화
+2. **상태 관리**: localStorage 활용한 교사 코드 영속성
+3. **UI/UX**: 로딩 상태 표시로 사용자 경험 향상
+
+## 트러블슈팅 가이드
+
+### 일반적인 문제들
+1. **API 키 오류**: 교사 대시보드에서 올바른 Gemini API 키 확인
+2. **캐시 문제**: 강제 새로고침 (Ctrl+F5) 또는 시크릿 모드 사용
+3. **권한 오류**: Firebase 콘솔에서 Authentication 설정 확인
+
+### 개발 환경 설정
+```bash
+# 프로젝트 설정
+npm install -g firebase-tools
+firebase login
+firebase init
+
+# Install Functions dependencies
+cd functions && npm install && cd ..
+
+# 로컬 개발 서버
+firebase serve
+firebase emulators:start
+
+# Functions-only emulator (for backend development)
+cd functions && npm run serve
+
+# 배포
+firebase deploy --only functions
+firebase deploy --only hosting
+firebase deploy
+```
+
+---
+
+**최종 업데이트**: 2025년 8월 18일  
+**개발자**: Human-AI Collaborative Development  
+**라이선스**: MIT License
 
 > 이 프로젝트는 AI를 활용한 교육 혁신을 목표로 하며, 확장 가능하고 유지보수가 용이한 아키텍처를 바탕으로 지속적으로 발전하고 있습니다.
