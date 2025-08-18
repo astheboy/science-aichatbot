@@ -37,8 +37,8 @@ ehthumbs.db
 Thumbs.db
 
 # Firebase Functions
-functions/lib/
 functions/.runtimeconfig.json
+# Note: functions/lib/ contains source code, not build artifacts, so it should be included
 
 # Build outputs
 dist/
