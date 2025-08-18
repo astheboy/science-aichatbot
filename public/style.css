@@ -82,6 +82,23 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.5rem;
 }
 
+/* Timestamp styling */
+.message-timestamp {
+    font-size: 0.75rem; /* text-xs */
+    color: #64748b; /* text-slate-500 */
+    margin-top: 0.25rem; /* mt-1 */
+    text-align: right;
+}
+
+.user-message .message-timestamp {
+    color: #e2e8f0; /* text-slate-200 for better contrast on blue background */
+}
+
+.ai-message .message-timestamp {
+    color: #64748b; /* text-slate-500 */
+    align-self: flex-start;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

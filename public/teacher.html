@@ -427,11 +427,25 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        수업 설명 (선택사항)
+                                        <span class="flex items-center space-x-2">
+                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">핵심 기능</span>
+                                        </span>
                                     </label>
-                                    <textarea id="lesson-description-input" rows="3"
-                                        placeholder="학생들에게 전달할 수업 안내 메시지를 입력하세요."
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                                    <textarea id="lesson-description-input" rows="5"
+                                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+
+예시:
+• 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
+• 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
+• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-xs text-amber-700">
+                                            <strong>💡 중요:</strong> 여기에 입력하는 내용이 AI 튜터의 핵심 성격과 교수법을 결정합니다. 
+                                            구체적이고 명확하게 작성할수록 더 전문화된 AI 튜터가 됩니다.
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <div class="flex justify-end">
@@ -478,6 +492,78 @@
                                     <!-- 수업 목록이 여기에 동적으로 추가됩니다 -->
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- 수업 편집 모달 -->
+                    <div id="edit-lesson-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                        <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4 max-h-full overflow-y-auto">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-semibold text-gray-900">수업 편집</h3>
+                                <button id="close-edit-modal" class="text-gray-400 hover:text-gray-600 p-1">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <form id="edit-lesson-form" class="space-y-4">
+                                <input type="hidden" id="edit-lesson-id">
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">수업 제목</label>
+                                    <input type="text" id="edit-lesson-title" placeholder="예: 분수의 나눗셈, 조선시대 문화"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">과목 선택</label>
+                                    <select id="edit-lesson-subject"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required>
+                                        <option value="">과목을 선택하세요</option>
+                                        <option value="korean">국어</option>
+                                        <option value="math">수학</option>
+                                        <option value="social">사회</option>
+                                        <option value="science">과학</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">핵심 기능</span>
+                                        </span>
+                                    </label>
+                                    <textarea id="edit-lesson-description" rows="5"
+                                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+
+예시:
+• 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
+• 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
+• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-xs text-amber-700">
+                                            <strong>💡 중요:</strong> 여기에 입력하는 내용이 AI 튜터의 핵심 성격과 교수법을 결정합니다. 
+                                            구체적이고 명확하게 작성할수록 더 전문화된 AI 튜터가 됩니다.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 pt-4 border-t">
+                                    <button type="button" id="cancel-edit-btn" 
+                                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
+                                        취소
+                                    </button>
+                                    <button type="submit" id="save-lesson-btn"
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                        수정 완료
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -758,6 +844,7 @@
             const getStudentSessions = httpsCallable(functions, 'getStudentSessions');
             const getStudentConversation = httpsCallable(functions, 'getStudentConversation');
             const analyzeStudentConversations = httpsCallable(functions, 'analyzeStudentConversations');
+            const deleteSession = httpsCallable(functions, 'deleteSession');
 
             // DOM 요소들
             const loginScreen = document.getElementById('login-screen');
@@ -1823,6 +1910,17 @@
             const lessonsEmpty = document.getElementById('lessons-empty');
             const lessonsList = document.getElementById('lessons-list');
 
+            // 수업 편집 관련 요소들
+            const editLessonModal = document.getElementById('edit-lesson-modal');
+            const closeEditModalBtn = document.getElementById('close-edit-modal');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const editLessonForm = document.getElementById('edit-lesson-form');
+            const editLessonIdInput = document.getElementById('edit-lesson-id');
+            const editLessonTitleInput = document.getElementById('edit-lesson-title');
+            const editLessonSubjectSelect = document.getElementById('edit-lesson-subject');
+            const editLessonDescriptionInput = document.getElementById('edit-lesson-description');
+            const saveLessonBtn = document.getElementById('save-lesson-btn');
+
             // 새 수업 생성 폼 제출
             createLessonForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1866,6 +1964,69 @@
             // 수업 목록 새로고침 버튼
             refreshLessonsBtn.addEventListener('click', () => {
                 loadLessons();
+            });
+
+            // 수업 편집 모달 이벤트 핸들러들
+            
+            // 편집 모달 닫기 버튼
+            closeEditModalBtn.addEventListener('click', () => {
+                editLessonModal.classList.add('hidden');
+            });
+
+            // 편집 취소 버튼
+            cancelEditBtn.addEventListener('click', () => {
+                editLessonModal.classList.add('hidden');
+            });
+
+            // 편집 모달 배경 클릭시 닫기
+            editLessonModal.addEventListener('click', (e) => {
+                if (e.target === editLessonModal) {
+                    editLessonModal.classList.add('hidden');
+                }
+            });
+
+            // 수업 편집 폼 제출
+            editLessonForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const lessonId = editLessonIdInput.value;
+                const title = editLessonTitleInput.value.trim();
+                const subject = editLessonSubjectSelect.value;
+                const description = editLessonDescriptionInput.value.trim();
+
+                if (!title || !subject) {
+                    showStatus('수업 제목과 과목을 모두 입력해주세요.', 'error');
+                    return;
+                }
+
+                try {
+                    saveLessonBtn.textContent = '수정 중...';
+                    saveLessonBtn.disabled = true;
+
+                    // updateLesson Firebase Function 호출
+                    const updateLesson = httpsCallable(functions, 'updateLesson');
+                    await updateLesson({
+                        lessonId,
+                        title,
+                        subject,
+                        description: description || null
+                    });
+
+                    showStatus('수업이 성공적으로 수정되었습니다!', 'success');
+                    
+                    // 모달 닫기
+                    editLessonModal.classList.add('hidden');
+                    
+                    // 수업 목록 새로고침
+                    await loadLessons();
+
+                } catch (error) {
+                    console.error('수업 수정 실패:', error);
+                    showStatus(`수업 수정 실패: ${error.message}`, 'error');
+                } finally {
+                    saveLessonBtn.textContent = '수정 완료';
+                    saveLessonBtn.disabled = false;
+                }
             });
 
             // 수업별 학생 세션 로드 기능
@@ -1985,17 +2146,13 @@
                         return;
                     }
 
-                    // 세션을 lastActivity 기준으로 내림차순 정렬 (최신 활동이 먼저)
-                    sessions.sort((a, b) => {
-                        const aTime = a.lastActivity ? new Date(a.lastActivity) : new Date(0);
-                        const bTime = b.lastActivity ? new Date(b.lastActivity) : new Date(0);
-                        return bTime - aTime;
-                    });
+                    // 학생 이름별로 세션 그룹화
+                    const groupedStudents = groupSessionsByStudentName(sessions);
 
-                    // 학생 목록 렌더링
-                    sessions.forEach(session => {
-                        const sessionElement = createLessonStudentElement(session);
-                        lessonStudentsList.appendChild(sessionElement);
+                    // 그룹화된 학생 목록 렌더링
+                    groupedStudents.forEach(studentGroup => {
+                        const studentGroupElement = createStudentGroupElement(studentGroup);
+                        lessonStudentsList.appendChild(studentGroupElement);
                     });
 
                 } catch (error) {
@@ -2004,6 +2161,370 @@
                     lessonStudentsLoading.classList.add('hidden');
                     lessonStudentsEmpty.classList.remove('hidden');
                 }
+            }
+
+            // Firestore Timestamp를 JavaScript Date로 변환하는 헬퍼 함수 (디버깅 강화)
+            function convertFirestoreTimestamp(timestamp, fieldName = 'unknown', sessionId = 'unknown') {
+                console.log(`[TIMESTAMP DEBUG] ${fieldName} for session ${sessionId}:`, {
+                    original: timestamp,
+                    type: typeof timestamp,
+                    isNull: timestamp === null,
+                    isUndefined: timestamp === undefined,
+                    constructor: timestamp?.constructor?.name,
+                    hasToDate: timestamp?.toDate !== undefined,
+                    hasSeconds: timestamp?.seconds !== undefined
+                });
+                
+                if (!timestamp) {
+                    console.log(`[TIMESTAMP DEBUG] ${fieldName} is null/undefined for session ${sessionId}`);
+                    return null;
+                }
+                
+                try {
+                    // Firestore Timestamp 객체인 경우
+                    if (timestamp && typeof timestamp === 'object' && timestamp.toDate) {
+                        const result = timestamp.toDate();
+                        console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using toDate():`, result);
+                        return result;
+                    }
+                    
+                    // Firestore Timestamp가 seconds와 nanoseconds 프로퍼티를 가진 객체인 경우
+                    if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+                        const result = new Date(timestamp.seconds * 1000);
+                        console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using seconds:`, result);
+                        return result;
+                    }
+                    
+                    // 문자열이나 숫자인 경우
+                    const date = new Date(timestamp);
+                    if (isNaN(date.getTime())) {
+                        console.log(`[TIMESTAMP DEBUG] ${fieldName} conversion failed - invalid date:`, timestamp);
+                        return null;
+                    }
+                    
+                    console.log(`[TIMESTAMP DEBUG] ${fieldName} converted from string/number:`, date);
+                    return date;
+                    
+                } catch (error) {
+                    console.error(`[TIMESTAMP DEBUG] Error converting ${fieldName} for session ${sessionId}:`, error);
+                    return null;
+                }
+            }
+
+            // 학생 이름별로 세션 그룹화 함수
+            function groupSessionsByStudentName(sessions) {
+                console.log('세션 그룹화 시작 - 총 세션 수:', sessions.length);
+                const grouped = {};
+                
+                sessions.forEach((session, index) => {
+                    // 삭제 버튼 조건 디버깅 강화
+                    const showDeleteButton = (session.messageCount <= 1 || session.messageCount === null || session.messageCount === undefined);
+                    
+                    console.log(`[DELETE BUTTON DEBUG] 세션 ${index + 1}:`, {
+                        sessionId: session.sessionId,
+                        studentName: session.studentName,
+                        messageCount: session.messageCount,
+                        messageCountType: typeof session.messageCount,
+                        lastActivity: session.lastActivity,
+                        createdAt: session.createdAt,
+                        updatedAt: session.updatedAt,
+                        timestamp: session.timestamp,
+                        '조건검사': {
+                            'messageCount <= 1': session.messageCount <= 1,
+                            'messageCount === null': session.messageCount === null,
+                            'messageCount === undefined': session.messageCount === undefined,
+                            '최종삭제버튼표시': showDeleteButton
+                        }
+                    });
+                    
+                    const studentName = session.studentName;
+                    if (!grouped[studentName]) {
+                        grouped[studentName] = {
+                            studentName: studentName,
+                            sessions: [],
+                            totalMessages: 0,
+                            lastActivity: null
+                        };
+                    }
+                    
+                    grouped[studentName].sessions.push(session);
+                    grouped[studentName].totalMessages += session.messageCount || 0;
+                    
+                    // 가장 최근 활동 시간 찾기 - 세션의 여러 시간 필드 확인 (강화된 로직)
+                    let sessionActivity = null;
+                    
+                    // 모든 가능한 시간 필드 확인 (우선순위 순서)
+                    const timeFields = ['lastActivity', 'updatedAt', 'createdAt', 'timestamp'];
+                    
+                    console.log(`[TIMESTAMP FALLBACK] ${studentName} 세션 ${session.sessionId}의 시간 필드 탐색:`);
+                    
+                    for (const field of timeFields) {
+                        console.log(`[TIMESTAMP FALLBACK] ${field} 필드 확인:`, session[field]);
+                        
+                        if (session[field]) {
+                            sessionActivity = convertFirestoreTimestamp(session[field], field, session.sessionId);
+                            if (sessionActivity) {
+                                console.log(`[TIMESTAMP FALLBACK] ✅ ${studentName} - ${field}에서 유효한 날짜 찾음:`, sessionActivity);
+                                break;
+                            } else {
+                                console.log(`[TIMESTAMP FALLBACK] ❌ ${field} 변환 실패`);
+                            }
+                        } else {
+                            console.log(`[TIMESTAMP FALLBACK] ${field} 필드가 null/undefined`);
+                        }
+                    }
+                    
+                    if (!sessionActivity) {
+                        console.warn(`[TIMESTAMP FALLBACK] ⚠️ ${studentName} 세션 ${session.sessionId}에서 유효한 시간 정보를 찾지 못함. 현재 시간으로 대체합니다.`);
+                        // 마지막 수단으로 현재 시간 사용
+                        sessionActivity = new Date();
+                    }
+                    
+                    if (sessionActivity && (!grouped[studentName].lastActivity || sessionActivity > grouped[studentName].lastActivity)) {
+                        grouped[studentName].lastActivity = sessionActivity;
+                    }
+                });
+                
+                // 배열로 변환하고 최근 활동 순으로 정렬
+                const groupedArray = Object.values(grouped);
+                groupedArray.sort((a, b) => {
+                    // null 값 처리
+                    if (!a.lastActivity && !b.lastActivity) return 0;
+                    if (!a.lastActivity) return 1;
+                    if (!b.lastActivity) return -1;
+                    return b.lastActivity - a.lastActivity;
+                });
+                
+                console.log('그룹화 완료:', groupedArray.map(g => ({
+                    studentName: g.studentName,
+                    sessionCount: g.sessions.length,
+                    totalMessages: g.totalMessages,
+                    lastActivity: g.lastActivity
+                })));
+                
+                return groupedArray;
+            }
+
+            // 학생 그룹 요소 생성 함수
+            function createStudentGroupElement(studentGroup) {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg border border-gray-200 mb-3';
+
+                // 날짜 포맷팅
+                let lastActiveText = '활동 정보 없음';
+                if (studentGroup.lastActivity) {
+                    try {
+                        lastActiveText = studentGroup.lastActivity.toLocaleString('ko-KR');
+                    } catch (error) {
+                        console.log('날짜 파싱 오류:', error);
+                    }
+                }
+
+                div.innerHTML = `
+                    <!-- 학생 그룹 헤더 -->
+                    <div class="p-4 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3">
+                                    <h4 class="font-semibold text-gray-900 text-lg">${studentGroup.studentName}</h4>
+                                    <span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full font-medium">
+                                        ${studentGroup.sessions.length}개 세션
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                                    <span>총 대화: ${studentGroup.totalMessages}개</span>
+                                    <span>최근 활동: ${lastActiveText}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button class="delete-all-student-sessions-btn px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 font-medium transition-colors"
+                                    data-student-name="${studentGroup.studentName}"
+                                    title="${studentGroup.studentName} 학생의 모든 세션 삭제">
+                                    모든 세션 삭제
+                                </button>
+                                <button class="toggle-sessions-btn px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors"
+                                    data-student="${studentGroup.studentName}">
+                                    세션 목록 보기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 학생 세션 목록 (초기에는 숨김) -->
+                    <div class="sessions-list hidden">
+                        <div class="p-4 space-y-2">
+                            ${studentGroup.sessions.map((session, index) => {
+                                // 개별 세션의 날짜 포맷팅
+                                const sessionDate = convertFirestoreTimestamp(session.lastActivity);
+                                const sessionDateText = sessionDate ? sessionDate.toLocaleString('ko-KR') : '';
+                                
+                                return `
+                                <div class="session-item flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                                    <div class="flex-1 cursor-pointer session-content" data-session-id="${session.sessionId}">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">세션 #${index + 1}</p>
+                                                <p class="text-xs text-gray-600">
+                                                    대화 ${session.messageCount || 0}개
+                                                    ${sessionDateText ? ' • ' + sessionDateText : ''}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                    ${(session.messageCount <= 1 || session.messageCount === null || session.messageCount === undefined) ? `
+                                            <button class="delete-session-btn px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 font-medium transition-colors"
+                                                data-session-id="${session.sessionId}"
+                                                data-student-name="${studentGroup.studentName}"
+                                                title="세션 삭제 (대화 ${session.messageCount || 0}개)">
+                                                삭제
+                                            </button>
+                                        ` : ''}
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                // 세션 목록 토글 이벤트
+                const toggleBtn = div.querySelector('.toggle-sessions-btn');
+                const sessionsList = div.querySelector('.sessions-list');
+                
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = sessionsList.classList.contains('hidden');
+                    if (isHidden) {
+                        sessionsList.classList.remove('hidden');
+                        toggleBtn.textContent = '세션 목록 숨기기';
+                    } else {
+                        sessionsList.classList.add('hidden');
+                        toggleBtn.textContent = '세션 목록 보기';
+                    }
+                });
+
+                // 개별 세션 클릭 이벤트
+                div.querySelectorAll('.session-content').forEach(sessionContent => {
+                    sessionContent.addEventListener('click', () => {
+                        const sessionId = sessionContent.getAttribute('data-session-id');
+                        const session = studentGroup.sessions.find(s => s.sessionId === sessionId);
+                        if (session) {
+                            loadStudentConversation(session);
+                        }
+                    });
+                });
+
+                // 세션 삭제 버튼 이벤트
+                div.querySelectorAll('.delete-session-btn').forEach(deleteBtn => {
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation(); // 클릭 이벤트 버블링 방지
+                        
+                        const sessionId = deleteBtn.getAttribute('data-session-id');
+                        const studentName = deleteBtn.getAttribute('data-student-name');
+                        
+                        if (!confirm(`${studentName} 학생의 세션을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+                            return;
+                        }
+                        
+                        try {
+                            deleteBtn.textContent = '삭제중...';
+                            deleteBtn.disabled = true;
+                            
+                            await deleteSession({ sessionId });
+                            
+                            showStatus('세션이 성공적으로 삭제되었습니다.', 'success');
+                            
+                            // DOM에서 해당 세션 요소 제거
+                            const sessionItem = deleteBtn.closest('.session-item');
+                            if (sessionItem) {
+                                sessionItem.remove();
+                            }
+                            
+                            // 해당 학생 그룹의 세션 수 업데이트
+                            const studentGroupElement = deleteBtn.closest('.bg-white.rounded-lg.border.border-gray-200');
+                            if (studentGroupElement) {
+                                const remainingSessions = studentGroupElement.querySelectorAll('.session-item');
+                                const sessionCountSpan = studentGroupElement.querySelector('.px-3.py-1.text-sm.bg-blue-100');
+                                if (sessionCountSpan) {
+                                    sessionCountSpan.textContent = `${remainingSessions.length}개 세션`;
+                                }
+                                
+                                // 세션이 모두 삭제되면 학생 그룹 자체를 제거
+                                if (remainingSessions.length === 0) {
+                                    studentGroupElement.remove();
+                                    
+                                    // 학생이 모두 없어지면 빈 상태 표시
+                                    const remainingStudents = lessonStudentsList.querySelectorAll('.bg-white.rounded-lg.border.border-gray-200');
+                                    if (remainingStudents.length === 0) {
+                                        lessonStudentsEmpty.classList.remove('hidden');
+                                    }
+                                }
+                            }
+                            
+                        } catch (error) {
+                            console.error('세션 삭제 실패:', error);
+                            showStatus(`세션 삭제 실패: ${error.message}`, 'error');
+                            
+                            deleteBtn.textContent = '삭제';
+                            deleteBtn.disabled = false;
+                        }
+                    });
+                });
+
+                // 모든 세션 삭제 버튼 이벤트 (새로 추가)
+                const deleteAllBtn = div.querySelector('.delete-all-student-sessions-btn');
+                if (deleteAllBtn) {
+                    deleteAllBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation(); // 클릭 이벤트 버블링 방지
+                        
+                        const studentName = deleteAllBtn.getAttribute('data-student-name');
+                        const sessionCount = studentGroup.sessions.length;
+                        
+                        if (!confirm(`${studentName} 학생의 모든 세션 ${sessionCount}개를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+                            return;
+                        }
+                        
+                        try {
+                            deleteAllBtn.textContent = '삭제중...';
+                            deleteAllBtn.disabled = true;
+                            
+                            // 해당 학생의 모든 세션 ID 수집
+                            const sessionIds = studentGroup.sessions.map(session => session.sessionId);
+                            
+                            // 각 세션을 순차적으로 삭제
+                            for (const sessionId of sessionIds) {
+                                await deleteSession({ sessionId });
+                            }
+                            
+                            showStatus(`${studentName} 학생의 모든 세션 ${sessionCount}개가 성공적으로 삭제되었습니다.`, 'success');
+                            
+                            // DOM에서 해당 학생 그룹 전체 제거
+                            const studentGroupElement = deleteAllBtn.closest('.bg-white.rounded-lg.border.border-gray-200');
+                            if (studentGroupElement) {
+                                studentGroupElement.remove();
+                                
+                                // 학생이 모두 없어지면 빈 상태 표시
+                                const remainingStudents = lessonStudentsList.querySelectorAll('.bg-white.rounded-lg.border.border-gray-200');
+                                if (remainingStudents.length === 0) {
+                                    lessonStudentsEmpty.classList.remove('hidden');
+                                }
+                            }
+                            
+                        } catch (error) {
+                            console.error('모든 세션 삭제 실패:', error);
+                            showStatus(`모든 세션 삭제 실패: ${error.message}`, 'error');
+                            
+                            deleteAllBtn.textContent = '모든 세션 삭제';
+                            deleteAllBtn.disabled = false;
+                        }
+                    });
+                }
+
+                return div;
             }
 
             // 수업별 학생 요소 생성
@@ -2117,12 +2638,16 @@
                 </div>
                 
                 <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-2">
+                        <button class="edit-lesson-btn text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded-md hover:bg-yellow-200 font-medium" 
+                            data-lesson-id="${lesson.id}" data-title="${lesson.title}" data-subject="${lesson.subject}" data-description="${lesson.description || ''}">
+                            편집
+                        </button>
                         <button class="copy-lesson-code-btn text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 font-medium" data-code="${lesson.lessonCode}">
-                            수업 코드 복사
+                            코드 복사
                         </button>
                         <button class="show-qr-btn text-sm bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200 font-medium" data-lesson-id="${lesson.id}" data-code="${lesson.lessonCode}" data-title="${lesson.title}">
-                            QR 코드 보기
+                            QR 코드
                         </button>
                     </div>
                     <div class="text-xs text-gray-500">
@@ -2157,6 +2682,24 @@
                         lessonCode: qrBtn.dataset.code,
                         title: qrBtn.dataset.title
                     });
+                });
+
+                // 편집 버튼 이벤트
+                const editBtn = div.querySelector('.edit-lesson-btn');
+                editBtn.addEventListener('click', () => {
+                    const lessonId = editBtn.dataset.lessonId;
+                    const title = editBtn.dataset.title;
+                    const subject = editBtn.dataset.subject;
+                    const description = editBtn.dataset.description;
+                    
+                    // 편집 모달에 데이터 로드
+                    editLessonIdInput.value = lessonId;
+                    editLessonTitleInput.value = title;
+                    editLessonSubjectSelect.value = subject;
+                    editLessonDescriptionInput.value = description;
+                    
+                    // 편집 모달 표시
+                    editLessonModal.classList.remove('hidden');
                 });
 
                 return div;

@@ -14,12 +14,18 @@ class ResponseAnalyzer {
      */
     static async analyzeStudentResponse(userMessage, subject = 'science', conversationHistory = []) {
         try {
+            console.log(`[응답 분석 시작] 과목: ${subject}, 메시지: "${userMessage}"`);
+            
             // 과목별 설정 로드
             const subjectConfig = await SubjectLoader.loadSubjectConfig(subject);
             const responseTypes = subjectConfig.response_types;
             
+            console.log(`[응답 분석] 로드된 응답 유형들:`, Object.keys(responseTypes));
+            
             // 메시지 전처리
             const processedMessage = this.preprocessMessage(userMessage);
+            
+            console.log(`[응답 분석] 전처리된 메시지: "${processedMessage}"`);
             
             // 각 응답 유형별로 매칭 점수 계산
             const matchResults = [];
@@ -27,7 +33,10 @@ class ResponseAnalyzer {
             for (const [typeKey, typeConfig] of Object.entries(responseTypes)) {
                 const confidence = this.calculateMatchConfidence(processedMessage, typeConfig.patterns);
                 
+                console.log(`[패턴 매칭] ${typeKey}: 신뢰도 ${confidence.toFixed(3)} (패턴 수: ${typeConfig.patterns.length})`);
+                
                 if (confidence > 0) {
+                    console.log(`[패턴 매칭 성공] ${typeKey} 매칭됨!`);
                     matchResults.push({
                         type: typeKey,
                         config: typeConfig,
@@ -35,6 +44,8 @@ class ResponseAnalyzer {
                     });
                 }
             }
+            
+            console.log(`[매칭 결과] 총 ${matchResults.length}개 유형이 매칭됨:`, matchResults.map(r => `${r.type}(${r.confidence.toFixed(3)})`));
             
             // 가장 높은 점수의 응답 유형 선택
             if (matchResults.length > 0) {

@@ -210,7 +210,11 @@ async function handleChatSubmit(e) {
 function displayUserMessage(message) {
   const messageElement = document.createElement("div");
   messageElement.className = "chat-message user-message";
-  messageElement.innerHTML = `<p>${message}</p>`;
+  const timestamp = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+  messageElement.innerHTML = `
+    <p>${message}</p>
+    <span class="timestamp">${timestamp}</span>
+  `;
   chatWindow.appendChild(messageElement);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
@@ -218,6 +222,7 @@ function displayUserMessage(message) {
 function displayAiMessage(message, isFirst = false) {
   const messageElement = document.createElement("div");
   messageElement.className = "chat-message ai-message";
+  const timestamp = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 
   const avatar = `<div class="avatar"><i data-lucide="bot"></i></div>`;
 
@@ -225,6 +230,7 @@ function displayAiMessage(message, isFirst = false) {
         <div class="message-content">
             ${isFirst || conversationHistory.length === 0 ? avatar : ""}
             <p>${message}</p>
+            <span class="timestamp">${timestamp}</span>
         </div>
     `;
 

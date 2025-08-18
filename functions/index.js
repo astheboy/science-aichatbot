@@ -59,10 +59,10 @@ function getDefaultPrompt() {
 }
 
 // 전체 프롬프트 생성 함수 (JSON 시스템 사용)
-async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}) {
+async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null) {
     try {
-        // 새로운 JSON 기반 프롬프트 생성 시스템 사용
-        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData);
+        // 새로운 JSON 기반 프롬프트 생성 시스템 사용 (수업 설명 포함)
+        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData, lessonDescription);
     } catch (error) {
         console.error('프롬프트 생성 오류:', error);
         
@@ -133,12 +133,17 @@ exports.getTutorResponse = onCall(async (request) => {
       // 4. 교사 설정과 모델 정보 가져오기
       const modelName = teacherData.modelName || 'gemini-2.0-flash';
       
-      // 5. JSON 기반 프롬프트 생성 시스템 사용 (과목 정보 추가)
+      // 5. JSON 기반 프롬프트 생성 시스템 사용 (과목 정보 + 수업 설명 추가)
       const teacherDataWithSubject = {
         ...teacherData,
-        subject: subject  // 수업의 과목 정보 추가
+        subject: subject,  // 수업의 과목 정보 추가
+        topic: lessonData.title  // 수업 제목 추가
       };
-      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject);
+      
+      // 수업 설명을 lessonDescription으로 추출
+      const lessonDescription = lessonData.description || null;
+      
+      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, lessonDescription);
       
       // 6. Gemini API 호출
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -178,7 +183,7 @@ exports.getTutorResponse = onCall(async (request) => {
           
           // sessions 컬렉션에서 세션 정보 업데이트 또는 생성
           const sessionRef = db.collection('sessions').doc(sessionId);
-          await sessionRef.set({
+          const sessionData = {
             lessonCode: lessonCode,
             lessonId: lessonDoc.id,
             lessonTitle: lessonData.title,
@@ -186,9 +191,18 @@ exports.getTutorResponse = onCall(async (request) => {
             studentName: studentName,
             sessionId: sessionId,
             lastActivity: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             messageCount: admin.firestore.FieldValue.increment(1),
             responseTypes: admin.firestore.FieldValue.arrayUnion(responseType)
-          }, { merge: true });
+          };
+          
+          // 세션이 새로 생성되는 경우 createdAt 추가
+          const existingSession = await sessionRef.get();
+          if (!existingSession.exists) {
+            sessionData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+          }
+          
+          await sessionRef.set(sessionData, { merge: true });
           
         } catch (logError) {
           console.error('대화 기록 저장 실패:', logError);
@@ -598,6 +612,9 @@ exports.getStudentSessions = onCall(async (request) => {
           studentName: sessionData.studentName,
           messageCount: sessionData.messageCount || 0,
           lastActivity: sessionData.lastActivity,
+          createdAt: sessionData.createdAt,
+          updatedAt: sessionData.updatedAt,
+          timestamp: sessionData.lastActivity || sessionData.updatedAt || sessionData.createdAt,
           responseTypes: sessionData.responseTypes || [],
           lessonId: sessionData.lessonId,
           lessonTitle: sessionData.lessonTitle,
@@ -1115,7 +1132,68 @@ exports.createLesson = onCall(async (request) => {
     }
 });
 
-// 교사의 수업 목록 조회
+// 수업 수정
+exports.updateLesson = onCall(async (request) => {
+    const { data, auth } = request;
+    const { lessonId, title, subject, description } = data;
+    
+    if (!auth) {
+      throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    if (!lessonId || !title || !subject) {
+      throw new HttpsError('invalid-argument', '수업 ID, 제목, 과목이 필요합니다.');
+    }
+
+    // 지원되는 과목 목록
+    const validSubjects = ['korean', 'math', 'social', 'science'];
+    if (!validSubjects.includes(subject)) {
+        throw new HttpsError('invalid-argument', '지원되지 않는 과목입니다.');
+    }
+
+    try {
+      const userId = auth.uid;
+      
+      // 수업 존재 여부 및 권한 확인
+      const lessonDoc = await db.collection('lessons').doc(lessonId).get();
+      
+      if (!lessonDoc.exists) {
+        throw new HttpsError('not-found', '수업을 찾을 수 없습니다.');
+      }
+      
+      const lessonData = lessonDoc.data();
+      
+      // 수업의 교사와 현재 사용자가 동일한지 확인
+      if (lessonData.teacherId !== userId) {
+        throw new HttpsError('permission-denied', '이 수업을 수정할 권한이 없습니다.');
+      }
+      
+      // 수업 데이터 업데이트
+      const updateData = {
+        title: title,
+        subject: subject,
+        description: description || null,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+      
+      await lessonDoc.ref.update(updateData);
+      
+      return {
+        success: true,
+        lessonId: lessonId,
+        message: '수업이 성공적으로 수정되었습니다.'
+      };
+      
+    } catch (error) {
+      console.error("수업 수정 오류:", error);
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      throw new HttpsError('internal', '수업 수정 중 오류가 발생했습니다.');
+    }
+});
+
+// 교사의 학생 세션 조회
 exports.getLessons = onCall(async (request) => {
     const { auth } = request;
     
@@ -1201,6 +1279,90 @@ exports.getLessons = onCall(async (request) => {
         throw error;
       }
       throw new HttpsError('internal', '수업 목록 조회 중 오류가 발생했습니다.');
+    }
+});
+
+// 세션 삭제 함수
+exports.deleteSession = onCall(async (request) => {
+    const { data, auth } = request;
+    const { sessionId } = data;
+    
+    if (!auth) {
+      throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    if (!sessionId) {
+      throw new HttpsError('invalid-argument', '세션 ID가 필요합니다.');
+    }
+
+    try {
+      const userId = auth.uid;
+      
+      // 교사 정보 찾기
+      const querySnapshot = await db.collection('teacher_keys')
+        .where('userId', '==', userId)
+        .limit(1)
+        .get();
+        
+      if (querySnapshot.empty) {
+        throw new HttpsError('not-found', '교사 정보를 찾을 수 없습니다.');
+      }
+      
+      const teacherDoc = querySnapshot.docs[0];
+      const teacherData = teacherDoc.data();
+      const teacherCode = teacherData.teacherCode;
+      
+      // 세션 정보 가져오기
+      const sessionDoc = await db.collection('sessions').doc(sessionId).get();
+      if (!sessionDoc.exists) {
+        throw new HttpsError('not-found', '세션을 찾을 수 없습니다.');
+      }
+      
+      const sessionData = sessionDoc.data();
+      
+      // 교사 코드가 일치하는지 확인 (보안)
+      if (sessionData.teacherCode !== teacherCode) {
+        throw new HttpsError('permission-denied', '해당 세션에 접근할 권한이 없습니다.');
+      }
+      
+      // 세션의 대화 기록들 삭제
+      const conversationsSnapshot = await db.collection('conversations')
+        .where('sessionId', '==', sessionId)
+        .get();
+      
+      // 대화 기록 일괄 삭제
+      const batch = db.batch();
+      
+      conversationsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // 세션에 대한 분석 결과 삭제
+      const analysesSnapshot = await db.collection('conversation_analyses')
+        .where('sessionId', '==', sessionId)
+        .get();
+      
+      analysesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // 세션 자체 삭제
+      batch.delete(sessionDoc.ref);
+      
+      // 일괄 삭제 실행
+      await batch.commit();
+      
+      return {
+        success: true,
+        message: '세션과 관련 대화 기록이 성공적으로 삭제되었습니다.'
+      };
+      
+    } catch (error) {
+      console.error("세션 삭제 오류:", error);
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      throw new HttpsError('internal', '세션 삭제 중 오류가 발생했습니다.');
     }
 });
 

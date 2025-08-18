@@ -11,9 +11,10 @@ class PromptBuilder {
      * @param {string} userMessage - 사용자 메시지
      * @param {Array} conversationHistory - 대화 이력
      * @param {Object} teacherData - 교사 설정 데이터
+     * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할 지시사항)
      * @returns {Array} Gemini API 호출용 프롬프트 배열
      */
-    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}) {
+    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null) {
         try {
             // 과목별 설정 로드
             const subject = teacherData.subject || 'science';
@@ -31,13 +32,14 @@ class PromptBuilder {
             // 4. 과목별 특화 규칙 적용
             const subjectRules = this.buildSubjectRules(subjectConfig, teacherData);
             
-            // 5. 최종 프롬프트 조합
+            // 5. 최종 프롬프트 조합 (수업 설명 추가)
             const systemInstruction = this.combinePromptElements(
                 basePrompt,
                 educationalContext,
                 subjectRules,
                 conversationContext,
-                teacherData
+                teacherData,
+                lessonDescription
             );
             
             // 6. Gemini API 형식으로 변환
@@ -266,10 +268,21 @@ class PromptBuilder {
      * @param {string} subjectRules - 과목별 규칙
      * @param {string} conversationContext - 대화 맥락
      * @param {Object} teacherData - 교사 설정
+     * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할)
      * @returns {string} 최종 시스템 지시사항
      */
-    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData) {
-        let systemInstruction = basePrompt;
+    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData, lessonDescription) {
+        let systemInstruction = "";
+        
+        // 1. 수업 설명 (핵심 지식 및 역할) 최우선 배치
+        if (lessonDescription && lessonDescription.trim()) {
+            systemInstruction += `### 🎯 수업 목표 및 AI 튜터 핵심 역할 ###\n`;
+            systemInstruction += `${lessonDescription.trim()}\n\n`;
+            systemInstruction += `위의 수업 목표와 맥락을 바탕으로 학생을 가르치는 전문 AI 튜터로서 활동하세요.\n\n`;
+        }
+        
+        // 2. 기존 프롬프트 요소들 추가
+        systemInstruction += basePrompt;
         
         // 교육학적 맥락 추가
         systemInstruction += educationalContext;
