@@ -1,37 +1,69 @@
-# 교사 코드 방식 AI 챗봇
+# 🤖 Science AI Chatbot - 차세대 AI 교육 플랫폼
 
-## 프로젝트 개요
+> **그래비트랙스 물리 실험에서 전과목 지원 AI 교육 플랫폼으로 진화한 완성형 시스템**
 
-이 프로젝트는 **'교사 코드' 방식**으로 작동하는 AI 챗봇입니다. 여러 교사가 각자의 Google Gemini API 키를 사용하면서도, 학생들은 간단한 교사 코드만 입력하여 챗봇을 사용할 수 있습니다.
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Google AI](https://img.shields.io/badge/Google%20AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-## 🏗️ 아키텍처
+## 🌟 프로젝트 개요
 
-- **Frontend**: HTML, CSS, JavaScript (Vanilla JS)
-- **Backend**: Firebase Functions (Node.js 20)
-- **Database**: Firebase Firestore
-- **Hosting**: Firebase Hosting
-- **AI Model**: Google Gemini 1.5 Flash
+**Science AI Chatbot**은 초등학생들의 학습을 돕는 지능형 AI 교육 플랫폼입니다. 단순한 그래비트랙스 실험 도구에서 시작하여 **국어, 수학, 사회, 과학** 전 과목을 지원하는 범용 AI 교육 플랫폼으로 발전했습니다.
 
-## 🚀 배포된 사이트
+### ✨ 핵심 특징
+- 🧠 **적응형 AI 튜터**: 학생 응답 유형을 실시간 분석하여 6가지 맞춤형 교수 전략 자동 적용
+- 📚 **전과목 지원**: JSON 기반 과목별 프롬프트 시스템으로 모든 교과목 학습 지원
+- 👩‍🏫 **교사 친화적**: 직관적인 대시보드로 수업 관리, 프롬프트 편집, 학생 분석 가능
+- 📱 **QR 코드 시스템**: 학생들이 스마트폰으로 바로 접속할 수 있는 편리한 시스템
+- 💰 **경제적 운영**: 월 100원 미만으로 20명 학급 운영 가능
 
-- **메인 사이트**: https://science-aichatbot.web.app
+### 🎓 교육적 혁신
+- **소크라테스식 교수법**: 답을 직접 알려주지 않고 학생 스스로 깨닫도록 유도
+- **구성주의 학습**: 학생의 기존 지식과 경험을 바탕으로 한 의미 있는 학습 지원
+- **개별화 교육**: 학생별 학습 패턴 분석을 통한 맞춤형 교수 전략 제공
+- **메타인지 발달**: 학습 과정에 대한 성찰과 자기 주도적 학습 능력 강화
+
+## 🌐 배포 주소
+
+- **학생용 챗봇**: https://science-aichatbot.web.app
+- **교사 대시보드**: https://science-aichatbot.web.app/teacher.html
 - **관리자 페이지**: https://science-aichatbot.web.app/admin.html
 
-## 📋 사용 방법
+## 🏗️ 기술 스택
 
-### 1. 교사 (개발자가 대신 등록)
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Backend**: Firebase Functions (Node.js 20)
+- **Database**: Firebase Firestore
+- **AI**: Google Gemini API (2.0 Flash, 1.5 Flash, 1.5 Pro 지원)
+- **Authentication**: Firebase Authentication (Google OAuth)
+- **Hosting**: Firebase Hosting
 
-1. **API 키 준비**: Google AI Studio에서 Gemini API 키를 발급받습니다.
-2. **교사 등록**: `/admin.html` 페이지에서 교사 코드와 API 키를 등록합니다.
-   - 교사 코드: `class2024a` (예시)
-   - API 키: `AIzaSy...`
-3. **학생들에게 코드 전달**: 등록된 교사 코드를 학생들에게 알려줍니다.
+## 🚀 주요 기능
 
-### 2. 학생
+### 👨‍🏫 교사용 기능
+- **Google OAuth 인증**: 안전한 교사 인증 시스템
+- **수업 관리**: 과목별 수업 생성 및 QR 코드 자동 생성
+- **커스텀 프롬프트**: 6가지 응답 유형별 맞춤 프롬프트 편집
+- **AI 모델 선택**: 5가지 Gemini 모델 중 선택 가능
+- **학생 분석**: AI 기반 학생 학습 패턴 분석 및 CSV 다운로드
+- **실시간 모니터링**: 수업 중 학생들의 AI 대화 현황 실시간 확인
 
-1. 메인 사이트에 접속합니다.
-2. 우측 챗봇 영역에서 **교사 코드를 입력**하고 저장합니다.
-3. 그래비트랙스 실험에 대해 AI 튜터와 대화를 나눕니다.
+### 👨‍🎓 학생용 기능
+- **간편한 접속**: 교사 코드 또는 QR 코드로 즉시 AI 튜터와 대화 시작
+- **과목별 AI 튜터**: 각 과목에 특화된 AI 튜터 페르소나
+- **적응형 응답**: 학생의 학습 진행 단계에 따른 맞춤형 피드백
+- **소크라테스식 학습**: 스스로 깨달을 수 있도록 유도하는 질문형 학습
+
+### 🔍 적응형 프롬프트 시스템
+학생의 응답을 6가지 유형으로 자동 분류하여 맞춤형 교수 전략 적용:
+
+1. **CONCEPT_QUESTION**: 개념 질문 시 일상적 비유로 설명
+2. **EXPLORATION_DEADLOCK**: 탐색 교착 상태 시 단계적 안내
+3. **FAILURE_REPORT**: 실패 보고 시 원인 추론 유도
+4. **SUCCESS_WITHOUT_PRINCIPLE**: 성공 시 과학적 원리 연결
+5. **HYPOTHESIS_INQUIRY**: 가설 제시 시 실험 설계 지원
+6. **DEFAULT**: 일반적 상황 대응
 
 ## 🔧 기술적 특징
 
