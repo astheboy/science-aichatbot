@@ -12,9 +12,10 @@ class PromptBuilder {
      * @param {Array} conversationHistory - 대화 이력
      * @param {Object} teacherData - 교사 설정 데이터
      * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할 지시사항)
+     * @param {Array|null} lessonResources - 수업 학습 자료 (링크, 파일 등)
      * @returns {Array} Gemini API 호출용 프롬프트 배열
      */
-    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null) {
+    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null, lessonResources = null) {
         try {
             // 과목별 설정 로드
             const subject = teacherData.subject || 'science';
@@ -32,14 +33,15 @@ class PromptBuilder {
             // 4. 과목별 특화 규칙 적용
             const subjectRules = this.buildSubjectRules(subjectConfig, teacherData);
             
-            // 5. 최종 프롬프트 조합 (수업 설명 추가)
+            // 5. 최종 프롬프트 조합 (수업 설명 및 학습 자료 추가)
             const systemInstruction = this.combinePromptElements(
                 basePrompt,
                 educationalContext,
                 subjectRules,
                 conversationContext,
                 teacherData,
-                lessonDescription
+                lessonDescription,
+                lessonResources
             );
             
             // 6. Gemini API 형식으로 변환
@@ -269,9 +271,10 @@ class PromptBuilder {
      * @param {string} conversationContext - 대화 맥락
      * @param {Object} teacherData - 교사 설정
      * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할)
+     * @param {Array|null} lessonResources - 수업 학습 자료
      * @returns {string} 최종 시스템 지시사항
      */
-    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData, lessonDescription) {
+    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData, lessonDescription, lessonResources) {
         let systemInstruction = "";
         
         // 1. 수업 설명 (핵심 지식 및 역할) 최우선 배치
@@ -279,6 +282,25 @@ class PromptBuilder {
             systemInstruction += `### 🎯 수업 목표 및 AI 튜터 핵심 역할 ###\n`;
             systemInstruction += `${lessonDescription.trim()}\n\n`;
             systemInstruction += `위의 수업 목표와 맥락을 바탕으로 학생을 가르치는 전문 AI 튜터로서 활동하세요.\n\n`;
+        }
+        
+        // 1-1. 학습 자료 정보 추가
+        if (lessonResources && lessonResources.length > 0) {
+            systemInstruction += `### 📚 참고 학습 자료 ###\n`;
+            systemInstruction += `교사가 이 수업을 위해 준비한 참고 자료들이 있습니다:\n\n`;
+            
+            lessonResources.forEach((resource, index) => {
+                const icon = resource.type === 'link' ? '🔗' : '📎';
+                systemInstruction += `${index + 1}. ${icon} ${resource.title}\n`;
+                if (resource.type === 'link') {
+                    systemInstruction += `   - URL: ${resource.url}\n`;
+                } else if (resource.type === 'file') {
+                    systemInstruction += `   - 파일명: ${resource.fileName || resource.title}\n`;
+                }
+            });
+            
+            systemInstruction += `\n학생이 탐구 과정에서 막히거나 추가 학습이 필요할 때, 위 자료를 적절히 안내해주세요.\n`;
+            systemInstruction += `단, 학생이 스스로 탐구할 기회를 먼저 주고, 2-3회 이상 어려움을 표현할 때 자료를 제안하세요.\n\n`;
         }
         
         // 2. 기존 프롬프트 요소들 추가

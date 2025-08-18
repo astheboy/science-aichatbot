@@ -1,4 +1,6 @@
 import { callGeminiApi } from "./api.js";
+import { db } from "./firebase-config.js";
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const chatWindow = document.getElementById("chat-window");
 const chatForm = document.getElementById("chat-form");
@@ -60,6 +62,10 @@ function initializeTutorState() {
     saveLessonCodeBtn.textContent = "변경";
     lessonCodeStatus.textContent = "수업 코드가 연결되었습니다.";
     lessonCodeStatus.className = "text-xs text-center text-green-600";
+    
+    // 수업 정보 가져오기
+    fetchAndDisplayLessonInfo(lessonCode);
+    
     if (conversationHistory.length === 0) {
       displayAiMessage(
         "공부를 하다가 궁금하거나 어려운 점이 생기면 나에게 무엇이든 물어봐!",
@@ -77,6 +83,9 @@ function initializeTutorState() {
         true
       );
     }
+    
+    // 수업 정보 숨기기
+    hideLessonInfo();
   }
 }
 
@@ -99,6 +108,9 @@ function saveLessonCode() {
     saveStudentNameBtn.textContent = "저장";
     studentNameStatus.textContent = "수업 코드 저장 후 이름을 입력하세요.";
     studentNameStatus.className = "text-xs text-center text-gray-400";
+    
+    // 수업 정보 숨기기
+    hideLessonInfo();
     return;
   }
 
@@ -441,5 +453,106 @@ function showAchievementNotification(achievement) {
   setTimeout(() => {
     notification.classList.add('hidden');
   }, 4000);
+}
+
+// 수업 정보 가져오기 및 표시
+async function fetchAndDisplayLessonInfo(lessonCode) {
+  try {
+    // Firestore에서 수업 정보 조회
+    const lessonsRef = collection(db, "lessons");
+    const q = query(lessonsRef, where("code", "==", lessonCode));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const lessonData = querySnapshot.docs[0].data();
+      displayLessonInfo(lessonData);
+    } else {
+      console.log("해당 수업 코드를 찾을 수 없습니다.");
+      hideLessonInfo();
+    }
+  } catch (error) {
+    console.error("수업 정보를 가져오는 중 오류 발생:", error);
+    hideLessonInfo();
+  }
+}
+
+// 수업 정보 UI에 표시
+function displayLessonInfo(lessonData) {
+  const lessonInfoSection = document.getElementById('lesson-info-section');
+  const lessonTitle = document.getElementById('lesson-title');
+  const lessonSubject = document.getElementById('lesson-subject');
+  const lessonDescription = document.getElementById('lesson-description');
+  const resourcesList = document.getElementById('resources-list');
+  
+  if (lessonInfoSection) {
+    lessonInfoSection.classList.remove('hidden');
+  }
+  
+  if (lessonTitle) {
+    lessonTitle.textContent = lessonData.title || '제목 없음';
+  }
+  
+  if (lessonSubject) {
+    lessonSubject.textContent = lessonData.subject || '과목 없음';
+  }
+  
+  if (lessonDescription) {
+    if (lessonData.description) {
+      lessonDescription.textContent = lessonData.description;
+      lessonDescription.parentElement.classList.remove('hidden');
+    } else {
+      lessonDescription.parentElement.classList.add('hidden');
+    }
+  }
+  
+  // 학습 자료 목록 표시
+  if (resourcesList && lessonData.resources && lessonData.resources.length > 0) {
+    resourcesList.innerHTML = '';
+    lessonData.resources.forEach(resource => {
+      const listItem = document.createElement('li');
+      listItem.className = 'flex items-center gap-2 text-sm text-gray-600';
+      
+      if (resource.type === 'link') {
+        listItem.innerHTML = `
+          <i data-lucide="link" class="w-4 h-4 text-blue-500"></i>
+          <a href="${resource.url}" target="_blank" class="hover:text-blue-600 underline">
+            ${resource.title}
+          </a>
+        `;
+      } else if (resource.type === 'file') {
+        listItem.innerHTML = `
+          <i data-lucide="file-text" class="w-4 h-4 text-green-500"></i>
+          <a href="${resource.url}" target="_blank" class="hover:text-green-600 underline">
+            ${resource.title}
+          </a>
+        `;
+      }
+      
+      resourcesList.appendChild(listItem);
+    });
+    
+    // Lucide 아이콘 다시 생성
+    lucide.createIcons();
+    
+    // 자료 섹션 표시
+    const resourcesSection = resourcesList.closest('div');
+    if (resourcesSection) {
+      resourcesSection.classList.remove('hidden');
+    }
+  } else if (resourcesList) {
+    // 자료가 없으면 섹션 숨기기
+    const resourcesSection = resourcesList.closest('div');
+    if (resourcesSection) {
+      resourcesSection.classList.add('hidden');
+    }
+  }
+}
+
+// 수업 정보 숨기기
+function hideLessonInfo() {
+  const lessonInfoSection = document.getElementById('lesson-info-section');
+  if (lessonInfoSection) {
+    lessonInfoSection.classList.add('hidden');
+  }
 }
 

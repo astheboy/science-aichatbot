@@ -63,11 +63,11 @@ function getDefaultPrompt() {
     return getPromptByResponseType('DEFAULT', null);
 }
 
-// 전체 프롬프트 생성 함수 (JSON 시스템 사용)
-async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null) {
+// 전체 프롬프트 생성 함수 (JSON 시스템 사용 + 학습 자료 추가)
+async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null, lessonResources = null) {
     try {
-        // 새로운 JSON 기반 프롬프트 생성 시스템 사용 (수업 설명 포함)
-        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData, lessonDescription);
+        // 새로운 JSON 기반 프롬프트 생성 시스템 사용 (수업 설명 및 학습 자료 포함)
+        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData, lessonDescription, lessonResources);
     } catch (error) {
         console.error('프롬프트 생성 오류:', error);
         
@@ -145,10 +145,16 @@ exports.getTutorResponse = onCall(async (request) => {
         topic: lessonData.title  // 수업 제목 추가
       };
       
-      // 수업 설명을 lessonDescription으로 추출
+      // 수업 설명과 학습 자료를 추출
       const lessonDescription = lessonData.description || null;
+      const lessonResources = lessonData.resources || null;
       
-      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, lessonDescription);
+      // 학습 자료가 있으면 로그 출력
+      if (lessonResources && lessonResources.length > 0) {
+        console.log(`수업 '${lessonData.title}'의 학습 자료 ${lessonResources.length}개를 프롬프트에 포함합니다.`);
+      }
+      
+      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, lessonDescription, lessonResources);
       
       // 6. Gemini API 호출
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -166,15 +172,9 @@ exports.getTutorResponse = onCall(async (request) => {
       const response = await result.response;
       const aiResponseText = response.text();
       
-      // 7. 게임화 시스템 처리 (학생 정보가 있는 경우)
+      // 7. 게임화 시스템 처리는 세션 업데이트 후에 수행
       let gamificationResult = null;
       let achievements = [];
-      
-      if (studentName && sessionId) {
-        // 게임화 처리
-        gamificationResult = await GamificationManager.processExperience(sessionId, responseType, subject);
-        achievements = await GamificationManager.checkAchievements(sessionId, responseType, subject);
-      }
       
       // 8. 대화 기록 저장 (학생 이름과 세션 ID가 있는 경우에만)
       if (studentName && sessionId) {
@@ -212,19 +212,41 @@ exports.getTutorResponse = onCall(async (request) => {
           };
           
           // 세션이 새로 생성되는 경우 초기화
-          const existingSession = await sessionRef.get();
-          if (!existingSession.exists) {
-            // 게임화 시스템 초기화
-            await GamificationManager.initializeSession(sessionId, studentName, {
-              lessonCode: lessonCode,
-              lessonId: lessonDoc.id,
-              lessonTitle: lessonData.title,
-              subject: subject,
-              teacherCode: lessonData.teacherCode
-            });
-          } else {
-            // 기존 세션 업데이트
-            await sessionRef.set(sessionData, { merge: true });
+          try {
+            const existingSession = await sessionRef.get();
+            console.log(`세션 상태 확인: ${sessionId}, 존재여부: ${existingSession.exists}`);
+            
+            if (!existingSession.exists) {
+              console.log(`새 세션 초기화: ${sessionId}, 학생이름: ${studentName}`);
+              // 게임화 시스템 초기화
+              const sessionInitResult = await GamificationManager.initializeSession(sessionId, studentName, {
+                lessonCode: lessonCode,
+                lessonId: lessonDoc.id,
+                lessonTitle: lessonData.title || '',
+                subject: subject,
+                teacherCode: lessonData.teacherCode
+              });
+              console.log(`세션 초기화 결과:`, sessionInitResult);
+            } else {
+              // 기존 세션 업데이트
+              await sessionRef.set(sessionData, { merge: true });
+              console.log(`기존 세션 업데이트 완료: ${sessionId}`);
+            }
+            
+            // 세션 초기화/업데이트 후 게임화 처리
+            console.log(`게임화 처리 시작: ${sessionId}, 응답유형: ${responseType}`);
+            try {
+              gamificationResult = await GamificationManager.processExperience(sessionId, responseType, subject);
+              console.log(`경험치 처리 결과:`, gamificationResult);
+              
+              achievements = await GamificationManager.checkAchievements(sessionId, responseType, subject);
+              console.log(`성취 처리 결과:`, achievements);
+            } catch (gamificationError) {
+              console.error(`게임화 처리 오류:`, gamificationError);
+            }
+          } catch (sessionError) {
+            console.error(`세션 초기화 오류:`, sessionError);
+            // 세션 오류가 있어도 기본 대화기능은 유지
           }
           
         } catch (logError) {
@@ -1080,7 +1102,7 @@ ${conversationText}
 // 수업 생성
 exports.createLesson = onCall(async (request) => {
     const { data, auth } = request;
-    const { title, subject, description } = data;
+    const { title, subject, description, resources } = data;
     
     if (!auth) {
       throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
@@ -1140,6 +1162,7 @@ exports.createLesson = onCall(async (request) => {
         title: title,
         subject: subject,
         description: description || null,
+        resources: resources || [], // 학습 자료 추가
         lessonCode: lessonCode,
         teacherId: userId,
         teacherEmail: userEmail,
@@ -1172,7 +1195,7 @@ exports.createLesson = onCall(async (request) => {
 // 수업 수정
 exports.updateLesson = onCall(async (request) => {
     const { data, auth } = request;
-    const { lessonId, title, subject, description } = data;
+    const { lessonId, title, subject, description, resources } = data;
     
     if (!auth) {
       throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
@@ -1210,6 +1233,7 @@ exports.updateLesson = onCall(async (request) => {
         title: title,
         subject: subject,
         description: description || null,
+        resources: resources || [], // 학습 자료 추가
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       };
       

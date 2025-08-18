@@ -448,6 +448,82 @@
                                     </div>
                                 </div>
 
+                                <!-- 학습 자료 추가 섹션 -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>📚 학습 자료 및 힌트</span>
+                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새 기능</span>
+                                        </span>
+                                    </label>
+                                    <p class="text-xs text-gray-600 mb-3">학생들이 막힐 때 AI 튜터가 제공할 보충 자료를 추가하세요.</p>
+                                    
+                                    <!-- 자료 추가 버튼들 -->
+                                    <div class="flex space-x-3 mb-3">
+                                        <button type="button" id="add-link-btn" 
+                                            class="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 font-medium">
+                                            🔗 웹 링크 추가
+                                        </button>
+                                        <button type="button" id="add-file-btn"
+                                            class="px-3 py-1.5 text-sm bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 font-medium">
+                                            📎 파일 업로드
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- 추가된 자료 목록 -->
+                                    <div id="resources-list" class="space-y-2 mb-3">
+                                        <!-- 자료가 여기에 동적으로 추가됩니다 -->
+                                    </div>
+                                    
+                                    <!-- 링크 추가 입력 영역 (숨김 상태) -->
+                                    <div id="link-input-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="link-title-input" placeholder="링크 제목 (예: 개념 설명 영상)"
+                                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                            <input type="url" id="link-url-input" placeholder="https://..."
+                                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                            <button type="button" id="save-link-btn"
+                                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                                추가
+                                            </button>
+                                            <button type="button" id="cancel-link-btn"
+                                                class="px-3 py-1 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 파일 업로드 영역 (숨김 상태) -->
+                                    <div id="file-upload-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
+                                        <div class="space-y-2">
+                                            <input type="file" id="file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
+                                                class="text-sm file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                            <div class="flex space-x-2">
+                                                <button type="button" id="upload-file-btn"
+                                                    class="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                                    업로드
+                                                </button>
+                                                <button type="button" id="cancel-file-btn"
+                                                    class="px-3 py-1 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                                                    취소
+                                                </button>
+                                            </div>
+                                            <div id="upload-progress" class="hidden">
+                                                <div class="text-xs text-gray-600 mb-1">업로드 중...</div>
+                                                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                                    <div id="upload-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <p class="text-xs text-blue-700">
+                                            <strong>💡 팁:</strong> 학생이 2회 이상 막힐 때 AI 튜터가 이 자료들을 적절히 제공합니다.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <div class="flex justify-end">
                                     <button type="submit" id="create-lesson-btn"
                                         class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
@@ -550,6 +626,76 @@
                                             <strong>💡 중요:</strong> 여기에 입력하는 내용이 AI 튜터의 핵심 성격과 교수법을 결정합니다. 
                                             구체적이고 명확하게 작성할수록 더 전문화된 AI 튜터가 됩니다.
                                         </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 학습 자료 관리 섹션 (편집 모달) -->
+                                <div class="border-t pt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>📚 학습 자료 및 힌트</span>
+                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새 기능</span>
+                                        </span>
+                                    </label>
+                                    <p class="text-xs text-gray-600 mb-3">학생들이 막힐 때 AI 튜터가 제공할 보충 자료를 관리하세요.</p>
+                                    
+                                    <!-- 자료 추가 버튼들 -->
+                                    <div class="flex space-x-3 mb-3">
+                                        <button type="button" id="edit-add-link-btn" 
+                                            class="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 font-medium">
+                                            🔗 웹 링크 추가
+                                        </button>
+                                        <button type="button" id="edit-add-file-btn"
+                                            class="px-3 py-1.5 text-sm bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 font-medium">
+                                            📎 파일 업로드
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- 추가된 자료 목록 -->
+                                    <div id="edit-resources-list" class="space-y-2 mb-3">
+                                        <!-- 자료가 여기에 동적으로 추가됩니다 -->
+                                    </div>
+                                    
+                                    <!-- 링크 추가 입력 영역 (숨김 상태) -->
+                                    <div id="edit-link-input-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="edit-link-title-input" placeholder="링크 제목 (예: 개념 설명 영상)"
+                                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                            <input type="url" id="edit-link-url-input" placeholder="https://..."
+                                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                            <button type="button" id="edit-save-link-btn"
+                                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                                추가
+                                            </button>
+                                            <button type="button" id="edit-cancel-link-btn"
+                                                class="px-3 py-1 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 파일 업로드 영역 (숨김 상태) -->
+                                    <div id="edit-file-upload-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
+                                        <div class="space-y-2">
+                                            <input type="file" id="edit-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
+                                                class="text-sm file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                            <div class="flex space-x-2">
+                                                <button type="button" id="edit-upload-file-btn"
+                                                    class="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                                    업로드
+                                                </button>
+                                                <button type="button" id="edit-cancel-file-btn"
+                                                    class="px-3 py-1 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                                                    취소
+                                                </button>
+                                            </div>
+                                            <div id="edit-upload-progress" class="hidden">
+                                                <div class="text-xs text-gray-600 mb-1">업로드 중...</div>
+                                                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                                    <div id="edit-upload-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -831,7 +977,8 @@
                 onAuthStateChanged
             } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
             import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
-            import { auth, functions } from './firebase-config.js';
+            import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+            import { auth, functions, storage } from './firebase-config.js';
 
             // Firebase Functions
             const updateTeacherApiKey = httpsCallable(functions, 'updateTeacherApiKey');
@@ -1906,6 +2053,429 @@
             const lessonsEmpty = document.getElementById('lessons-empty');
             const lessonsList = document.getElementById('lessons-list');
 
+            // 자료 관리 관련 요소들 (새 수업 생성)
+            const addLinkBtn = document.getElementById('add-link-btn');
+            const addFileBtn = document.getElementById('add-file-btn');
+            const linkInputArea = document.getElementById('link-input-area');
+            const fileUploadArea = document.getElementById('file-upload-area');
+            const linkTitleInput = document.getElementById('link-title-input');
+            const linkUrlInput = document.getElementById('link-url-input');
+            const saveLinkBtn = document.getElementById('save-link-btn');
+            const cancelLinkBtn = document.getElementById('cancel-link-btn');
+            const fileInput = document.getElementById('file-input');
+            const uploadFileBtn = document.getElementById('upload-file-btn');
+            const cancelFileBtn = document.getElementById('cancel-file-btn');
+            const uploadProgress = document.getElementById('upload-progress');
+            const uploadProgressBar = document.getElementById('upload-progress-bar');
+            const resourcesList = document.getElementById('resources-list');
+
+            // 자료 관리 관련 요소들 (수업 편집)
+            const editAddLinkBtn = document.getElementById('edit-add-link-btn');
+            const editAddFileBtn = document.getElementById('edit-add-file-btn');
+            const editLinkInputArea = document.getElementById('edit-link-input-area');
+            const editFileUploadArea = document.getElementById('edit-file-upload-area');
+            const editLinkTitleInput = document.getElementById('edit-link-title-input');
+            const editLinkUrlInput = document.getElementById('edit-link-url-input');
+            const editSaveLinkBtn = document.getElementById('edit-save-link-btn');
+            const editCancelLinkBtn = document.getElementById('edit-cancel-link-btn');
+            const editFileInput = document.getElementById('edit-file-input');
+            const editUploadFileBtn = document.getElementById('edit-upload-file-btn');
+            const editCancelFileBtn = document.getElementById('edit-cancel-file-btn');
+            const editUploadProgress = document.getElementById('edit-upload-progress');
+            const editUploadProgressBar = document.getElementById('edit-upload-progress-bar');
+            const editResourcesList = document.getElementById('edit-resources-list');
+
+            // 임시 자료 저장용 배열
+            let tempResources = [];
+            let editTempResources = [];
+
+            // === 자료 관리 이벤트 핸들러 (새 수업 생성) ===
+            
+            // 웹 링크 추가 버튼
+            addLinkBtn.addEventListener('click', () => {
+                linkInputArea.classList.remove('hidden');
+                fileUploadArea.classList.add('hidden');
+                linkTitleInput.value = '';
+                linkUrlInput.value = '';
+            });
+
+            // 파일 업로드 버튼
+            addFileBtn.addEventListener('click', () => {
+                fileUploadArea.classList.remove('hidden');
+                linkInputArea.classList.add('hidden');
+                fileInput.value = '';
+            });
+
+            // 링크 저장 버튼
+            saveLinkBtn.addEventListener('click', () => {
+                const title = linkTitleInput.value.trim();
+                const url = linkUrlInput.value.trim();
+                
+                if (!title || !url) {
+                    showStatus('링크 제목과 URL을 모두 입력해주세요.', 'error');
+                    return;
+                }
+                
+                if (!isValidUrl(url)) {
+                    showStatus('올바른 URL 형식을 입력해주세요.', 'error');
+                    return;
+                }
+                
+                const resource = {
+                    id: generateResourceId(),
+                    type: 'link',
+                    title: title,
+                    url: url,
+                    createdAt: new Date().toISOString()
+                };
+                
+                tempResources.push(resource);
+                renderResources();
+                
+                linkInputArea.classList.add('hidden');
+                linkTitleInput.value = '';
+                linkUrlInput.value = '';
+                
+                showStatus('링크가 추가되었습니다.', 'success', 2000);
+            });
+
+            // 링크 취소 버튼
+            cancelLinkBtn.addEventListener('click', () => {
+                linkInputArea.classList.add('hidden');
+                linkTitleInput.value = '';
+                linkUrlInput.value = '';
+            });
+
+            // 파일 업로드 버튼
+            uploadFileBtn.addEventListener('click', async () => {
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    showStatus('파일을 선택해주세요.', 'error');
+                    return;
+                }
+                
+                // 파일 크기 제한 (10MB)
+                const maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showStatus('파일 크기는 10MB 이하여야 합니다.', 'error');
+                    return;
+                }
+                
+                try {
+                    uploadFileBtn.disabled = true;
+                    uploadFileBtn.textContent = '업로드 중...';
+                    uploadProgress.classList.remove('hidden');
+                    
+                    // Firebase Storage에 파일 업로드
+                    const fileName = `lessons/${Date.now()}_${file.name}`;
+                    const storageRef = ref(storage, fileName);
+                    const uploadTask = uploadBytesResumable(storageRef, file);
+                    
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // 업로드 진행 상황 표시
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            uploadProgressBar.style.width = progress + '%';
+                        },
+                        (error) => {
+                            console.error('파일 업로드 실패:', error);
+                            showStatus('파일 업로드에 실패했습니다.', 'error');
+                            uploadFileBtn.disabled = false;
+                            uploadFileBtn.textContent = '업로드';
+                            uploadProgress.classList.add('hidden');
+                        },
+                        async () => {
+                            // 업로드 완료 후 다운로드 URL 획득
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            
+                            const resource = {
+                                id: generateResourceId(),
+                                type: 'file',
+                                title: file.name,
+                                url: downloadURL,
+                                fileName: file.name,
+                                fileSize: file.size,
+                                fileType: file.type,
+                                storagePath: fileName,
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            tempResources.push(resource);
+                            renderResources();
+                            
+                            fileUploadArea.classList.add('hidden');
+                            fileInput.value = '';
+                            uploadProgress.classList.add('hidden');
+                            uploadProgressBar.style.width = '0%';
+                            uploadFileBtn.disabled = false;
+                            uploadFileBtn.textContent = '업로드';
+                            
+                            showStatus('파일이 성공적으로 업로드되었습니다.', 'success');
+                        }
+                    );
+                    
+                } catch (error) {
+                    console.error('파일 업로드 오류:', error);
+                    showStatus('파일 업로드 중 오류가 발생했습니다.', 'error');
+                    uploadFileBtn.disabled = false;
+                    uploadFileBtn.textContent = '업로드';
+                    uploadProgress.classList.add('hidden');
+                }
+            });
+
+            // 파일 업로드 취소 버튼
+            cancelFileBtn.addEventListener('click', () => {
+                fileUploadArea.classList.add('hidden');
+                fileInput.value = '';
+                uploadProgress.classList.add('hidden');
+                uploadProgressBar.style.width = '0%';
+            });
+
+            // === 자료 관리 이벤트 핸들러 (수업 편집) ===
+            
+            // 편집 모달 - 웹 링크 추가 버튼
+            editAddLinkBtn.addEventListener('click', () => {
+                editLinkInputArea.classList.remove('hidden');
+                editFileUploadArea.classList.add('hidden');
+                editLinkTitleInput.value = '';
+                editLinkUrlInput.value = '';
+            });
+
+            // 편집 모달 - 파일 업로드 버튼
+            editAddFileBtn.addEventListener('click', () => {
+                editFileUploadArea.classList.remove('hidden');
+                editLinkInputArea.classList.add('hidden');
+                editFileInput.value = '';
+            });
+
+            // 편집 모달 - 링크 저장 버튼
+            editSaveLinkBtn.addEventListener('click', () => {
+                const title = editLinkTitleInput.value.trim();
+                const url = editLinkUrlInput.value.trim();
+                
+                if (!title || !url) {
+                    showStatus('링크 제목과 URL을 모두 입력해주세요.', 'error');
+                    return;
+                }
+                
+                if (!isValidUrl(url)) {
+                    showStatus('올바른 URL 형식을 입력해주세요.', 'error');
+                    return;
+                }
+                
+                const resource = {
+                    id: generateResourceId(),
+                    type: 'link',
+                    title: title,
+                    url: url,
+                    createdAt: new Date().toISOString()
+                };
+                
+                editTempResources.push(resource);
+                renderEditResources();
+                
+                editLinkInputArea.classList.add('hidden');
+                editLinkTitleInput.value = '';
+                editLinkUrlInput.value = '';
+                
+                showStatus('링크가 추가되었습니다.', 'success', 2000);
+            });
+
+            // 편집 모달 - 링크 취소 버튼
+            editCancelLinkBtn.addEventListener('click', () => {
+                editLinkInputArea.classList.add('hidden');
+                editLinkTitleInput.value = '';
+                editLinkUrlInput.value = '';
+            });
+
+            // 편집 모달 - 파일 업로드 버튼
+            editUploadFileBtn.addEventListener('click', async () => {
+                const file = editFileInput.files[0];
+                
+                if (!file) {
+                    showStatus('파일을 선택해주세요.', 'error');
+                    return;
+                }
+                
+                // 파일 크기 제한 (10MB)
+                const maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showStatus('파일 크기는 10MB 이하여야 합니다.', 'error');
+                    return;
+                }
+                
+                try {
+                    editUploadFileBtn.disabled = true;
+                    editUploadFileBtn.textContent = '업로드 중...';
+                    editUploadProgress.classList.remove('hidden');
+                    
+                    // Firebase Storage에 파일 업로드
+                    const fileName = `lessons/${Date.now()}_${file.name}`;
+                    const storageRef = ref(storage, fileName);
+                    const uploadTask = uploadBytesResumable(storageRef, file);
+                    
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // 업로드 진행 상황 표시
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            editUploadProgressBar.style.width = progress + '%';
+                        },
+                        (error) => {
+                            console.error('파일 업로드 실패:', error);
+                            showStatus('파일 업로드에 실패했습니다.', 'error');
+                            editUploadFileBtn.disabled = false;
+                            editUploadFileBtn.textContent = '업로드';
+                            editUploadProgress.classList.add('hidden');
+                        },
+                        async () => {
+                            // 업로드 완료 후 다운로드 URL 획득
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            
+                            const resource = {
+                                id: generateResourceId(),
+                                type: 'file',
+                                title: file.name,
+                                url: downloadURL,
+                                fileName: file.name,
+                                fileSize: file.size,
+                                fileType: file.type,
+                                storagePath: fileName,
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            editTempResources.push(resource);
+                            renderEditResources();
+                            
+                            editFileUploadArea.classList.add('hidden');
+                            editFileInput.value = '';
+                            editUploadProgress.classList.add('hidden');
+                            editUploadProgressBar.style.width = '0%';
+                            editUploadFileBtn.disabled = false;
+                            editUploadFileBtn.textContent = '업로드';
+                            
+                            showStatus('파일이 성공적으로 업로드되었습니다.', 'success');
+                        }
+                    );
+                    
+                } catch (error) {
+                    console.error('파일 업로드 오류:', error);
+                    showStatus('파일 업로드 중 오류가 발생했습니다.', 'error');
+                    editUploadFileBtn.disabled = false;
+                    editUploadFileBtn.textContent = '업로드';
+                    editUploadProgress.classList.add('hidden');
+                }
+            });
+
+            // 편집 모달 - 파일 업로드 취소 버튼
+            editCancelFileBtn.addEventListener('click', () => {
+                editFileUploadArea.classList.add('hidden');
+                editFileInput.value = '';
+                editUploadProgress.classList.add('hidden');
+                editUploadProgressBar.style.width = '0%';
+            });
+
+            // === 유틸리티 함수들 ===
+            
+            // URL 유효성 검사
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            // 리소스 ID 생성
+            function generateResourceId() {
+                return 'resource_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            // 파일 크기 포맷팅
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            }
+            
+            // 자료 목록 렌더링 (새 수업 생성)
+            function renderResources() {
+                resourcesList.innerHTML = '';
+                
+                if (tempResources.length === 0) {
+                    resourcesList.innerHTML = '<p class="text-xs text-gray-500 italic">아직 추가된 자료가 없습니다.</p>';
+                    return;
+                }
+                
+                tempResources.forEach(resource => {
+                    const resourceEl = createResourceElement(resource, false);
+                    resourcesList.appendChild(resourceEl);
+                });
+            }
+            
+            // 자료 목록 렌더링 (수업 편집)
+            function renderEditResources() {
+                editResourcesList.innerHTML = '';
+                
+                if (editTempResources.length === 0) {
+                    editResourcesList.innerHTML = '<p class="text-xs text-gray-500 italic">아직 추가된 자료가 없습니다.</p>';
+                    return;
+                }
+                
+                editTempResources.forEach(resource => {
+                    const resourceEl = createResourceElement(resource, true);
+                    editResourcesList.appendChild(resourceEl);
+                });
+            }
+            
+            // 자료 요소 생성
+            function createResourceElement(resource, isEdit) {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2 bg-gray-50 rounded-md';
+                
+                const icon = resource.type === 'link' ? '🔗' : '📎';
+                const typeLabel = resource.type === 'link' ? '링크' : '파일';
+                
+                div.innerHTML = `
+                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+                        <span class="text-lg">${icon}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">${resource.title}</p>
+                            <p class="text-xs text-gray-500">
+                                ${typeLabel}
+                                ${resource.fileSize ? ' • ' + formatFileSize(resource.fileSize) : ''}
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="remove-resource-btn text-red-600 hover:text-red-800 text-sm font-medium"
+                        data-resource-id="${resource.id}" data-is-edit="${isEdit}">
+                        삭제
+                    </button>
+                `;
+                
+                // 삭제 버튼 이벤트
+                const removeBtn = div.querySelector('.remove-resource-btn');
+                removeBtn.addEventListener('click', () => {
+                    const resourceId = removeBtn.dataset.resourceId;
+                    const isEditMode = removeBtn.dataset.isEdit === 'true';
+                    
+                    if (isEditMode) {
+                        editTempResources = editTempResources.filter(r => r.id !== resourceId);
+                        renderEditResources();
+                    } else {
+                        tempResources = tempResources.filter(r => r.id !== resourceId);
+                        renderResources();
+                    }
+                    
+                    showStatus('자료가 삭제되었습니다.', 'info', 2000);
+                });
+                
+                return div;
+            }
+
             // 수업 편집 관련 요소들
             const editLessonModal = document.getElementById('edit-lesson-modal');
             const closeEditModalBtn = document.getElementById('close-edit-modal');
@@ -1937,13 +2507,16 @@
                     const result = await createLesson({
                         title,
                         subject,
-                        description: description || null
+                        description: description || null,
+                        resources: tempResources // 학습 자료 추가
                     });
 
                     showStatus('새 수업이 성공적으로 생성되었습니다!', 'success');
 
                     // 폼 리셋
                     createLessonForm.reset();
+                    tempResources = []; // 임시 자료 배열 초기화
+                    renderResources(); // 자료 목록 UI 초기화
 
                     // 수업 목록 새로고침
                     await loadLessons();
@@ -2005,13 +2578,16 @@
                         lessonId,
                         title,
                         subject,
-                        description: description || null
+                        description: description || null,
+                        resources: editTempResources // 학습 자료 추가
                     });
 
                     showStatus('수업이 성공적으로 수정되었습니다!', 'success');
                     
                     // 모달 닫기
                     editLessonModal.classList.add('hidden');
+                    editTempResources = []; // 임시 자료 배열 초기화
+                    renderEditResources(); // 자료 목록 UI 초기화
                     
                     // 수업 목록 새로고침
                     await loadLessons();

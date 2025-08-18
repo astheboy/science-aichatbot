@@ -18,7 +18,32 @@
         <!-- Main Content -->
         <main class="w-full lg:w-3/5 xl:w-2/3 p-6 sm:p-8 lg:p-12 lg:overflow-y-auto lg:h-screen">
             <div class="max-w-4xl mx-auto">
-                <header class="mb-8 text-center">
+                <!-- 수업 정보 섹션 (수업 코드 입력 후 표시) -->
+                <div id="lesson-info-section" class="hidden mb-8 bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl shadow-lg border border-blue-200">
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-2xl font-bold text-gray-800">
+                                <span id="lesson-title">수업 제목</span>
+                            </h2>
+                            <span id="lesson-subject-badge" class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">과목</span>
+                        </div>
+                        <p id="lesson-description" class="text-gray-700 leading-relaxed">수업 설명이 여기에 표시됩니다.</p>
+                    </div>
+                    
+                    <!-- 학습 자료 섹션 -->
+                    <div id="lesson-resources-section" class="hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <span class="text-xl mr-2">📚</span>
+                            학습 자료
+                        </h3>
+                        <div id="resources-list" class="space-y-2">
+                            <!-- 자료들이 동적으로 추가됩니다 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 기본 헤더 (수업 코드 입력 전 표시) -->
+                <header id="default-header" class="mb-8 text-center">
                     <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
                         <i data-lucide="sparkles" class="w-10 h-10 text-white"></i>
                     </div>
@@ -152,7 +177,8 @@
                     <h2 class="text-xl font-bold text-gray-800">생각을 깨우는 AI 튜터</h2>
                 </div>
                 
-                <!-- 게임화 시스템 UI -->
+                <!-- 게임화 시스템 UI (임시 비활성화) -->
+                <!--
                 <div id="gamification-panel" class="hidden bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-lg text-white">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center space-x-3">
@@ -175,8 +201,10 @@
                         <span class="bg-white bg-opacity-20 px-2 py-1 rounded">+<span id="exp-gained-amount">0</span> XP 획득!</span>
                     </div>
                 </div>
+                -->
                 
-                <!-- 성취 알림 -->
+                <!-- 성취 알림 (임시 비활성화) -->
+                <!--
                 <div id="achievement-notification" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white p-4 rounded-lg shadow-2xl z-50 animate-bounce">
                     <div class="flex items-center space-x-3">
                         <div class="text-3xl" id="achievement-icon">🏆</div>
@@ -187,8 +215,10 @@
                         </div>
                     </div>
                 </div>
+                -->
                 
-                <!-- 레벨업 알림 -->
+                <!-- 레벨업 알림 (임시 비활성화) -->
+                <!--
                 <div id="level-up-notification" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-8 rounded-2xl shadow-2xl z-50">
                     <div class="text-center">
                         <div class="text-6xl mb-4 animate-pulse">⭐</div>
@@ -197,6 +227,7 @@
                         <div class="text-lg" id="new-title-display"></div>
                     </div>
                 </div>
+                -->
                 
                 <div id="lesson-code-section" class="space-y-2">
                     <div class="flex items-center space-x-2">
