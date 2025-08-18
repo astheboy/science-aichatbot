@@ -1863,16 +1863,12 @@
                 const div = document.createElement('div');
                 div.className = 'space-y-2';
 
-                // 메시지 타임스탬프 처리 개선
+                // 메시지 타임스탬프 처리 개선 - convertFirestoreTimestamp 함수 사용
                 let timestamp = '시간 정보 없음';
                 if (conversation.timestamp) {
-                    try {
-                        const date = new Date(conversation.timestamp);
-                        if (!isNaN(date.getTime())) {
-                            timestamp = date.toLocaleString('ko-KR');
-                        }
-                    } catch (error) {
-                        console.log('메시지 날짜 파싱 오류:', error);
+                    const convertedDate = convertFirestoreTimestamp(conversation.timestamp, 'messageTimestamp', 'conversation');
+                    if (convertedDate) {
+                        timestamp = convertedDate.toLocaleString('ko-KR');
                     }
                 }
 
@@ -1889,7 +1885,7 @@
                 <div class="flex justify-start">
                     <div class="max-w-xs lg:max-w-md px-4 py-2 bg-gray-200 text-gray-800 rounded-lg">
                         <p class="text-sm whitespace-pre-wrap">${conversation.aiResponse}</p>
-                        ${conversation.responseType ? `<p class="text-xs text-gray-600 mt-1">응답 유형: ${conversation.responseType}</p>` : ''}
+                        ${conversation.responseType ? `<p class="text-xs text-gray-600 mt-1">응답 유형: ${convertResponseTypeToKorean(conversation.responseType)}</p>` : ''}
                     </div>
                 </div>
             `;
@@ -2163,7 +2159,51 @@
                 }
             }
 
-            // Firestore Timestamp를 JavaScript Date로 변환하는 헬퍼 함수 (디버깅 강화)
+            // 응답 유형을 영어에서 한글로 변환하는 함수 (모든 과목 포함)
+            function convertResponseTypeToKorean(responseType) {
+                const responseTypeMap = {
+                    // 기본 유형
+                    'DEFAULT': '기본 안내',
+                    
+                    // 과학 과목 응답 유형
+                    'CONCEPT_QUESTION': '개념 질문',
+                    'EXPLORATION_DEADLOCK': '탐색 교착 상태', 
+                    'FAILURE_REPORT': '실패 보고',
+                    'SUCCESS_WITHOUT_PRINCIPLE': '원칙 없는 성공',
+                    'HYPOTHESIS_INQUIRY': '가설 탐구',
+                    
+                    // 수학 과목 응답 유형
+                    'CONCEPT_CONFUSION': '개념 혼란',
+                    'PROCEDURE_ERROR': '절차 오류',
+                    'PROBLEM_SOLVING_BLOCK': '문제해결 막힘',
+                    'PATTERN_RECOGNITION_STRUGGLE': '패턴 인식 어려움',
+                    'MATHEMATICAL_REASONING': '수학적 추론',
+                    'CALCULATION_ANXIETY': '계산 불안',
+                    
+                    // 사회 과목 응답 유형
+                    'FACTUAL_CONFUSION': '사실 혼란',
+                    'PERSPECTIVE_LIMITATION': '관점 제한',
+                    'VALUE_CONFLICT': '가치 갈등',
+                    'SOCIAL_APATHY': '사회적 무관심',
+                    'CRITICAL_INQUIRY': '비판적 탐구',
+                    'STEREOTYPE_BIAS': '고정관념 편견',
+                    
+                    // 국어 과목 응답 유형
+                    'TEXT_COMPREHENSION_QUESTION': '텍스트 이해 질문',
+                    'EXPRESSION_STRUGGLE': '표현 어려움',
+                    'INTERPRETATION_CONFUSION': '해석 혼란',
+                    'SURFACE_UNDERSTANDING': '표면적 이해',
+                    
+                    // 기타 일반적 유형들 (기존 시스템에서 사용될 수 있는)
+                    'CURIOSITY_DRIVEN': '호기심 주도',
+                    'DIFFICULTY_EXPRESSION': '어려움 표현',
+                    'CONFIRMATION_SEEKING': '확인 요청'
+                };
+                
+                return responseTypeMap[responseType] || responseType;
+            }
+
+            // Firestore Timestamp를 JavaScript Date로 변환하는 헬퍼 함수 (Firebase v10 호환성 개선)
             function convertFirestoreTimestamp(timestamp, fieldName = 'unknown', sessionId = 'unknown') {
                 console.log(`[TIMESTAMP DEBUG] ${fieldName} for session ${sessionId}:`, {
                     original: timestamp,
@@ -2172,7 +2212,9 @@
                     isUndefined: timestamp === undefined,
                     constructor: timestamp?.constructor?.name,
                     hasToDate: timestamp?.toDate !== undefined,
-                    hasSeconds: timestamp?.seconds !== undefined
+                    hasSeconds: timestamp?.seconds !== undefined,
+                    hasNanoseconds: timestamp?.nanoseconds !== undefined,
+                    objectKeys: timestamp && typeof timestamp === 'object' ? Object.keys(timestamp) : null
                 });
                 
                 if (!timestamp) {
@@ -2181,29 +2223,60 @@
                 }
                 
                 try {
-                    // Firestore Timestamp 객체인 경우
-                    if (timestamp && typeof timestamp === 'object' && timestamp.toDate) {
+                    // Firestore Timestamp 객체인 경우 (toDate 메서드가 있는 경우)
+                    if (timestamp && typeof timestamp === 'object' && typeof timestamp.toDate === 'function') {
                         const result = timestamp.toDate();
                         console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using toDate():`, result);
                         return result;
                     }
                     
-                    // Firestore Timestamp가 seconds와 nanoseconds 프로퍼티를 가진 객체인 경우
-                    if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
-                        const result = new Date(timestamp.seconds * 1000);
-                        console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using seconds:`, result);
-                        return result;
+                    // Firebase v10에서 Timestamp가 plain object로 serialized된 경우
+                    if (timestamp && typeof timestamp === 'object' && 
+                        (timestamp.seconds !== undefined || timestamp._seconds !== undefined)) {
+                        
+                        const seconds = timestamp.seconds || timestamp._seconds;
+                        const nanoseconds = timestamp.nanoseconds || timestamp._nanoseconds || 0;
+                        
+                        if (seconds !== undefined) {
+                            // seconds를 밀리초로 변환하고 nanoseconds를 더함
+                            const milliseconds = (seconds * 1000) + Math.floor(nanoseconds / 1000000);
+                            const result = new Date(milliseconds);
+                            console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using seconds/nanoseconds:`, {
+                                seconds,
+                                nanoseconds,
+                                milliseconds,
+                                result
+                            });
+                            return result;
+                        }
                     }
                     
-                    // 문자열이나 숫자인 경우
-                    const date = new Date(timestamp);
-                    if (isNaN(date.getTime())) {
-                        console.log(`[TIMESTAMP DEBUG] ${fieldName} conversion failed - invalid date:`, timestamp);
-                        return null;
+                    // Date 객체인 경우 그대로 반환
+                    if (timestamp instanceof Date) {
+                        console.log(`[TIMESTAMP DEBUG] ${fieldName} is already a Date object:`, timestamp);
+                        return timestamp;
                     }
                     
-                    console.log(`[TIMESTAMP DEBUG] ${fieldName} converted from string/number:`, date);
-                    return date;
+                    // 숫자인 경우 (timestamp milliseconds)
+                    if (typeof timestamp === 'number') {
+                        const result = new Date(timestamp);
+                        if (!isNaN(result.getTime())) {
+                            console.log(`[TIMESTAMP DEBUG] ${fieldName} converted from number:`, result);
+                            return result;
+                        }
+                    }
+                    
+                    // 문자열인 경우
+                    if (typeof timestamp === 'string') {
+                        const result = new Date(timestamp);
+                        if (!isNaN(result.getTime())) {
+                            console.log(`[TIMESTAMP DEBUG] ${fieldName} converted from string:`, result);
+                            return result;
+                        }
+                    }
+                    
+                    console.log(`[TIMESTAMP DEBUG] ${fieldName} conversion failed - unsupported format:`, timestamp);
+                    return null;
                     
                 } catch (error) {
                     console.error(`[TIMESTAMP DEBUG] Error converting ${fieldName} for session ${sessionId}:`, error);
