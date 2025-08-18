@@ -151,6 +151,53 @@
                     </div>
                     <h2 class="text-xl font-bold text-gray-800">생각을 깨우는 AI 튜터</h2>
                 </div>
+                
+                <!-- 게임화 시스템 UI -->
+                <div id="gamification-panel" class="hidden bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-lg text-white">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-lg font-bold">
+                                <span id="student-level-display">Lv. 1</span>
+                                <span id="student-title" class="ml-2 text-sm opacity-90">탐구자 🌱</span>
+                            </div>
+                        </div>
+                        <div class="text-2xl" id="latest-achievement-icon"></div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="flex-1 bg-white bg-opacity-30 rounded-full h-2 overflow-hidden">
+                            <div id="exp-progress-bar" class="bg-yellow-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="text-sm whitespace-nowrap">
+                            <span id="current-exp">0</span>/<span id="next-level-exp">50</span> XP
+                        </div>
+                    </div>
+                    <div id="exp-gain-notification" class="hidden mt-2 text-center text-sm animate-pulse">
+                        <span class="bg-white bg-opacity-20 px-2 py-1 rounded">+<span id="exp-gained-amount">0</span> XP 획득!</span>
+                    </div>
+                </div>
+                
+                <!-- 성취 알림 -->
+                <div id="achievement-notification" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white p-4 rounded-lg shadow-2xl z-50 animate-bounce">
+                    <div class="flex items-center space-x-3">
+                        <div class="text-3xl" id="achievement-icon">🏆</div>
+                        <div>
+                            <div class="font-bold text-lg" id="achievement-name">성취 달성!</div>
+                            <div class="text-sm" id="achievement-description">첫 질문을 했어요!</div>
+                            <div class="text-xs mt-1">+<span id="achievement-exp-bonus">10</span> XP 보너스!</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 레벨업 알림 -->
+                <div id="level-up-notification" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-8 rounded-2xl shadow-2xl z-50">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4 animate-pulse">⭐</div>
+                        <div class="text-3xl font-bold mb-2">LEVEL UP!</div>
+                        <div class="text-xl mb-2"><span id="new-level-display">Lv. 2</span> 달성!</div>
+                        <div class="text-lg" id="new-title-display"></div>
+                    </div>
+                </div>
+                
                 <div id="lesson-code-section" class="space-y-2">
                     <div class="flex items-center space-x-2">
                         <input type="text" id="lesson-code-input" placeholder="수업 코드를 입력하세요 (예: ABCD1234)" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">

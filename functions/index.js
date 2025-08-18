@@ -7,12 +7,17 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const SubjectLoader = require('./lib/subjectLoader');
 const ResponseAnalyzer = require('./lib/responseAnalyzer');
 const PromptBuilder = require('./lib/promptBuilder');
+const gamificationModule = require('./lib/gamificationManager');
 
 // 글로벌 설정
 setGlobalOptions({ region: "asia-northeast3" });
 
 admin.initializeApp();
 const db = admin.firestore();
+
+// GamificationManager 초기화
+gamificationModule.initialize(admin);
+const GamificationManager = gamificationModule.GamificationManager;
 
 // 애플리케이션 시작 시 모든 과목 설정 미리 로드
 SubjectLoader.preloadAllConfigs().catch(console.error);
@@ -161,7 +166,17 @@ exports.getTutorResponse = onCall(async (request) => {
       const response = await result.response;
       const aiResponseText = response.text();
       
-      // 7. 대화 기록 저장 (학생 이름과 세션 ID가 있는 경우에만)
+      // 7. 게임화 시스템 처리 (학생 정보가 있는 경우)
+      let gamificationResult = null;
+      let achievements = [];
+      
+      if (studentName && sessionId) {
+        // 게임화 처리
+        gamificationResult = await GamificationManager.processExperience(sessionId, responseType, subject);
+        achievements = await GamificationManager.checkAchievements(sessionId, responseType, subject);
+      }
+      
+      // 8. 대화 기록 저장 (학생 이름과 세션 ID가 있는 경우에만)
       if (studentName && sessionId) {
         try {
           const conversationData = {
@@ -196,13 +211,21 @@ exports.getTutorResponse = onCall(async (request) => {
             responseTypes: admin.firestore.FieldValue.arrayUnion(responseType)
           };
           
-          // 세션이 새로 생성되는 경우 createdAt 추가
+          // 세션이 새로 생성되는 경우 초기화
           const existingSession = await sessionRef.get();
           if (!existingSession.exists) {
-            sessionData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+            // 게임화 시스템 초기화
+            await GamificationManager.initializeSession(sessionId, studentName, {
+              lessonCode: lessonCode,
+              lessonId: lessonDoc.id,
+              lessonTitle: lessonData.title,
+              subject: subject,
+              teacherCode: lessonData.teacherCode
+            });
+          } else {
+            // 기존 세션 업데이트
+            await sessionRef.set(sessionData, { merge: true });
           }
-          
-          await sessionRef.set(sessionData, { merge: true });
           
         } catch (logError) {
           console.error('대화 기록 저장 실패:', logError);
@@ -210,7 +233,21 @@ exports.getTutorResponse = onCall(async (request) => {
         }
       }
       
-      return { text: aiResponseText };
+      // 응답에 게임화 정보 포함
+      const responseData = { 
+        text: aiResponseText,
+        responseType: responseType
+      };
+      
+      if (gamificationResult) {
+        responseData.gamification = gamificationResult;
+      }
+      
+      if (achievements && achievements.length > 0) {
+        responseData.achievements = achievements;
+      }
+      
+      return responseData;
 
     } catch (error) {
       console.error("오류 발생:", error);

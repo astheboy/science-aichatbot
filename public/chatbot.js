@@ -17,6 +17,15 @@ let lessonCode = "";
 let studentName = "";
 let sessionId = "";
 
+// 게임화 시스템 관련 변수
+let currentGameStats = {
+  level: 1,
+  exp: 0,
+  nextLevelExp: 50,
+  currentTitle: { name: '탐구자', icon: '🌱' },
+  achievements: []
+};
+
 
 export function initChatbot() {
   saveLessonCodeBtn.addEventListener("click", saveLessonCode);
@@ -28,6 +37,7 @@ export function initChatbot() {
   
   initializeTutorState();
   initializeStudentNameState();
+  initializeGamificationUI();
 }
 
 function handleUrlParameters() {
@@ -149,6 +159,7 @@ function saveStudentName() {
     studentName = name;
     alert("이름이 저장되었습니다. 이제 대화 기록이 저장됩니다!");
     initializeStudentNameState();
+    initializeGamificationUI(); // 게임화 UI 초기화
   } else {
     alert("이름을 입력해주세요.");
   }
@@ -192,7 +203,24 @@ async function handleChatSubmit(e) {
       apiData.sessionId = sessionId;
     }
 
-    const aiResponseText = await callGeminiApi(apiData);
+    const response = await callGeminiApi(apiData);
+    
+    // 응답이 문자열인 경우 (이전 버전 호환)
+    let aiResponseText = response;
+    if (typeof response === 'object' && response.text) {
+      aiResponseText = response.text;
+      
+      // 게임화 정보 처리
+      if (response.gamification) {
+        updateGamificationStats(response.gamification);
+      }
+      
+      // 성취 처리
+      if (response.achievements && response.achievements.length > 0) {
+        handleAchievements(response.achievements);
+      }
+    }
+    
     displayAiMessage(aiResponseText);
     conversationHistory.push({
       role: "model",
@@ -237,5 +265,181 @@ function displayAiMessage(message, isFirst = false) {
   chatWindow.appendChild(messageElement);
   lucide.createIcons();
   chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// 게임화 UI 초기화
+function initializeGamificationUI() {
+  const gamificationPanel = document.getElementById('gamification-panel');
+  
+  // 학생 이름이 있을 때만 게임화 패널 표시
+  if (studentName && sessionId) {
+    gamificationPanel?.classList.remove('hidden');
+    updateGamificationDisplay();
+  } else {
+    gamificationPanel?.classList.add('hidden');
+  }
+}
+
+// 게임화 통계 업데이트
+function updateGamificationStats(gamificationData) {
+  if (!gamificationData) return;
+  
+  // 경험치 및 레벨 업데이트
+  if (gamificationData.currentExp !== undefined) {
+    currentGameStats.exp = gamificationData.currentExp;
+  }
+  if (gamificationData.currentLevel !== undefined) {
+    currentGameStats.level = gamificationData.currentLevel;
+  }
+  if (gamificationData.nextLevelExp !== undefined) {
+    currentGameStats.nextLevelExp = gamificationData.nextLevelExp;
+  }
+  if (gamificationData.newTitle) {
+    currentGameStats.currentTitle = gamificationData.newTitle;
+  }
+  
+  // UI 업데이트
+  updateGamificationDisplay();
+  
+  // 경험치 획듍 알림
+  if (gamificationData.expGained && gamificationData.expGained > 0) {
+    showExpGainNotification(gamificationData.expGained);
+  }
+  
+  // 레벨업 처리
+  if (gamificationData.leveledUp) {
+    showLevelUpNotification(gamificationData.currentLevel, gamificationData.newTitle);
+  }
+}
+
+// 게임화 UI 표시 업데이트
+function updateGamificationDisplay() {
+  // 레벨 표시
+  const levelDisplay = document.getElementById('student-level-display');
+  if (levelDisplay) {
+    levelDisplay.textContent = `Lv. ${currentGameStats.level}`;
+  }
+  
+  // 칭호 표시
+  const titleDisplay = document.getElementById('student-title');
+  if (titleDisplay && currentGameStats.currentTitle) {
+    titleDisplay.textContent = `${currentGameStats.currentTitle.name} ${currentGameStats.currentTitle.icon}`;
+  }
+  
+  // 경험치 표시
+  const currentExpDisplay = document.getElementById('current-exp');
+  const nextLevelExpDisplay = document.getElementById('next-level-exp');
+  const expProgressBar = document.getElementById('exp-progress-bar');
+  
+  if (currentExpDisplay) {
+    currentExpDisplay.textContent = currentGameStats.exp;
+  }
+  if (nextLevelExpDisplay) {
+    nextLevelExpDisplay.textContent = currentGameStats.nextLevelExp;
+  }
+  if (expProgressBar) {
+    const progressPercentage = (currentGameStats.exp / currentGameStats.nextLevelExp) * 100;
+    expProgressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
+  }
+  
+  // 게임화 패널 표시
+  const gamificationPanel = document.getElementById('gamification-panel');
+  if (gamificationPanel && studentName && sessionId) {
+    gamificationPanel.classList.remove('hidden');
+  }
+}
+
+// 경험치 획듍 알림
+function showExpGainNotification(expAmount) {
+  const notification = document.getElementById('exp-gain-notification');
+  const expAmountDisplay = document.getElementById('exp-gained-amount');
+  
+  if (!notification || !expAmountDisplay) return;
+  
+  expAmountDisplay.textContent = expAmount;
+  notification.classList.remove('hidden');
+  
+  // 3초 후 숬김
+  setTimeout(() => {
+    notification.classList.add('hidden');
+  }, 3000);
+}
+
+// 레벨업 알림
+function showLevelUpNotification(newLevel, newTitle) {
+  const notification = document.getElementById('level-up-notification');
+  const levelDisplay = document.getElementById('new-level-display');
+  const titleDisplay = document.getElementById('new-title-display');
+  
+  if (!notification) return;
+  
+  if (levelDisplay) {
+    levelDisplay.textContent = `Lv. ${newLevel}`;
+  }
+  if (titleDisplay && newTitle) {
+    titleDisplay.textContent = `새로운 칭호: ${newTitle.name} ${newTitle.icon}`;
+  }
+  
+  notification.classList.remove('hidden');
+  
+  // 5초 후 숬김
+  setTimeout(() => {
+    notification.classList.add('hidden');
+  }, 5000);
+}
+
+// 성취 처리
+function handleAchievements(achievements) {
+  if (!achievements || achievements.length === 0) return;
+  
+  achievements.forEach((achievement, index) => {
+    // 각 성취를 순차적으로 표시
+    setTimeout(() => {
+      showAchievementNotification(achievement);
+    }, index * 2000); // 2초 간격으로 표시
+  });
+  
+  // 성취 목록 업데이트
+  currentGameStats.achievements = [...currentGameStats.achievements, ...achievements];
+  
+  // 최신 성취 아이콘 표시
+  if (achievements.length > 0) {
+    const latestAchievement = achievements[achievements.length - 1];
+    const iconDisplay = document.getElementById('latest-achievement-icon');
+    if (iconDisplay && latestAchievement.icon) {
+      iconDisplay.textContent = latestAchievement.icon;
+    }
+  }
+}
+
+// 성취 알림 표시
+function showAchievementNotification(achievement) {
+  const notification = document.getElementById('achievement-notification');
+  const iconDisplay = document.getElementById('achievement-icon');
+  const nameDisplay = document.getElementById('achievement-name');
+  const descriptionDisplay = document.getElementById('achievement-description');
+  const expBonusDisplay = document.getElementById('achievement-exp-bonus');
+  
+  if (!notification) return;
+  
+  if (iconDisplay) {
+    iconDisplay.textContent = achievement.icon || '🏆';
+  }
+  if (nameDisplay) {
+    nameDisplay.textContent = achievement.name || '성취 달성!';
+  }
+  if (descriptionDisplay) {
+    descriptionDisplay.textContent = achievement.description || '';
+  }
+  if (expBonusDisplay) {
+    expBonusDisplay.textContent = achievement.expBonus || 0;
+  }
+  
+  notification.classList.remove('hidden');
+  
+  // 4초 후 숬김
+  setTimeout(() => {
+    notification.classList.add('hidden');
+  }, 4000);
 }
 
