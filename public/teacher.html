@@ -425,28 +425,49 @@
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        <span class="flex items-center space-x-2">
-                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
-                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">핵심 기능</span>
-                                        </span>
-                                    </label>
-                                    <textarea id="lesson-description-input" rows="5"
-                                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="flex items-center space-x-2">
+                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
+                        </span>
+                    </label>
+                    <textarea id="lesson-ai-instructions-input" rows="5"
+                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
 • 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
 • 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                                        <p class="text-xs text-amber-700">
-                                            <strong>💡 중요:</strong> 여기에 입력하는 내용이 AI 튜터의 핵심 성격과 교수법을 결정합니다. 
-                                            구체적이고 명확하게 작성할수록 더 전문화된 AI 튜터가 됩니다.
-                                        </p>
-                                    </div>
-                                </div>
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                        <p class="text-xs text-amber-700">
+                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="flex items-center space-x-2">
+                            <span>📝 수업 설명</span>
+                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게 표시</span>
+                        </span>
+                    </label>
+                    <textarea id="lesson-student-description-input" rows="3"
+                        placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
+
+예시:
+• 오늘은 조선시대 백성들의 일상생활과 문화에 대해 알아봅니다.
+• 분수의 나눗셈을 실생활 예시와 함께 배워봅시다.
+• 식물의 광합성 과정과 우리 생활에 미치는 영향을 탐구합니다."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p class="text-xs text-blue-700">
+                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
+                        </p>
+                    </div>
+                </div>
 
                                 <!-- 학습 자료 추가 섹션 -->
                                 <div class="border-t pt-4">
@@ -606,28 +627,49 @@
                                     </select>
                                 </div>
                                 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        <span class="flex items-center space-x-2">
-                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
-                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">핵심 기능</span>
-                                        </span>
-                                    </label>
-                                    <textarea id="edit-lesson-description" rows="5"
-                                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="flex items-center space-x-2">
+                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
+                        </span>
+                    </label>
+                    <textarea id="edit-lesson-ai-instructions" rows="5"
+                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
 • 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
 • 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                                        <p class="text-xs text-amber-700">
-                                            <strong>💡 중요:</strong> 여기에 입력하는 내용이 AI 튜터의 핵심 성격과 교수법을 결정합니다. 
-                                            구체적이고 명확하게 작성할수록 더 전문화된 AI 튜터가 됩니다.
-                                        </p>
-                                    </div>
-                                </div>
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                        <p class="text-xs text-amber-700">
+                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
+                        </p>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="flex items-center space-x-2">
+                            <span>📝 수업 설명</span>
+                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게 표시</span>
+                        </span>
+                    </label>
+                    <textarea id="edit-lesson-student-description" rows="3"
+                        placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
+
+예시:
+• 오늘은 조선시대 백성들의 일상생활과 문화에 대해 알아봅니다.
+• 분수의 나눗셈을 실생활 예시와 함께 배워봅시다.
+• 식물의 광합성 과정과 우리 생활에 미치는 영향을 탐구합니다."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p class="text-xs text-blue-700">
+                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
+                        </p>
+                    </div>
+                </div>
                                 
                                 <!-- 학습 자료 관리 섹션 (편집 모달) -->
                                 <div class="border-t pt-4">
@@ -977,8 +1019,11 @@
                 onAuthStateChanged
             } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
             import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
-            import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-            import { auth, functions, storage } from './firebase-config.js';
+            import { ref, uploadBytesResumable, getDownloadURL, getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+            import { auth, functions } from './firebase-config.js';
+            
+            // Storage를 직접 초기화
+            const storage = getStorage();
 
             // Firebase Functions
             const updateTeacherApiKey = httpsCallable(functions, 'updateTeacherApiKey');
@@ -2046,7 +2091,8 @@
             const createLessonForm = document.getElementById('create-lesson-form');
             const lessonTitleInput = document.getElementById('lesson-title-input');
             const lessonSubjectSelect = document.getElementById('lesson-subject-select');
-            const lessonDescriptionInput = document.getElementById('lesson-description-input');
+            const lessonAiInstructionsInput = document.getElementById('lesson-ai-instructions-input');
+            const lessonStudentDescriptionInput = document.getElementById('lesson-student-description-input');
             const createLessonBtn = document.getElementById('create-lesson-btn');
             const refreshLessonsBtn = document.getElementById('refresh-lessons-btn');
             const lessonsLoading = document.getElementById('lessons-loading');
@@ -2484,7 +2530,8 @@
             const editLessonIdInput = document.getElementById('edit-lesson-id');
             const editLessonTitleInput = document.getElementById('edit-lesson-title');
             const editLessonSubjectSelect = document.getElementById('edit-lesson-subject');
-            const editLessonDescriptionInput = document.getElementById('edit-lesson-description');
+            const editLessonAiInstructionsInput = document.getElementById('edit-lesson-ai-instructions');
+            const editLessonStudentDescriptionInput = document.getElementById('edit-lesson-student-description');
             const saveLessonBtn = document.getElementById('save-lesson-btn');
 
             // 새 수업 생성 폼 제출
@@ -2493,7 +2540,8 @@
 
                 const title = lessonTitleInput.value.trim();
                 const subject = lessonSubjectSelect.value;
-                const description = lessonDescriptionInput.value.trim();
+                const aiInstructions = lessonAiInstructionsInput.value.trim();
+                const studentDescription = lessonStudentDescriptionInput.value.trim();
 
                 if (!title || !subject) {
                     showStatus('수업 제목과 과목을 모두 입력해주세요.', 'error');
@@ -2507,7 +2555,8 @@
                     const result = await createLesson({
                         title,
                         subject,
-                        description: description || null,
+                        aiInstructions: aiInstructions || null,
+                        studentDescription: studentDescription || null,
                         resources: tempResources // 학습 자료 추가
                     });
 
@@ -2540,17 +2589,26 @@
             // 편집 모달 닫기 버튼
             closeEditModalBtn.addEventListener('click', () => {
                 editLessonModal.classList.add('hidden');
+                // 편집 모달 닫을 때 임시 자료 배열 초기화
+                editTempResources = [];
+                renderEditResources();
             });
 
             // 편집 취소 버튼
             cancelEditBtn.addEventListener('click', () => {
                 editLessonModal.classList.add('hidden');
+                // 편집 취소 시 임시 자료 배열 초기화
+                editTempResources = [];
+                renderEditResources();
             });
 
             // 편집 모달 배경 클릭시 닫기
             editLessonModal.addEventListener('click', (e) => {
                 if (e.target === editLessonModal) {
                     editLessonModal.classList.add('hidden');
+                    // 모달 닫을 때 임시 자료 배열 초기화
+                    editTempResources = [];
+                    renderEditResources();
                 }
             });
 
@@ -2561,7 +2619,8 @@
                 const lessonId = editLessonIdInput.value;
                 const title = editLessonTitleInput.value.trim();
                 const subject = editLessonSubjectSelect.value;
-                const description = editLessonDescriptionInput.value.trim();
+                const aiInstructions = editLessonAiInstructionsInput.value.trim();
+                const studentDescription = editLessonStudentDescriptionInput.value.trim();
 
                 if (!title || !subject) {
                     showStatus('수업 제목과 과목을 모두 입력해주세요.', 'error');
@@ -2578,7 +2637,8 @@
                         lessonId,
                         title,
                         subject,
-                        description: description || null,
+                        aiInstructions: aiInstructions || null,
+                        studentDescription: studentDescription || null,
                         resources: editTempResources // 학습 자료 추가
                     });
 
@@ -3227,6 +3287,9 @@
 
                     const result = await getLessons();
                     const lessons = result.data.lessons || [];
+                    
+                    // 디버깅: 로드된 수업 목록 확인
+                    console.log('로드된 수업 목록:', lessons);
 
                     lessonsLoading.classList.add('hidden');
 
@@ -3256,16 +3319,33 @@
                 const div = document.createElement('div');
                 div.className = 'bg-gray-50 rounded-lg p-6 border border-gray-200 hover:border-blue-300 transition-colors';
 
-                // 생성일 포맷팅
+                // 생성일 포맷팅 (Firestore Timestamp 지원)
                 let createdAtText = '생성일 정보 없음';
                 if (lesson.createdAt) {
                     try {
-                        const date = new Date(lesson.createdAt);
-                        if (!isNaN(date.getTime())) {
+                        let date;
+                        
+                        // Firestore Timestamp 객체인 경우
+                        if (lesson.createdAt && typeof lesson.createdAt === 'object' && lesson.createdAt.toDate) {
+                            date = lesson.createdAt.toDate();
+                        }
+                        // Firestore v9+ 에서 직렬화된 timestamp 객체인 경우
+                        else if (lesson.createdAt && typeof lesson.createdAt === 'object' && 
+                                (lesson.createdAt._seconds || lesson.createdAt.seconds)) {
+                            const seconds = lesson.createdAt._seconds || lesson.createdAt.seconds;
+                            const nanoseconds = lesson.createdAt._nanoseconds || lesson.createdAt.nanoseconds || 0;
+                            date = new Date((seconds * 1000) + Math.floor(nanoseconds / 1000000));
+                        }
+                        // 일반 Date 객체나 타임스탬프인 경우
+                        else {
+                            date = new Date(lesson.createdAt);
+                        }
+                        
+                        if (date && !isNaN(date.getTime())) {
                             createdAtText = date.toLocaleString('ko-KR');
                         }
                     } catch (error) {
-                        console.log('날짜 파싱 오류:', error);
+                        console.log('날짜 파싱 오류:', error, lesson.createdAt);
                     }
                 }
 
@@ -3329,7 +3409,8 @@
                 qrBtn.addEventListener('click', () => {
                     showQRCodeModal({
                         lessonCode: qrBtn.dataset.code,
-                        title: qrBtn.dataset.title
+                        title: qrBtn.dataset.title,
+                        studentDescription: lesson.studentDescription || ''
                     });
                 });
 
@@ -3341,11 +3422,21 @@
                     const subject = editBtn.dataset.subject;
                     const description = editBtn.dataset.description;
                     
+                    // 디버깅: lesson 객체 확인
+                    console.log('편집할 수업 데이터:', lesson);
+                    console.log('수업 자료(resources):', lesson.resources);
+                    
                     // 편집 모달에 데이터 로드
                     editLessonIdInput.value = lessonId;
                     editLessonTitleInput.value = title;
                     editLessonSubjectSelect.value = subject;
-                    editLessonDescriptionInput.value = description;
+                    editLessonAiInstructionsInput.value = lesson.aiInstructions || '';
+                    editLessonStudentDescriptionInput.value = lesson.studentDescription || '';
+                    
+                    // 기존 자료 로드 (resources 필드가 없는 경우 빈 배열로 초기화)
+                    editTempResources = Array.isArray(lesson.resources) ? [...lesson.resources] : [];
+                    console.log('editTempResources에 로드된 자료:', editTempResources);
+                    renderEditResources();
                     
                     // 편집 모달 표시
                     editLessonModal.classList.remove('hidden');
@@ -3396,6 +3487,13 @@
                             <p class="text-sm text-blue-700 mb-2 font-medium">수업 코드</p>
                             <code class="text-xl font-mono font-bold text-blue-800">${lesson.lessonCode}</code>
                         </div>
+                        
+                        ${lesson.studentDescription ? `
+                        <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                            <p class="text-sm text-green-700 mb-2 font-medium">📝 수업 설명 (학생에게 표시)</p>
+                            <p class="text-sm text-gray-700">${lesson.studentDescription}</p>
+                        </div>
+                        ` : ''}
                         
                         <div class="space-y-2 text-sm text-gray-600 mb-6">
                             <p class="font-medium">📋 사용 방법</p>

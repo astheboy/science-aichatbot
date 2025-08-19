@@ -64,10 +64,10 @@ function getDefaultPrompt() {
 }
 
 // 전체 프롬프트 생성 함수 (JSON 시스템 사용 + 학습 자료 추가)
-async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null, lessonResources = null) {
+async function buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, aiInstructions = null, lessonResources = null) {
     try {
-        // 새로운 JSON 기반 프롬프트 생성 시스템 사용 (수업 설명 및 학습 자료 포함)
-        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData, lessonDescription, lessonResources);
+        // 새로운 JSON 기반 프롬프트 생성 시스템 사용 (AI 지시사항 및 학습 자료 포함)
+        return await PromptBuilder.buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherData, aiInstructions, lessonResources);
     } catch (error) {
         console.error('프롬프트 생성 오류:', error);
         
@@ -145,8 +145,8 @@ exports.getTutorResponse = onCall(async (request) => {
         topic: lessonData.title  // 수업 제목 추가
       };
       
-      // 수업 설명과 학습 자료를 추출
-      const lessonDescription = lessonData.description || null;
+      // AI 지시사항과 학습 자료를 추출
+      const aiInstructions = lessonData.aiInstructions || null;
       const lessonResources = lessonData.resources || null;
       
       // 학습 자료가 있으면 로그 출력
@@ -154,7 +154,7 @@ exports.getTutorResponse = onCall(async (request) => {
         console.log(`수업 '${lessonData.title}'의 학습 자료 ${lessonResources.length}개를 프롬프트에 포함합니다.`);
       }
       
-      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, lessonDescription, lessonResources);
+      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, aiInstructions, lessonResources);
       
       // 6. Gemini API 호출
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -1102,7 +1102,7 @@ ${conversationText}
 // 수업 생성
 exports.createLesson = onCall(async (request) => {
     const { data, auth } = request;
-    const { title, subject, description, resources } = data;
+    const { title, subject, aiInstructions, studentDescription, resources } = data;
     
     if (!auth) {
       throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
@@ -1161,7 +1161,8 @@ exports.createLesson = onCall(async (request) => {
       const lessonData = {
         title: title,
         subject: subject,
-        description: description || null,
+        aiInstructions: aiInstructions || null,
+        studentDescription: studentDescription || null,
         resources: resources || [], // 학습 자료 추가
         lessonCode: lessonCode,
         teacherId: userId,
@@ -1195,7 +1196,7 @@ exports.createLesson = onCall(async (request) => {
 // 수업 수정
 exports.updateLesson = onCall(async (request) => {
     const { data, auth } = request;
-    const { lessonId, title, subject, description, resources } = data;
+    const { lessonId, title, subject, aiInstructions, studentDescription, resources } = data;
     
     if (!auth) {
       throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
@@ -1232,7 +1233,8 @@ exports.updateLesson = onCall(async (request) => {
       const updateData = {
         title: title,
         subject: subject,
-        description: description || null,
+        aiInstructions: aiInstructions || null,
+        studentDescription: studentDescription || null,
         resources: resources || [], // 학습 자료 추가
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       };
@@ -1312,7 +1314,10 @@ exports.getLessons = onCall(async (request) => {
             id: doc.id,
             title: lessonData.title,
             subject: lessonData.subject,
-            description: lessonData.description,
+            description: lessonData.description, // 기존 호환성 유지
+            aiInstructions: lessonData.aiInstructions,
+            studentDescription: lessonData.studentDescription,
+            resources: lessonData.resources || [], // resources 필드 추가
             lessonCode: lessonData.lessonCode,
             createdAt: lessonData.createdAt,
             studentCount: uniqueStudents.size, // 실시간 계산된 학생 수

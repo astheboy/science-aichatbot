@@ -11,11 +11,11 @@ class PromptBuilder {
      * @param {string} userMessage - 사용자 메시지
      * @param {Array} conversationHistory - 대화 이력
      * @param {Object} teacherData - 교사 설정 데이터
-     * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할 지시사항)
+     * @param {string|null} aiInstructions - AI 튜터 핵심 역할 지시사항 (교사가 작성한 지시사항)
      * @param {Array|null} lessonResources - 수업 학습 자료 (링크, 파일 등)
      * @returns {Array} Gemini API 호출용 프롬프트 배열
      */
-    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, lessonDescription = null, lessonResources = null) {
+    static async buildFullPrompt(analysisResult, userMessage, conversationHistory = [], teacherData = {}, aiInstructions = null, lessonResources = null) {
         try {
             // 과목별 설정 로드
             const subject = teacherData.subject || 'science';
@@ -33,14 +33,14 @@ class PromptBuilder {
             // 4. 과목별 특화 규칙 적용
             const subjectRules = this.buildSubjectRules(subjectConfig, teacherData);
             
-            // 5. 최종 프롬프트 조합 (수업 설명 및 학습 자료 추가)
+            // 5. 최종 프롬프트 조합 (AI 지시사항 및 학습 자료 추가)
             const systemInstruction = this.combinePromptElements(
                 basePrompt,
                 educationalContext,
                 subjectRules,
                 conversationContext,
                 teacherData,
-                lessonDescription,
+                aiInstructions,
                 lessonResources
             );
             
@@ -270,17 +270,17 @@ class PromptBuilder {
      * @param {string} subjectRules - 과목별 규칙
      * @param {string} conversationContext - 대화 맥락
      * @param {Object} teacherData - 교사 설정
-     * @param {string|null} lessonDescription - 수업 설명 (AI 튜터 핵심 역할)
+     * @param {string|null} aiInstructions - AI 튜터 핵심 역할 지시사항
      * @param {Array|null} lessonResources - 수업 학습 자료
      * @returns {string} 최종 시스템 지시사항
      */
-    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData, lessonDescription, lessonResources) {
+    static combinePromptElements(basePrompt, educationalContext, subjectRules, conversationContext, teacherData, aiInstructions, lessonResources) {
         let systemInstruction = "";
         
-        // 1. 수업 설명 (핵심 지식 및 역할) 최우선 배치
-        if (lessonDescription && lessonDescription.trim()) {
+        // 1. AI 지시사항 (핵심 지식 및 역할) 최우선 배치
+        if (aiInstructions && aiInstructions.trim()) {
             systemInstruction += `### 🎯 수업 목표 및 AI 튜터 핵심 역할 ###\n`;
-            systemInstruction += `${lessonDescription.trim()}\n\n`;
+            systemInstruction += `${aiInstructions.trim()}\n\n`;
             systemInstruction += `위의 수업 목표와 맥락을 바탕으로 학생을 가르치는 전문 AI 튜터로서 활동하세요.\n\n`;
         }
         

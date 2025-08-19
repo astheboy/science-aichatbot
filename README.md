@@ -1,6 +1,6 @@
-# 🤖 Science AI Chatbot - 차세대 AI 교육 플랫폼
+# 🤖 Science AI Chatbot - AI 교육 플랫폼
 
-> **그래비트랙스 물리 실험에서 전과목 지원 AI 교육 플랫폼으로 진화한 완성형 시스템**
+> **그래비트랙스 물리 실험에서 시작해 전과목 지원 AI 교육 플랫폼으로 진화한 완성형 시스템**
 
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -9,14 +9,15 @@
 
 ## 🌟 프로젝트 개요
 
-**Science AI Chatbot**은 초등학생들의 학습을 돕는 지능형 AI 교육 플랫폼입니다. 단순한 그래비트랙스 실험 도구에서 시작하여 **국어, 수학, 사회, 과학** 전 과목을 지원하는 범용 AI 교육 플랫폼으로 발전했습니다.
+**Science AI Chatbot**은 초등학생들의 학습을 돕는 차세대 AI 교육 플랫폼입니다. 단순한 그래비트랙스 실험 도구에서 시작하여 **전 과목을 지원하는 완전한 교육 관리 시스템**으로 발전했습니다.
 
 ### ✨ 핵심 특징
 - 🧠 **적응형 AI 튜터**: 학생 응답 유형을 실시간 분석하여 6가지 맞춤형 교수 전략 자동 적용
-- 📚 **전과목 지원**: JSON 기반 과목별 프롬프트 시스템으로 모든 교과목 학습 지원
-- 👩‍🏫 **교사 친화적**: 직관적인 대시보드로 수업 관리, 프롬프트 편집, 학생 분석 가능
+- 📚 **교육 관리 플랫폼**: 수업 생성, 학생 관리, 과제 제출, 성과 분석까지 완전한 교육 워크플로우 지원
+- 👩‍🏫 **교사 중심 설계**: 직관적인 대시보드로 수업 관리, AI 프롬프트 편집, 학생 분석 가능
 - 📱 **QR 코드 시스템**: 학생들이 스마트폰으로 바로 접속할 수 있는 편리한 시스템
 - 💰 **경제적 운영**: 월 100원 미만으로 20명 학급 운영 가능
+- 📊 **완전한 학습 관리**: 개인-AI 튜터 대화 실시간 기록 및 확인, 실시간 제출 현황, AI 피드백 자동 생성
 
 ### 🎓 교육적 혁신
 - **소크라테스식 교수법**: 답을 직접 알려주지 않고 학생 스스로 깨닫도록 유도
@@ -26,36 +27,37 @@
 
 ## 🌐 배포 주소
 
-- **학생용 챗봇**: https://science-aichatbot.web.app
-- **교사 대시보드**: https://science-aichatbot.web.app/teacher.html
-- **관리자 페이지**: https://science-aichatbot.web.app/admin.html
+- **학생용 메인**: https://aitutor.sangcode.dev
+- **교사 대시보드**: https://aitutor.sangcode.dev/teacher.html
+- **관리자 페이지**: https://aitutor.sangcode.dev/admin.html
 
 ## 🏗️ 기술 스택
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Backend**: Firebase Functions (Node.js 20)
 - **Database**: Firebase Firestore
-- **AI**: Google Gemini API (2.0 Flash, 1.5 Flash, 1.5 Pro 지원)
+- **AI**: Google Gemini API (2.0 Flash, 2.0 Flash-Lite, 2.5 Flash, 2.5 Flas-lite 지원)
 - **Authentication**: Firebase Authentication (Google OAuth)
 - **Hosting**: Firebase Hosting
+- **Storage**: Firebase Storage (파일 업로드 지원)
 
 ## 🚀 주요 기능
 
-### 👨‍🏫 교사용 기능
+### 👨‍🏫 교사용 대시보드
 - **Google OAuth 인증**: 안전한 교사 인증 시스템
-- **수업 관리**: 과목별 수업 생성 및 QR 코드 자동 생성
-- **커스텀 프롬프트**: 6가지 응답 유형별 맞춤 프롬프트 편집
-- **AI 모델 선택**: 5가지 Gemini 모델 중 선택 가능
-- **학생 분석**: AI 기반 학생 학습 패턴 분석 및 CSV 다운로드
-- **실시간 모니터링**: 수업 중 학생들의 AI 대화 현황 실시간 확인
+- **수업 관리**: 수업 생성, 편집, QR 코드 자동 생성 및 자료 업로드
+- **학생 관리**: 제출 현황 실시간 모니터링
+- **채팅 관리**: 개인 대화 저장, 제출 현황 추적, AI 피드백 자동 생성
+- **AI 튜터 관리**: 커스텀 프롬프트 편집, 6가지 응답 유형별 맞춤 설정
+- **성과 분석**: 학생별 대화 포트폴리오, 학습 패턴 분석, CSV 다운로드
 
 ### 👨‍🎓 학생용 기능
-- **간편한 접속**: 교사 코드 또는 QR 코드로 즉시 AI 튜터와 대화 시작
-- **과목별 AI 튜터**: 각 과목에 특화된 AI 튜터 페르소나
-- **적응형 응답**: 학생의 학습 진행 단계에 따른 맞춤형 피드백
-- **소크라테스식 학습**: 스스로 깨달을 수 있도록 유도하는 질문형 학습
+- **간편한 접속**: QR 코드 또는 수업 코드로 즉시 AI 튜터와 대화 시작
+- **적응형 학습**: 스스로 깨달을 수 있도록 유도하는 맞춤형 AI 응답 및 질문형 학습
+- **과목별 AI 튜터**: 각 과목에 학생들의 응답 유형에 맞는 AI 튜터 페르소나
+- **학습 자료**: 교사가 업로드한 참고 자료 및 링크 접근
 
-### 🔍 적응형 프롬프트 시스템
+### 🔍 적응형 프롬프트 시스템(과학 예시)
 학생의 응답을 6가지 유형으로 자동 분류하여 맞춤형 교수 전략 적용:
 
 1. **CONCEPT_QUESTION**: 개념 질문 시 일상적 비유로 설명
@@ -67,158 +69,95 @@
 
 ## 🔧 기술적 특징
 
+### 완전한 교육 관리 시스템
+- **수업 라이프사이클**: 생성 → 수업 관리 → 제출 현황 → 대화 분석
+- **실시간 모니터링**: 학생별 AI 튜터 대화 현황 실시간 추적
+- **파일 관리**: Firebase Storage를 활용한 안전한 파일 업로드 및 관리
+- **자동화 워크플로우**: AI 피드백 자동 생성, 학생 개별 기록 생성
+
 ### 보안성
-- **API 키 숨김**: 학생들은 API 키를 직접 입력하지 않습니다.
-- **서버사이드 처리**: 모든 AI 요청은 Firebase Functions에서 처리됩니다.
-- **Firestore 보안 규칙**: 클라이언트에서 `teacher_keys` 컬렉션에 직접 접근할 수 없습니다.
+- **API 키 보호**: 모든 AI 요청은 서버사이드에서 처리
+- **Firestore 보안 규칙**: 적절한 데이터 접근 권한 관리
+- **사용자 인증**: Google OAuth 기반 안전한 교사 인증
 
 ### 확장성
-- **다중 교사 지원**: 하나의 웹사이트에서 여러 교사가 각각의 API 키를 사용할 수 있습니다.
-- **코드 기반 인증**: 복잡한 로그인 없이 간단한 코드로 접근합니다.
+- **다중 교사 지원**: 독립적인 교사별 환경
+- **모듈러 아키텍처**: 새로운 과목 및 기능 확장 용이
+- **반응형 디자인**: 데스크톱, 태블릿, 모바일 최적화
 
 ## 📊 예상 비용
 
-1학급 20명, 월 150회 사용 기준:
+1학급 20명, 월 활발한 사용 기준:
 - **Google AI (Gemini)**: 월 약 70원
-- **Firebase**: 무료 (무료 제공량 내)
+- **Firebase (Firestore, Functions, Storage)**: 무료 tier 범위 내
 - **총 예상 비용**: **월 100원 미만**
-
-## 🏁 다음 단계
-
-1. **Firebase 콘솔 설정 완료**:
-   - Firestore 데이터베이스 활성화
-   - 보안 규칙 적용
-
-2. **첫 번째 교사 등록**:
-   - `/admin.html`에서 테스트 교사 등록
-
-3. **테스트**:
-   - 학생 입장에서 교사 코드 입력 후 챗봇 테스트
-
-## 📁 파일 구조
-
-```
-# 🤖 Science AI Chatbot - 그래비트랙스 AI 튜터
-
-초등학생들의 물리학 실험 학습을 돕는 AI 튜터 챗봇 시스템입니다.
-
-## 🚀 주요 기능
-
-### 👨‍🏫 교사용 기능
-- **Google 로그인 기반 대시보드**: 안전한 OAuth 인증
-- **API 키 관리**: 각자의 Gemini API 키로 개별 운영
-- **커스텀 프롬프트**: AI 튜터의 성격과 교육 방식 맞춤 설정
-- **교사 코드**: 학생들과 공유할 고유 코드 자동 생성
-
-### 👨‍🎓 학생용 기능
-- **간편한 접속**: 교사 코드만으로 AI 튜터와 대화 시작
-- **실시간 AI 피드백**: 그래비트랙스 실험 관련 질문 응답
-- **소크라테스식 학습**: 답을 직접 알려주지 않고 스스로 깨달을 수 있도록 유도
-
-## 🔧 기술 스택
-
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Backend**: Firebase Functions (Node.js)
-- **Database**: Firebase Firestore
-- **AI**: Google Gemini API
-- **Authentication**: Firebase Authentication (Google OAuth)
-- **Hosting**: Firebase Hosting
-
-## 🌐 배포 주소
-
-- **메인 사이트**: https://science-aichatbot.web.app
-- **교사 대시보드**: https://science-aichatbot.web.app/teacher.html
-- **관리자 페이지**: https://science-aichatbot.web.app/admin.html
-
-## 💰 운영 비용
-
-### 1개 학급 (학생 20명) 기준
-- **월간 예상 비용**: 약 100원 미만
-- **10개 학급**: 월 약 700원
-
-Firebase 무료 tier와 Gemini API의 저렴한 비용으로 거의 무료 운영이 가능합니다.
-
-## 🛠 설치 및 실행
-
-### 필수 요구사항
-- Node.js (v14 이상)
-- Firebase CLI
-- Google Cloud Project (Gemini API 활성화)
-
-### 로컬 개발 환경 설정
-
-1. **저장소 클론**
-   ```bash
-   git clone https://github.com/astheboy/science-aichatbot.git
-   cd science-aichatbot
-   ```
-
-2. **Firebase 설정**
-   ```bash
-   npm install -g firebase-tools
-   firebase login
-   firebase init
-   ```
-
-3. **Functions 의존성 설치**
-   ```bash
-   cd functions
-   npm install
-   cd ..
-   ```
-
-4. **로컬 서버 실행**
-   ```bash
-   firebase serve
-   # 또는 에뮬레이터 사용
-   firebase emulators:start
-   ```
-
-### 배포
-```bash
-# Functions 배포
-firebase deploy --only functions
-
-# Hosting 배포  
-firebase deploy --only hosting
-
-# 전체 배포
-firebase deploy
-```
 
 ## 📁 프로젝트 구조
 
 ```
 science-aichatbot/
 ├── public/                 # 프론트엔드 파일
-│   ├── index.html          # 학생용 메인 페이지 (챗봇)
-│   ├── teacher.html        # 교사용 대시보드
-│   ├── admin.html          # 관리자 페이지
-│   ├── api.js              # API 호출 함수
-│   ├── chatbot.js          # 챗봇 로직
-│   ├── firebase-config.js  # Firebase 설정
-│   └── main.js             # 메인 스크립트
+│   ├── index.html          # 학생용 챗봇 메인
+│   ├── teacher.html        # 교사 대시보드 (완전한 교육 관리 시스템)
+│   ├── dashboard.html      # 교사 클래스 목록
+│   ├── class.html          # 클래스 관리 페이지
+│   ├── experiment-details.html # 과제 상세 및 제출 현황
+│   ├── report.html         # 학생 보고서 작성
+│   ├── student-portfolio.html # 개별 학생 포트폴리오
+│   ├── css/style.css       # 통합 스타일시트
+│   ├── js/                 # JavaScript 모듈들
+│   │   ├── chatbot.js      # AI 챗봇 로직
+│   │   ├── teacher.js      # 교사 대시보드 로직
+│   │   └── ...            # 기타 모듈들
+│   └── firebase-config.js  # Firebase 설정
 ├── functions/              # Firebase Functions
-│   ├── index.js            # Cloud Functions 코드
-│   └── package.json        # 의존성 관리
-├── devlog.md              # 개발 로그
-├── README.md              # 프로젝트 설명
-└── .gitignore             # Git 제외 파일
+│   └── index.js            # 백엔드 로직 (AI 호출, 데이터 관리)
+├── prompts/               # 과목별 프롬프트 설정
+│   ├── student_response_analysis_science.json        # 과학 과목 프롬프트
+│   ├── student_response_analysis_math.json          # 수학 과목 프롬프트
+│   └── ...
+├── devlog.md              # 상세한 개발 기록
+└── README.md              # 프로젝트 가이드
 ```
 
-## 🎯 사용법
+## 🎯 시작하기
 
-### 교사용
-1. https://science-aichatbot.web.app/teacher.html 접속
+### 교사용 (권장)
+1. https://aitutor.sangcode.dev/teacher.html 접속
 2. Google 계정으로 로그인
 3. Gemini API 키 등록 ([API 키 발급](https://aistudio.google.com/apikey))
-4. 원하는 경우 프롬프트 커스터마이징
-5. 생성된 교사 코드를 학생들에게 공유
+4. 첫 번째 수업 생성 및 학생 등록
+5. 생성된 QR 코드를 학생들에게 공유
 
 ### 학생용
-1. https://science-aichatbot.web.app 접속
-2. 교사가 제공한 코드 입력
-3. 그래비트랙스 실험에 대해 AI 튜터와 대화
+1. 교사가 제공한 QR 코드 스캔 또는 수업 코드 입력
+2. AI 튜터와 대화하며 학습
+3. 과제가 있는 경우 보고서 작성 및 제출
+
+## 🏆 최신 업데이트 (2025년 8월 19일)
+
+### ✨ 교사 대시보드 개선
+- **수업 정보 편집 시스템**: AI 지시사항과 학생 설명의 명확한 분리
+- **자료 관리**: 파일 업로드 및 링크 관리 기능
+- **레이아웃 개선**: 모바일 친화적 반응형 디자인
+- **실시간 현황**: 학생의 제출한 대화 실시간 기록 및 분석
+
+### 🤖 AI 시스템 고도화
+- **최신 모델 지원**: Gemini 2.0 Flash 등 최신 AI 모델 지원
+- **맞춤형 프롬프트**: 교사가 직접 편집 가능한 AI 지시사항
+- **자동 피드백**: 제출된 대화에 대한 즉시 AI 피드백 생성
+
+### 🔧 시스템 안정성
+- **하위 호환성**: 기존 데이터와 완벽한 호환성 유지
+- **오류 처리**: 견고한 에러 핸들링 및 사용자 피드백
+- **성능 최적화**: 캐시 버스팅 및 로딩 성능 개선
+
+## 💡 교육적 가치
+
+- **교사 업무 효율화**: 수업 준비부터 학생의 학습 성과 분석까지 통합 관리
+- **개별화 교육**: AI 기반 맞춤형 학습 지원
+- **메타인지 강화**: 학습 과정 성찰 및 피드백 시스템
+- **디지털 리터러시**: 현대적 도구 활용 능력 배양
 
 ## 🤝 기여하기
 
@@ -230,40 +169,12 @@ science-aichatbot/
 
 ## 📝 라이선스
 
-이 프로젝트는 MIT 라이선스를 따릅니다. [LICENSE](LICENSE) 파일에서 자세한 내용을 확인할 수 있습니다.
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이나 버그 리포트는 GitHub Issues를 통해 남겨주세요.
+이 프로젝트는 MIT 라이선스를 따릅니다.
 
 ---
 
-**개발**: AI Assistant with Human Collaboration  
-**최종 업데이트**: 2025년 1월 11일
-├── public/
-│   ├── index.html          # 메인 페이지
-│   ├── admin.html          # 교사 등록 페이지  
-│   ├── firebase-config.js  # Firebase 설정
-│   ├── api.js              # API 호출 로직
-│   ├── chatbot.js          # 챗봇 로직
-│   └── ... (기타 파일들)
-├── functions/
-│   ├── index.js            # Firebase Functions
-│   └── package.json
-├── firebase.json           # Firebase 설정
-├── firestore.rules         # Firestore 보안 규칙
-└── README.md
-```
+**개발**: SangCode.dev  
+**최종 업데이트**: 2025년 8월 19일  
+**프로젝트 상태**: AI-튜터 교육 플랫폼
 
-## 🎯 핵심 기능
-
-### Cloud Functions
-- `getTutorResponse`: 교사 코드로 API 키를 조회하고 Gemini API 호출
-- `addTeacher`: 새로운 교사 코드와 API 키 등록
-
-### 프론트엔드
-- 교사 코드 입력 및 저장
-- 실시간 AI 챗봇 대화
-- 그래비트랙스 물리 학습 콘텐츠
-
-이제 Firebase 콘솔에서 Firestore를 활성화하고 첫 번째 교사를 등록하면 완전히 작동하는 시스템이 됩니다!
+> 이 프로젝트는 AI를 활용한 교육 혁신을 목표로 하며, 확장 가능하고 유지보수가 용이한 아키텍처를 바탕으로 지속적으로 발전하고 있습니다.

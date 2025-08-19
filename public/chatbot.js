@@ -56,6 +56,8 @@ function handleUrlParameters() {
 
 function initializeTutorState() {
   lessonCode = localStorage.getItem("lessonCode");
+  console.log("[initializeTutorState] 저장된 수업 코드:", lessonCode);
+  
   if (lessonCode) {
     lessonCodeInput.value = lessonCode;
     lessonCodeInput.disabled = true;
@@ -63,6 +65,7 @@ function initializeTutorState() {
     lessonCodeStatus.textContent = "수업 코드가 연결되었습니다.";
     lessonCodeStatus.className = "text-xs text-center text-green-600";
     
+    console.log("[initializeTutorState] 수업 정보 가져오기 시작:", lessonCode);
     // 수업 정보 가져오기
     fetchAndDisplayLessonInfo(lessonCode);
     
@@ -116,6 +119,8 @@ function saveLessonCode() {
 
   const code = lessonCodeInput.value.trim().toUpperCase();
   if (code) {
+    console.log("[saveLessonCode] 입력된 코드 (대문자 변환):", code);
+    console.log("[saveLessonCode] 원본 입력:", lessonCodeInput.value);
     localStorage.setItem("lessonCode", code);
     lessonCode = code;
     alert("수업 코드가 저장되었습니다.");
@@ -458,47 +463,118 @@ function showAchievementNotification(achievement) {
 // 수업 정보 가져오기 및 표시
 async function fetchAndDisplayLessonInfo(lessonCode) {
   try {
-    // Firestore에서 수업 정보 조회
+    console.log("[fetchAndDisplayLessonInfo] ===== 수업 정보 조회 시작 =====");
+    console.log("[fetchAndDisplayLessonInfo] 검색할 코드:", lessonCode);
+    console.log("[fetchAndDisplayLessonInfo] 코드 타입:", typeof lessonCode);
+    console.log("[fetchAndDisplayLessonInfo] 코드 길이:", lessonCode.length);
+    
+    // Firestore에서 수업 정보 조회 - 대소문자 무관하게 검색
     const lessonsRef = collection(db, "lessons");
-    const q = query(lessonsRef, where("code", "==", lessonCode));
+    
+    // 먼저 모든 lessons 문서를 가져와서 필드명 확인
+    console.log("[fetchAndDisplayLessonInfo] 모든 lessons 문서 확인 중...");
+    const allLessonsSnapshot = await getDocs(lessonsRef);
+    console.log("[fetchAndDisplayLessonInfo] 전체 수업 개수:", allLessonsSnapshot.size);
+    
+    if (allLessonsSnapshot.size > 0) {
+      console.log("[fetchAndDisplayLessonInfo] 첫 번째 수업 데이터 예시:");
+      const firstDoc = allLessonsSnapshot.docs[0];
+      const firstData = firstDoc.data();
+      console.log("  - 문서 ID:", firstDoc.id);
+      console.log("  - 데이터 필드들:", Object.keys(firstData));
+      console.log("  - lessonCode 필드 값:", firstData.lessonCode);
+      console.log("  - 전체 데이터:", firstData);
+    }
+    
+    // 이제 실제 쿼리 실행
+    console.log("[fetchAndDisplayLessonInfo] lessonCode가 '" + lessonCode + "'인 문서 검색 중...");
+    const q = query(lessonsRef, where("lessonCode", "==", lessonCode));
     const querySnapshot = await getDocs(q);
+    console.log("[fetchAndDisplayLessonInfo] 쿼리 결과 - 일치하는 문서 개수:", querySnapshot.size);
     
     if (!querySnapshot.empty) {
-      const lessonData = querySnapshot.docs[0].data();
+      const lessonDoc = querySnapshot.docs[0];
+      const lessonData = lessonDoc.data();
+      console.log("[fetchAndDisplayLessonInfo] 수업 데이터 조회 성공:");
+      console.log("  - 문서 ID:", lessonDoc.id);
+      console.log("  - 제목:", lessonData.title);
+      console.log("  - 과목:", lessonData.subject);
+      console.log("  - 설명:", lessonData.description);
+      console.log("  - 자료 개수:", lessonData.resources?.length || 0);
+      console.log("  - 전체 데이터:", lessonData);
       displayLessonInfo(lessonData);
     } else {
-      console.log("해당 수업 코드를 찾을 수 없습니다.");
+      console.warn("[fetchAndDisplayLessonInfo] 해당 수업 코드를 찾을 수 없습니다: " + lessonCode);
+      console.log("[fetchAndDisplayLessonInfo] Firestore 컬렉션 'lessons'에서 lessonCode 필드가 '" + lessonCode + "'인 문서를 찾을 수 없음");
+      // 기본 헤더 표시
+      const defaultHeader = document.getElementById('default-header');
+      if (defaultHeader) {
+        defaultHeader.classList.remove('hidden');
+      }
       hideLessonInfo();
     }
   } catch (error) {
-    console.error("수업 정보를 가져오는 중 오류 발생:", error);
+    console.error("[fetchAndDisplayLessonInfo] 수업 정보를 가져오는 중 오류 발생:");
+    console.error("  - 오류 메시지:", error.message);
+    console.error("  - 오류 스택:", error.stack);
+    console.error("  - 전체 오류 객체:", error);
     hideLessonInfo();
   }
 }
 
 // 수업 정보 UI에 표시
 function displayLessonInfo(lessonData) {
+  console.log("수업 정보 표시 시작:", lessonData);
+  
   const lessonInfoSection = document.getElementById('lesson-info-section');
   const lessonTitle = document.getElementById('lesson-title');
-  const lessonSubject = document.getElementById('lesson-subject');
+  const lessonSubjectBadge = document.getElementById('lesson-subject-badge');
   const lessonDescription = document.getElementById('lesson-description');
   const resourcesList = document.getElementById('resources-list');
   
+  // 기본 헤더와 고정 카드들 숨기기
+  const defaultHeader = document.getElementById('default-header');
+  if (defaultHeader) {
+    defaultHeader.classList.add('hidden');
+  }
+  
+  // 고정된 설명 카드들 숨기기
+  const mainElement = document.querySelector('main');
+  if (mainElement) {
+    const sections = mainElement.querySelectorAll('section');
+    sections.forEach(section => {
+      // lesson-info-section이 아닌 모든 section 숨기기
+      if (!section.closest('#lesson-info-section')) {
+        section.style.display = 'none';
+      }
+    });
+  }
+  
   if (lessonInfoSection) {
     lessonInfoSection.classList.remove('hidden');
+    console.log("수업 정보 섹션 표시됨");
   }
   
   if (lessonTitle) {
     lessonTitle.textContent = lessonData.title || '제목 없음';
   }
   
-  if (lessonSubject) {
-    lessonSubject.textContent = lessonData.subject || '과목 없음';
+  if (lessonSubjectBadge) {
+    const subjectNames = {
+      'korean': '국어',
+      'math': '수학',
+      'social': '사회',
+      'science': '과학'
+    };
+    const subjectDisplayName = subjectNames[lessonData.subject] || lessonData.subject || '과목 없음';
+    lessonSubjectBadge.textContent = subjectDisplayName;
   }
   
   if (lessonDescription) {
-    if (lessonData.description) {
-      lessonDescription.textContent = lessonData.description;
+    // studentDescription을 우선 표시, 없으면 description 표시
+    const descriptionText = lessonData.studentDescription || lessonData.description;
+    if (descriptionText) {
+      lessonDescription.textContent = descriptionText;
       lessonDescription.parentElement.classList.remove('hidden');
     } else {
       lessonDescription.parentElement.classList.add('hidden');
@@ -508,22 +584,28 @@ function displayLessonInfo(lessonData) {
   // 학습 자료 목록 표시
   if (resourcesList && lessonData.resources && lessonData.resources.length > 0) {
     resourcesList.innerHTML = '';
+    const resourcesSection = document.getElementById('lesson-resources-section');
+    if (resourcesSection) {
+      resourcesSection.classList.remove('hidden');
+    }
+    
     lessonData.resources.forEach(resource => {
-      const listItem = document.createElement('li');
-      listItem.className = 'flex items-center gap-2 text-sm text-gray-600';
+      const listItem = document.createElement('div');
+      listItem.className = 'flex items-center gap-2 p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors';
       
       if (resource.type === 'link') {
         listItem.innerHTML = `
-          <i data-lucide="link" class="w-4 h-4 text-blue-500"></i>
-          <a href="${resource.url}" target="_blank" class="hover:text-blue-600 underline">
+          <span class="text-blue-500">🔗</span>
+          <a href="${resource.url}" target="_blank" class="flex-1 text-blue-600 hover:text-blue-800 underline text-sm">
             ${resource.title}
           </a>
         `;
       } else if (resource.type === 'file') {
+        const fileIcon = resource.fileName && resource.fileName.endsWith('.pdf') ? '📄' : '📎';
         listItem.innerHTML = `
-          <i data-lucide="file-text" class="w-4 h-4 text-green-500"></i>
-          <a href="${resource.url}" target="_blank" class="hover:text-green-600 underline">
-            ${resource.title}
+          <span class="text-green-500">${fileIcon}</span>
+          <a href="${resource.url}" target="_blank" class="flex-1 text-green-600 hover:text-green-800 underline text-sm">
+            ${resource.title || resource.fileName}
           </a>
         `;
       }
@@ -531,17 +613,9 @@ function displayLessonInfo(lessonData) {
       resourcesList.appendChild(listItem);
     });
     
-    // Lucide 아이콘 다시 생성
-    lucide.createIcons();
-    
-    // 자료 섹션 표시
-    const resourcesSection = resourcesList.closest('div');
-    if (resourcesSection) {
-      resourcesSection.classList.remove('hidden');
-    }
-  } else if (resourcesList) {
+  } else {
     // 자료가 없으면 섹션 숨기기
-    const resourcesSection = resourcesList.closest('div');
+    const resourcesSection = document.getElementById('lesson-resources-section');
     if (resourcesSection) {
       resourcesSection.classList.add('hidden');
     }
@@ -553,6 +627,12 @@ function hideLessonInfo() {
   const lessonInfoSection = document.getElementById('lesson-info-section');
   if (lessonInfoSection) {
     lessonInfoSection.classList.add('hidden');
+  }
+  
+  // 학습 자료 섹션도 숨기기
+  const resourcesSection = document.getElementById('lesson-resources-section');
+  if (resourcesSection) {
+    resourcesSection.classList.add('hidden');
   }
 }
 

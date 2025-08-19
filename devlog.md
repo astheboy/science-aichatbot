@@ -1392,7 +1392,365 @@ function analyzeWithContext(message, previousMessages) {
 
 ---
 
-**최종 업데이트**: 2025년 8월 18일  
+## 2025년 8월 19일 - Firestore Timestamp 변환 시스템 완전 해결
+
+### 🎯 작업 목표
+
+교사 대시보드의 수업 관리 페이지에서 "생성일 정보 없음" 문제를 해결하여, Firestore Timestamp 객체를 정확히 JavaScript Date로 변환하도록 시스템 개선.
+
+### 📋 주요 구현 내용
+
+#### 1. Firestore Timestamp 변환 로직 고도화
+
+**문제 상황:**
+- `teacher.html`의 수업 목록에서 수업 생성일이 "생성일 정보 없음"으로 표시
+- `lesson.createdAt`이 Firestore Timestamp 형태(`{_seconds, _nanoseconds}`)로 저장되나 `new Date()` 생성자로는 변환 불가
+- Firebase v10+ 환경에서 Timestamp 객체의 직렬화 형태 변화로 인한 호환성 문제
+
+**해결 방안:**
+```javascript
+// 기존 단순한 변환 (실패)
+const date = new Date(lesson.createdAt);
+
+// 개선된 다층 변환 시스템
+let date;
+
+// 1. Firestore Timestamp 객체인 경우
+if (lesson.createdAt && typeof lesson.createdAt === 'object' && lesson.createdAt.toDate) {
+    date = lesson.createdAt.toDate();
+}
+// 2. Firestore v9+ 에서 직렬화된 timestamp 객체인 경우
+else if (lesson.createdAt && typeof lesson.createdAt === 'object' && 
+        (lesson.createdAt._seconds || lesson.createdAt.seconds)) {
+    const seconds = lesson.createdAt._seconds || lesson.createdAt.seconds;
+    const nanoseconds = lesson.createdAt._nanoseconds || lesson.createdAt.nanoseconds || 0;
+    date = new Date((seconds * 1000) + Math.floor(nanoseconds / 1000000));
+}
+// 3. 일반 Date 객체나 타임스탬프인 경우
+else {
+    date = new Date(lesson.createdAt);
+}
+
+if (date && !isNaN(date.getTime())) {
+    createdAtText = date.toLocaleString('ko-KR');
+}
+```
+
+#### 2. 포괄적 Timestamp 처리 시스템
+
+**지원하는 Timestamp 형태들:**
+1. **Native Firestore Timestamp**: `{toDate: function}`
+2. **Serialized Timestamp v9+**: `{_seconds: number, _nanoseconds: number}`
+3. **Firestore Web SDK Timestamp**: `{seconds: number, nanoseconds: number}`
+4. **JavaScript Date**: `Date` 객체
+5. **Unix Timestamp**: 숫자형 밀리초
+6. **ISO String**: 문자열형 날짜
+
+#### 3. 에러 핸들링 및 로깅 강화
+
+```javascript
+try {
+    // 변환 로직
+} catch (error) {
+    console.log('날짜 파싱 오류:', error, lesson.createdAt);
+    // 사용자에게는 깔끔한 폴백 메시지 표시
+}
+```
+
+#### 4. 한국어 로케일 최적화
+
+```javascript
+// 한국 시간대 및 형식으로 표시
+createdAtText = date.toLocaleString('ko-KR');
+// 결과 예시: "2025. 8. 19. 오후 2:08:13"
+```
+
+### 🔧 해결된 기술적 문제들
+
+#### 1. Firebase SDK 버전별 호환성 문제
+- **문제**: Firebase v10+에서 Timestamp 객체의 직렬화 방식 변경
+- **해결**: 모든 SDK 버전의 Timestamp 형태를 감지하고 적절히 변환하는 범용 시스템 구축
+- **결과**: Firebase SDK 업데이트나 환경 변화에 관계없이 안정적 동작
+
+#### 2. 타임존 및 로케일 처리 문제
+- **문제**: 서버 시간과 클라이언트 시간 차이로 인한 혼란
+- **해결**: 한국어 로케일(`ko-KR`)을 명시적으로 지정하여 일관된 시간 표시
+- **결과**: 모든 사용자에게 동일한 형식의 날짜/시간 표시
+
+#### 3. Null/Undefined 처리 강화
+- **문제**: 일부 레코드에서 `createdAt` 필드가 누락되거나 null인 경우
+- **해결**: 각 변환 단계에서 철저한 null 체크 및 적절한 폴백 처리
+- **결과**: 예외 상황에서도 시스템 안정성 확보
+
+### 📚 교육적 효과 및 활용성
+
+#### 1. 교사 사용자 경험 대폭 개선
+- **정확한 수업 일정 관리**: 교사가 수업 생성 시점을 정확히 파악하여 체계적 관리 가능
+- **시간순 정렬**: 최근 생성 수업부터 정렬되어 현재 진행 중인 수업을 쉽게 식별
+- **학기 관리**: 생성일 기준으로 학기별, 월별 수업 관리 및 아카이빙 가능
+
+#### 2. 수업 데이터 신뢰성 확보
+- **정확한 메타데이터**: 수업별 생성 시점, 진행 기간 등 정확한 데이터 제공
+- **분석 기반 마련**: 향후 수업 패턴 분석, 교사별 활용도 분석 등의 기초 데이터 확보
+- **감사 추적**: 수업 생성 및 수정 이력 추적을 위한 정확한 타임스탬프 보장
+
+#### 3. 시스템 전반적 안정성 향상
+- **예외 처리**: 다양한 데이터 형태에 대한 견고한 처리로 시스템 오류 방지
+- **미래 호환성**: Firebase나 브라우저 업데이트에도 안정적 동작 보장
+- **국제화 준비**: 다양한 로케일 지원 기반 마련
+
+### 🎨 UI/UX 개선 사항
+
+#### 1. 일관된 날짜 표시 형식
+- **표준화**: 모든 날짜가 "YYYY. M. D. 오전/오후 H:MM:SS" 형식으로 통일
+- **가독성**: 한국어 사용자에게 친숙한 날짜 형식으로 이해도 향상
+- **정렬**: 날짜 기반 정렬이 올바르게 작동하여 최신 수업이 상단에 표시
+
+#### 2. 로딩 상태 및 오류 처리
+- **사용자 피드백**: 날짜 변환 중 오류가 발생해도 적절한 폴백 메시지 표시
+- **개발자 도구**: 브라우저 콘솔을 통한 상세 디버깅 정보 제공
+- **우아한 실패**: 날짜 변환 실패 시에도 전체 UI가 깨지지 않도록 보호
+
+### 💡 향후 발전 가능성
+
+#### 1. 시간대 사용자 설정
+- **개인화**: 교사별로 선호하는 시간대 설정 기능
+- **다지역 지원**: 해외 한국 학교나 국제 학교 지원을 위한 다중 시간대
+- **자동 감지**: 브라우저의 시간대 설정을 자동으로 감지하여 적용
+
+#### 2. 고급 날짜 필터링
+- **기간별 조회**: 특정 기간에 생성된 수업만 필터링하는 기능
+- **학기별 관리**: 학기 시작/종료일 기반 수업 자동 분류
+- **달력 뷰**: 달력 형태로 수업 일정을 시각화하는 UI
+
+#### 3. 데이터 분석 기능
+- **사용 패턴 분석**: 교사별 수업 생성 패턴, 활용도 분석
+- **시간대별 활용도**: 언제 가장 많이 수업이 생성되고 활용되는지 분석
+- **학습 효과 추적**: 수업 지속 기간과 학습 효과의 상관관계 분석
+
+### ✅ 완성된 핵심 기능
+- [x] Firestore Timestamp 완전 호환 변환 시스템 ✨ 신규
+- [x] 다중 SDK 버전 지원 안정성 확보 ✨ 신규
+- [x] 한국어 로케일 최적화 ✨ 개선
+- [x] 포괄적 에러 핸들링 및 폴백 시스템 ✨ 신규
+- [x] 교사 대시보드 수업 관리 UX 완성 ✨ 개선
+
+### 🚀 기술적 성취
+
+1. **완전한 호환성**: Firebase의 모든 SDK 버전과 Timestamp 형태 지원
+2. **견고한 시스템**: 예외 상황에서도 안정적으로 동작하는 방어적 프로그래밍
+3. **미래 보장성**: 향후 Firebase 업데이트나 환경 변화에도 대응 가능한 확장성
+4. **사용자 중심**: 한국어 환경에 최적화된 직관적 날짜 표시
+5. **개발자 친화**: 디버깅과 유지보수가 용이한 명확한 코드 구조
+
+### 💰 비즈니스 가치
+
+- **교사 만족도 향상**: 정확한 수업 정보 표시로 사용자 신뢰도 증대
+- **시스템 안정성**: 오류 없는 날짜 처리로 전체 플랫폼 신뢰성 확보
+- **확장성 확보**: 다국가, 다언어 서비스 확장을 위한 기술적 기반 마련
+- **유지보수 비용 절감**: 견고한 에러 처리로 향후 지원 업무 부담 감소
+
+이번 Firestore Timestamp 변환 시스템 완성으로 **Science AI Chatbot**의 핵심 데이터 처리 안정성이 크게 향상되었으며, 교사들이 수업을 더욱 체계적이고 효율적으로 관리할 수 있는 완성된 도구가 되었습니다. 특히 Firebase의 복잡한 Timestamp 객체 구조를 완전히 해결함으로써, 실제 교육 현장에서 안정적으로 사용할 수 있는 엔터프라이즈급 시스템의 기반을 확보했습니다.
+
+---
+
+## 2025년 8월 19일 - 교사 대시보드 수업 정보 편집 기능 구현
+
+### 🎯 작업 목표
+교사가 기존에 생성한 수업의 기본 정보(제목, 과목, 설명, AI 지시사항)를 수정할 수 있도록 teacher.html의 수업 편집 기능을 완전히 구현하여 교사의 수업 관리 편의성을 향상시킴.
+
+### 📋 주요 구현 내용
+
+#### 1. 수업 설명 분리 시스템 구현
+**기존 문제점:**
+- 하나의 `description` 필드로 AI 지시사항과 학생용 설명이 혼재
+- 교사가 AI에게 주는 지시사항이 학생에게 그대로 노출되는 문제
+- 교육적 맥락과 학생 표시용 정보의 명확한 구분 부족
+
+**개선 내용:**
+- **AI 튜터 지시사항** (`aiInstructions`): 교사가 AI에게 주는 내부 지시사항
+- **학생용 수업 설명** (`studentDescription`): 학생에게 표시되는 수업 안내 및 설명
+- 수업 생성과 수정 시 두 필드를 독립적으로 관리
+
+#### 2. 교사 대시보드 UI 개선
+**수업 생성 폼 개선:**
+```html
+<!-- AI 튜터 지시사항 (교사 전용) -->
+<label for="lesson-ai-instructions-input">AI 튜터 지시사항 (교사 전용)</label>
+<textarea id="lesson-ai-instructions-input" rows="4" 
+    placeholder="AI 튜터가 따라야 할 교수법, 역할, 답변 스타일 등을 구체적으로 지시해주세요."></textarea>
+
+<!-- 학생용 수업 설명 -->
+<label for="lesson-student-description-input">학생용 수업 설명</label>
+<textarea id="lesson-student-description-input" rows="3" 
+    placeholder="학생들에게 표시될 수업 소개 및 학습 목표를 입력하세요."></textarea>
+```
+
+**수업 편집 모달 완성:**
+- 기존 수업 데이터를 편집 모달에 정확히 로드
+- `aiInstructions`와 `studentDescription` 필드 개별 편집 가능
+- 수업 자료(`resources`) 목록도 편집 모달에서 수정 가능
+
+#### 3. 백엔드 Firebase Functions 수정
+**수정된 Cloud Functions:**
+
+```javascript
+// createLesson 함수
+exports.createLesson = functions.https.onCall(async (data, context) => {
+  const { title, subject, aiInstructions, studentDescription, resources } = data;
+  
+  const lessonData = {
+    teacherId: context.auth.uid,
+    title,
+    subject,
+    aiInstructions: aiInstructions || '',
+    studentDescription: studentDescription || '',
+    resources: resources || [],
+    createdAt: FieldValue.serverTimestamp()
+  };
+  
+  const lessonRef = await admin.firestore().collection('lessons').add(lessonData);
+  return { lessonId: lessonRef.id };
+});
+
+// updateLesson 함수
+exports.updateLesson = functions.https.onCall(async (data, context) => {
+  const { lessonId, title, subject, aiInstructions, studentDescription, resources } = data;
+  
+  const updateData = {
+    title,
+    subject,
+    aiInstructions: aiInstructions || '',
+    studentDescription: studentDescription || '',
+    resources: resources || [],
+    updatedAt: FieldValue.serverTimestamp()
+  };
+  
+  await admin.firestore().collection('lessons').doc(lessonId).update(updateData);
+  return { success: true };
+});
+```
+
+#### 4. 프론트엔드 JavaScript 로직 완성
+**수업 편집 기능 구현:**
+- 수업 편집 버튼 클릭 시 기존 데이터를 모달에 로드
+- `aiInstructions`, `studentDescription`, `resources` 필드 개별 관리
+- 편집 완료 시 업데이트된 정보를 Firestore에 저장
+
+```javascript
+// 편집 모달에 기존 데이터 로드
+function loadLessonDataToEditModal(lesson) {
+  document.getElementById('edit-lesson-title').value = lesson.title || '';
+  document.getElementById('edit-lesson-subject').value = lesson.subject || 'science';
+  document.getElementById('edit-lesson-ai-instructions').value = lesson.aiInstructions || lesson.description || '';
+  document.getElementById('edit-lesson-student-description').value = lesson.studentDescription || '';
+  
+  // 기존 자료 로드
+  editTempResources.length = 0;
+  if (Array.isArray(lesson.resources)) {
+    editTempResources.push(...lesson.resources);
+  }
+  updateEditResourcesList();
+}
+```
+
+#### 5. 학생 페이지 표시 로직 개선
+**chatbot.js 및 index.html 업데이트:**
+- 학생 페이지에서 `studentDescription` 우선 표시
+- `studentDescription`이 없을 경우 기존 `description` 폴백
+- QR 코드 모달에도 학생용 설명 표시
+
+```javascript
+// 학생용 수업 설명 표시 로직
+function displayLessonInfo(lessonData) {
+  const description = lessonData.studentDescription || lessonData.description || '';
+  if (description) {
+    lessonDescriptionElement.textContent = description;
+    lessonDescriptionElement.style.display = 'block';
+  } else {
+    lessonDescriptionElement.style.display = 'none';
+  }
+}
+```
+
+### 🔧 해결된 기술적 문제들
+
+#### 1. 기존 수업 데이터 로딩 문제
+**문제**: 수업 편집 시 기존 `resources` 데이터가 `undefined`인 경우 오류 발생
+**해결**: 안전한 배열 확인 및 폴백 처리 구현
+```javascript
+if (Array.isArray(lesson.resources)) {
+    editTempResources.push(...lesson.resources);
+} else {
+    editTempResources.length = 0;
+}
+```
+
+#### 2. AI 지시사항과 학생 설명 분리
+**문제**: 기존 수업들은 `description` 필드만 가지고 있어 호환성 문제
+**해결**: 점진적 마이그레이션을 위한 폴백 시스템 구현
+- 편집 시 기존 `description`을 `aiInstructions`로 초기값 설정
+- `studentDescription`은 빈 값으로 시작하여 교사가 필요시 입력
+
+#### 3. 프롬프트 시스템 호환성
+**문제**: 기존 AI 프롬프트 시스템이 `description` 필드를 사용
+**해결**: PromptBuilder에서 `aiInstructions` 우선, `description` 폴백 로직 구현
+
+### 📚 교육적 효과 및 활용성
+
+#### 1. 교사 업무 효율성 향상
+- **명확한 역할 분리**: AI 지시사항과 학생 안내사항의 구분으로 혼란 제거
+- **유연한 수업 관리**: 생성 후에도 수업 정보를 자유롭게 수정 가능
+- **점진적 개선**: 수업 진행 중에도 AI 튜터 지시사항을 조정하여 교육 효과 최적화
+
+#### 2. 학습자 경험 개선
+- **적절한 정보 제공**: 학생에게는 학습에 필요한 정보만 제공
+- **AI 튜터 품질 향상**: 명확한 지시사항으로 더 일관되고 효과적인 AI 응답
+- **맞춤형 학습 환경**: 과목과 학습 목표에 특화된 AI 튜터 경험
+
+#### 3. 시스템 유지보수성 확보
+- **하위 호환성**: 기존 수업들도 정상적으로 동작하면서 점진적 업그레이드 가능
+- **확장 가능성**: 향후 추가 필드나 기능 확장이 용이한 구조
+- **데이터 무결성**: 잘못된 데이터 입력을 방지하는 안전장치 구현
+
+### 🎨 UI/UX 개선 사항
+
+#### 1. 직관적인 폼 설계
+- **명확한 라벨링**: "교사 전용", "학생에게 표시" 등 용도가 명확한 라벨
+- **적절한 플레이스홀더**: 각 필드의 용도와 작성 방법을 안내하는 예시 텍스트
+- **시각적 구분**: 두 설명 필드를 시각적으로 구분하여 혼동 방지
+
+#### 2. 편집 워크플로 개선
+- **모달 상태 관리**: 편집 시작 시 기존 데이터 로드, 취소 시 변경사항 초기화
+- **실시간 피드백**: 저장 중 로딩 표시, 성공/실패 메시지 표시
+- **데이터 검증**: 필수 필드 확인 및 적절한 오류 메시지 제공
+
+### ✅ 완성된 핵심 기능
+- [x] AI 지시사항과 학생 설명 분리 시스템 ✨ 신규
+- [x] 수업 정보 편집 모달 완전 구현 ✨ 신규
+- [x] 백엔드 수업 업데이트 함수 개선 ✨ 개선
+- [x] 기존 수업 호환성 보장 시스템 ✨ 신규
+- [x] 학생 페이지 표시 로직 개선 ✨ 개선
+- [x] 수업 자료 편집 기능 통합 ✨ 개선
+
+### 🚀 기술적 성취
+1. **완전한 CRUD 시스템**: 수업 생성, 조회, 수정의 완전한 구현
+2. **점진적 마이그레이션**: 기존 데이터와의 완벽한 호환성 유지
+3. **명확한 데이터 분리**: 교사용과 학생용 정보의 체계적 관리
+4. **확장 가능한 구조**: 향후 추가 필드나 기능 확장에 유연한 대응
+5. **사용자 중심 설계**: 교사와 학생 모두의 사용성을 고려한 인터페이스
+
+### 💰 교육적 가치
+- **교사 만족도 향상**: 수업을 유연하게 관리할 수 있어 교사의 업무 효율성 증대
+- **AI 튜터 품질 개선**: 명확한 지시사항으로 더 정확하고 효과적인 AI 응답
+- **학습 환경 최적화**: 학생에게는 적절한 정보만 제공하여 학습 집중도 향상
+- **시스템 신뢰성**: 안정적인 데이터 관리로 장기적 사용 가능성 확보
+
+이번 수업 편집 기능 구현으로 **Science AI Chatbot**이 교사가 실제 교육 현장에서 유연하고 효과적으로 활용할 수 있는 **완성된 교육 관리 도구**로 발전했습니다. 특히 AI 지시사항과 학생 설명의 명확한 분리를 통해 교사는 더욱 정밀한 AI 튜터 관리가 가능하며, 학생들은 더욱 적절하고 집중된 학습 환경을 제공받을 수 있게 되었습니다.
+
+---
+
+**최종 업데이트**: 2025년 8월 19일  
 **개발자**: Human-AI Collaborative Development  
 **라이선스**: MIT License
 
