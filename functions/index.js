@@ -1432,26 +1432,3 @@ exports.deleteSession = onCall(async (request) => {
     }
 });
 
-// 개발자용: 수동 교사 등록 (기존 호환성 유지)
-exports.addTeacher = onCall(async (request) => {
-    const { data } = request;
-    const { teacherCode, apiKey, teacherName } = data;
-    
-    if (!teacherCode || !apiKey) {
-      throw new HttpsError('invalid-argument', '교사 코드와 API 키가 모두 필요합니다.');
-    }
-
-    try {
-      await db.collection('teacher_keys').doc(teacherCode).set({
-        apiKey: apiKey,
-        teacherName: teacherName || '',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      return { success: true, message: '교사 정보가 성공적으로 등록되었습니다.' };
-    } catch (error) {
-      console.error("교사 등록 오류:", error);
-      throw new HttpsError('internal', '교사 정보 등록 중 오류가 발생했습니다.');
-    }
-});

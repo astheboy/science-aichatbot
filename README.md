@@ -27,16 +27,16 @@
 
 ## 🌐 배포 주소
 
-- **학생용 메인**: https://aitutor.sangcode.dev
-- **교사 대시보드**: https://aitutor.sangcode.dev/teacher.html
-- **관리자 페이지**: https://aitutor.sangcode.dev/admin.html
+- **학생용 메인**: https://science-aichatbot.web.app
+- **교사 대시보드**: https://science-aichatbot.web.app/teacher.html
+- **소개 페이지**: https://science-aichatbot.web.app/introduction.html
 
 ## 🏗️ 기술 스택
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Backend**: Firebase Functions (Node.js 20)
 - **Database**: Firebase Firestore
-- **AI**: Google Gemini API (2.0 Flash, 2.0 Flash-Lite, 2.5 Flash, 2.5 Flas-lite 지원)
+- **AI**: Google Gemini API (2.5 Flash-Lite, 2.0 Flash, 2.0 Flash-Lite 지원)
 - **Authentication**: Firebase Authentication (Google OAuth)
 - **Hosting**: Firebase Hosting
 - **Storage**: Firebase Storage (파일 업로드 지원)
@@ -96,34 +96,44 @@
 
 ```
 science-aichatbot/
-├── public/                 # 프론트엔드 파일
-│   ├── index.html          # 학생용 챗봇 메인
-│   ├── teacher.html        # 교사 대시보드 (완전한 교육 관리 시스템)
-│   ├── dashboard.html      # 교사 클래스 목록
-│   ├── class.html          # 클래스 관리 페이지
-│   ├── experiment-details.html # 과제 상세 및 제출 현황
-│   ├── report.html         # 학생 보고서 작성
-│   ├── student-portfolio.html # 개별 학생 포트폴리오
-│   ├── css/style.css       # 통합 스타일시트
-│   ├── js/                 # JavaScript 모듈들
-│   │   ├── chatbot.js      # AI 챗봇 로직
-│   │   ├── teacher.js      # 교사 대시보드 로직
-│   │   └── ...            # 기타 모듈들
-│   └── firebase-config.js  # Firebase 설정
-├── functions/              # Firebase Functions
-│   └── index.js            # 백엔드 로직 (AI 호출, 데이터 관리)
-├── prompts/               # 과목별 프롬프트 설정
-│   ├── student_response_analysis_science.json        # 과학 과목 프롬프트
-│   ├── student_response_analysis_math.json          # 수학 과목 프롬프트
-│   └── ...
-├── devlog.md              # 상세한 개발 기록
-└── README.md              # 프로젝트 가이드
+├── public/                     # 프론트엔드 파일
+│   ├── index.html              # 학생용 챗봇 메인
+│   ├── teacher.html            # 교사 대시보드
+│   ├── introduction.html       # 소개 페이지
+│   ├── style.css               # 통합 스타일시트
+│   ├── api.js                  # API 호출 유틸리티
+│   ├── chatbot.js              # AI 챗봇 로직
+│   ├── main.js                 # 공용 초기화 로직
+│   ├── content.js              # 정적 콘텐츠
+│   ├── firebase-config.js      # Firebase 설정
+│   └── favicon.svg
+├── functions/                  # Firebase Functions
+│   ├── index.js                # 백엔드 로직 (AI 호출, 데이터 관리)
+│   ├── package.json
+│   ├── lib/                    # 서버 모듈들
+│   │   ├── subjectLoader.js
+│   │   ├── responseAnalyzer.js
+│   │   ├── promptBuilder.js
+│   │   └── gamificationManager.js
+│   └── prompts/                # 과목별 프롬프트 설정
+│       ├── student_response_analysis_science.json
+│       ├── student_response_analysis_math.json
+│       ├── student_response_analysis_korean.json
+│       └── student_response_analysis_social.json
+├── firestore.rules             # Firestore 보안 규칙
+├── firestore.indexes.json      # Firestore 인덱스 설정
+├── docs/
+│   └── archive/
+│       ├── comprehensive-development-plan.md
+│       └── development-plan-phase1.md
+├── devlog.md                   # 상세한 개발 기록
+└── README.md                   # 프로젝트 가이드
 ```
 
 ## 🎯 시작하기
 
 ### 교사용 (권장)
-1. https://aitutor.sangcode.dev/teacher.html 접속
+1. https://science-aichatbot.web.app/teacher.html 접속
 2. Google 계정으로 로그인
 3. Gemini API 키 등록 ([API 키 발급](https://aistudio.google.com/apikey))
 4. 첫 번째 수업 생성 및 학생 등록
@@ -133,6 +143,13 @@ science-aichatbot/
 1. 교사가 제공한 QR 코드 스캔 또는 수업 코드 입력
 2. AI 튜터와 대화하며 학습
 3. 과제가 있는 경우 보고서 작성 및 제출
+
+## 🏆 최신 업데이트 (2025년 8월 26일)
+
+- 레거시 정리: public/admin.html 및 examples/ 폴더 제거
+- Functions 정리: 레거시 수동 교사 등록 함수(exports.addTeacher) 제거
+- 문서 구조 정리: comprehensive-development-plan.md, development-plan-phase1.md를 docs/archive/로 이동
+- README 정리: 배포 주소와 프로젝트 구조를 현재 코드베이스와 일치하도록 업데이트
 
 ## 🏆 최신 업데이트 (2025년 8월 19일)
 
@@ -174,7 +191,7 @@ science-aichatbot/
 ---
 
 **개발**: SangCode.dev  
-**최종 업데이트**: 2025년 8월 19일  
+**최종 업데이트**: 2025년 8월 26일  
 **프로젝트 상태**: AI-튜터 교육 플랫폼
 
 > 이 프로젝트는 AI를 활용한 교육 혁신을 목표로 하며, 확장 가능하고 유지보수가 용이한 아키텍처를 바탕으로 지속적으로 발전하고 있습니다.
