@@ -1,0 +1,201 @@
+{
+  "question_guidance": {
+    "description": "학생의 전략적 회피 행동을 긍정적으로 활용하여 더 나은 질문 구성을 돕는 시스템",
+    "good_question_patterns": {
+      "observation_based": {
+        "template": "관찰한 것: {observation} / 궁금한 점: {question} / 추측: {hypothesis}",
+        "examples": [
+          "관찰한 것: 공이 3번째 고리에서 멈췄어요 / 궁금한 점: 왜 끝까지 안 갔을까요? / 추측: 높이가 부족했나요?",
+          "관찰한 것: 구슬이 빨리 굴러가다가 갑자기 느려졌어요 / 궁금한 점: 무엇이 속도를 줄였을까요? / 추측: 마찰 때문인가요?",
+          "관찰한 것: 레일을 높이 올렸더니 더 멀리 갔어요 / 궁금한 점: 높이와 거리가 관련이 있나요? / 추측: 에너지가 더 많아서 그런가요?"
+        ]
+      },
+      "comparison_based": {
+        "template": "실험 A: {condition_a} → 결과: {result_a} / 실험 B: {condition_b} → 결과: {result_b} / 질문: 왜 다를까요?",
+        "examples": [
+          "실험 A: 낮은 높이에서 시작 → 결과: 절반까지만 도달 / 실험 B: 높은 높이에서 시작 → 결과: 끝까지 도달 / 질문: 높이가 결과에 어떤 영향을 주나요?",
+          "실험 A: 매끄러운 표면 → 결과: 빠르게 움직임 / 실험 B: 거친 표면 → 결과: 천천히 움직임 / 질문: 표면이 다르면 왜 속도가 달라지나요?"
+        ]
+      },
+      "problem_solving": {
+        "template": "목표: {goal} / 현재 상황: {current_state} / 시도한 것: {attempts} / 질문: 어떻게 개선할 수 있을까요?",
+        "examples": [
+          "목표: 공이 끝까지 도달하게 하기 / 현재 상황: 중간에서 멈춤 / 시도한 것: 높이를 조금 올려봤지만 여전히 부족 / 질문: 다른 방법은 무엇이 있을까요?",
+          "목표: 구슬이 일정한 속도로 움직이게 하기 / 현재 상황: 속도가 계속 변함 / 시도한 것: 각도를 조정해봤지만 효과 없음 / 질문: 속도를 일정하게 유지하려면 어떻게 해야 할까요?"
+        ]
+      }
+    },
+    "question_improvement_tips": {
+      "vague_to_specific": [
+        {
+          "vague": "실험이 안 돼요",
+          "specific": "공이 3번째 장애물에서 멈춰요. 왜 그럴까요?",
+          "improvement": "구체적인 상황을 설명하고 정확한 지점을 명시"
+        },
+        {
+          "vague": "이상해요",
+          "specific": "예상과 달리 구슬이 오른쪽으로 굴러갔어요. 트랙이 기울어진 건가요?",
+          "improvement": "예상했던 것과 실제 일어난 일을 대비하여 설명"
+        },
+        {
+          "vague": "잘 모르겠어요",
+          "specific": "중력과 마찰력 중에서 어느 것이 더 큰 영향을 주는지 궁금해요",
+          "improvement": "구체적인 개념이나 요소들을 명시하여 질문"
+        }
+      ],
+      "separate_observation_thinking": [
+        {
+          "mixed": "공이 떨어지는 게 에너지 때문인 것 같아요",
+          "separated": "관찰: 공이 떨어졌어요 / 생각: 에너지가 부족했던 것 같아요 / 질문: 에너지를 더 늘리려면 어떻게 해야 하나요?",
+          "improvement": "본 것(사실)과 생각한 것(추측)을 분리하여 표현"
+        }
+      ],
+      "hypothesis_formation": [
+        {
+          "description": "단순 질문을 가설 형태로 발전시키기",
+          "before": "왜 안 될까요?",
+          "after": "높이가 낮아서 안 되는 건가요? 아니면 다른 이유가 있을까요?",
+          "guide": "가능한 원인을 예상해보고 질문으로 만들어보세요"
+        }
+      ]
+    },
+    "interactive_question_builder": {
+      "step_by_step_prompts": [
+        {
+          "step": 1,
+          "prompt": "먼저 어떤 실험을 하고 있는지 알려주세요",
+          "purpose": "실험 상황 파악"
+        },
+        {
+          "step": 2,
+          "prompt": "실험에서 무엇을 관찰했나요? (본 것만 말해주세요)",
+          "purpose": "객관적 관찰 분리"
+        },
+        {
+          "step": 3,
+          "prompt": "예상했던 것과 어떻게 달랐나요?",
+          "purpose": "기대와 현실의 차이 인식"
+        },
+        {
+          "step": 4,
+          "prompt": "왜 그렇게 되었다고 생각하시나요?",
+          "purpose": "가설 형성"
+        },
+        {
+          "step": 5,
+          "prompt": "이제 궁금한 점을 구체적으로 질문해보세요",
+          "purpose": "완성된 질문 생성"
+        }
+      ]
+    },
+    "avoidant_behavior_support": {
+      "detection_patterns": [
+        "질문을 작성하는 중",
+        "입력했다가 지움",
+        "여러 번 수정",
+        "긴 시간 대기"
+      ],
+      "supportive_interventions": [
+        {
+          "trigger": "질문 작성 지연",
+          "message": "좋은 질문을 만들기 위해 고민하고 계시는군요! 천천히 생각해보세요. 필요하면 단계별로 도와드릴게요.",
+          "options": [
+            "단계별 질문 가이드 받기",
+            "좋은 질문 예시 보기",
+            "현재 상황부터 차근차근 정리하기"
+          ]
+        },
+        {
+          "trigger": "질문 수정 반복",
+          "message": "더 정확한 질문을 만들려고 노력하는 모습이 훌륭해요! 어떤 부분이 어려우신가요?",
+          "support_types": [
+            "관찰과 추측 분리하기",
+            "구체적 표현 사용하기",
+            "핵심 궁금증 찾기"
+          ]
+        }
+      ]
+    },
+    "question_quality_feedback": {
+      "criteria": {
+        "specificity": {
+          "weight": 30,
+          "indicators": ["구체적 상황 묘사", "정확한 위치/시점 명시", "측정 가능한 요소 포함"]
+        },
+        "clarity": {
+          "weight": 25,
+          "indicators": ["명확한 표현", "이해하기 쉬운 구조", "모호함 없음"]
+        },
+        "scientific_thinking": {
+          "weight": 25,
+          "indicators": ["관찰과 추론 분리", "인과관계 고려", "변수 인식"]
+        },
+        "curiosity": {
+          "weight": 20,
+          "indicators": ["진정한 궁금증 표현", "탐구 의지", "학습 동기"]
+        }
+      },
+      "feedback_templates": [
+        "훌륭한 관찰이에요! {specific_observation}를 정확히 표현했네요. 이제 {next_step}에 대해서도 생각해볼까요?",
+        "정말 좋은 질문이에요! {strength}가 특히 인상적입니다. 한 가지 더 구체화한다면 {suggestion}는 어떨까요?",
+        "과학자처럼 사고하고 있어요! {scientific_element}를 잘 구분했네요. 이런 식으로 계속 탐구해보세요."
+      ]
+    },
+    "gamification_elements": {
+      "question_quality_levels": [
+        {
+          "level": 1,
+          "name": "관찰자",
+          "description": "무엇이 일어났는지 잘 관찰해요",
+          "criteria": "구체적 관찰 표현"
+        },
+        {
+          "level": 2,
+          "name": "탐구자",
+          "description": "궁금한 점을 명확히 표현해요",
+          "criteria": "명확한 질문 구성"
+        },
+        {
+          "level": 3,
+          "name": "과학자",
+          "description": "관찰과 추측을 구분해서 생각해요",
+          "criteria": "과학적 사고 과정 적용"
+        },
+        {
+          "level": 4,
+          "name": "연구자",
+          "description": "가설을 세우고 검증 방법을 제안해요",
+          "criteria": "가설-검증 구조의 질문"
+        },
+        {
+          "level": 5,
+          "name": "발명가",
+          "description": "창의적이고 종합적인 질문을 해요",
+          "criteria": "복합적 사고와 창의성"
+        }
+      ],
+      "achievement_badges": [
+        {
+          "name": "정확한 관찰자",
+          "condition": "구체적이고 정확한 관찰 3회",
+          "icon": "🔍"
+        },
+        {
+          "name": "호기심 대왕",
+          "condition": "다양한 각도의 질문 5회",
+          "icon": "❓"
+        },
+        {
+          "name": "가설 마스터",
+          "condition": "가설 형태의 질문 3회",
+          "icon": "💡"
+        },
+        {
+          "name": "연결 고수",
+          "condition": "이전 학습과 연결된 질문 3회",
+          "icon": "🔗"
+        }
+      ]
+    }
+  }
+}

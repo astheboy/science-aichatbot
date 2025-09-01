@@ -62,21 +62,33 @@ class PromptBuilder {
      * @returns {string} 선택된 기본 프롬프트
      */
     static async selectBestPrompt(analysisResult, teacherData, subjectConfig) {
-        const { type, config, context } = analysisResult;
+        const { type, config, context, metacognitive_needs, reflective_needs } = analysisResult;
         
-        // 1. 교사의 커스텀 프롬프트 우선 확인
+        // 1. 성찰적 학습이 필요한 경우 전용 프롬프트 사용 (우선순위)
+        if (reflective_needs && this.requiresReflectiveLearning(reflective_needs)) {
+            console.log('성찰적 학습 프롬프트 적용:', reflective_needs.summary_trigger_type || 'general_reflection');
+            return await this.getReflectiveLearningPrompt(reflective_needs, conversationHistory, subjectConfig);
+        }
+        
+        // 2. 메타인지 스캐폴딩이 필요한 경우 전용 프롬프트 사용
+        if (metacognitive_needs && this.requiresMetacognitiveIntervention(metacognitive_needs)) {
+            console.log('메타인지 스캐폴딩 프롬프트 적용:', metacognitive_needs.scaffolding_type);
+            return await this.getMetacognitivePrompt(metacognitive_needs, subjectConfig);
+        }
+        
+        // 3. 교사의 커스텀 프롬프트 우선 확인
         if (teacherData.customPrompts && teacherData.customPrompts[type]) {
             console.log(`교사 커스텀 프롬프트 사용: ${type}`);
             return teacherData.customPrompts[type];
         }
         
-        // 2. JSON의 ai_tutor_prompt 필드 우선 사용
+        // 4. JSON의 ai_tutor_prompt 필드 우선 사용
         if (config.ai_tutor_prompt) {
             console.log(`과목별 AI 튜터 프롬프트 사용: ${type}`);
             return config.ai_tutor_prompt;
         }
         
-        // 3. 폴백: sample_prompts에서 선택 (기존 호환성 유지)
+        // 5. 폴백: sample_prompts에서 선택 (기존 호환성 유지)
         const samplePrompts = config.sample_prompts;
         if (!samplePrompts || samplePrompts.length === 0) {
             console.log(`sample_prompts가 없어서 기본 전략 사용: ${type}`);
@@ -397,6 +409,382 @@ class PromptBuilder {
                 text: `${fallbackInstruction}\n\n### 학생의 발화 ###\n${userMessage}`
             }]
         }];
+    }
+    
+    /**
+     * 메타인지 개입이 필요한지 판단합니다
+     * @param {Object} metacognitiveNeeds - 메타인지 분석 결과
+     * @returns {boolean} 개입 필요 여부
+     */
+    static requiresMetacognitiveIntervention(metacognitiveNeeds) {
+        return metacognitiveNeeds.requires_diagnosis_first || 
+               metacognitiveNeeds.requires_evaluation_prompt ||
+               metacognitiveNeeds.requires_problem_specification;
+    }
+    
+    /**
+     * 메타인지 스캐폴딩용 프롬프트를 생성합니다
+     * @param {Object} metacognitiveNeeds - 메타인지 분석 결과
+     * @param {Object} subjectConfig - 과목별 설정
+     * @returns {string} 메타인지 스캐폴딩 프롬프트
+     */
+    static async getMetacognitivePrompt(metacognitiveNeeds, subjectConfig) {
+        try {
+            // 메타인지 설정 로드
+            const fs = require('fs').promises;
+            const path = require('path');
+            const configPath = path.join(__dirname, '../config/metacognitive_scaffolding.json');
+            const configData = await fs.readFile(configPath, 'utf8');
+            const metacognitiveConfig = JSON.parse(configData).metacognitive_scaffolding;
+            
+            const scaffoldingType = metacognitiveNeeds.scaffolding_type;
+            const studentLevel = metacognitiveNeeds.student_ability_level || 'medium';
+            
+            console.log(`메타인지 스캐폴딩: ${scaffoldingType}, 학생 수준: ${studentLevel}`);
+            
+            // 기본 프롬프트 선택
+            let basePrompt = '';
+            
+            if (scaffoldingType && metacognitiveConfig.response_types[scaffoldingType]) {
+                const templates = metacognitiveConfig.response_types[scaffoldingType].prompt_templates || [];
+                if (templates.length > 0) {
+                    // 랜덤하게 선택하여 다양성 제공
+                    const randomIndex = Math.floor(Math.random() * templates.length);
+                    basePrompt = templates[randomIndex];
+                }
+            }
+            
+            // 학생 수준별 적응형 프롬프트 추가
+            const adaptiveConfig = metacognitiveConfig.adaptive_scaffolding;
+            if (studentLevel === 'high' && adaptiveConfig.high_ability_students) {
+                const additionalPrompts = adaptiveConfig.high_ability_students.prompts || [];
+                if (additionalPrompts.length > 0) {
+                    const randomPrompt = additionalPrompts[Math.floor(Math.random() * additionalPrompts.length)];
+                    basePrompt += `\n\n${randomPrompt}`;
+                }
+            } else if (studentLevel === 'low' && adaptiveConfig.struggling_students) {
+                const additionalPrompts = adaptiveConfig.struggling_students.prompts || [];
+                if (additionalPrompts.length > 0) {
+                    const randomPrompt = additionalPrompts[Math.floor(Math.random() * additionalPrompts.length)];
+                    basePrompt += `\n\n${randomPrompt}`;
+                }
+            }
+            
+            // 메타인지 규칙 추가
+            basePrompt += this.getMetacognitiveRules(metacognitiveNeeds, subjectConfig);
+            
+            return basePrompt || '학생의 사고 과정을 이해하고 스스로 답을 찾을 수 있도록 도와주세요.';
+            
+        } catch (error) {
+            console.error('메타인지 프롬프트 생성 오류:', error);
+            return '학생이 스스로 생각하고 탐구할 수 있도록 안내해주세요.';
+        }
+    }
+    
+    /**
+     * 메타인지 스캐폴딩 규칙을 생성합니다
+     * @param {Object} metacognitiveNeeds - 메타인지 분석 결과
+     * @param {Object} subjectConfig - 과목별 설정
+     * @returns {string} 메타인지 규칙 문자열
+     */
+    static getMetacognitiveRules(metacognitiveNeeds, subjectConfig) {
+        let rules = `\n\n### 메타인지 스캐폴딩 지침 ###\n`;
+        
+        if (metacognitiveNeeds.requires_diagnosis_first) {
+            rules += `- 🎯 **진단 우선**: 학생이 스스로 문제를 진단하도록 유도한 후 도움 제공\n`;
+            rules += `- 학생의 현재 이해 상태와 구체적 어려움을 먼저 파악하세요\n`;
+            rules += `- "무엇이 어려운가요?" "어느 부분에서 막혔나요?" 같은 진단 질문 활용\n`;
+        }
+        
+        if (metacognitiveNeeds.requires_problem_specification) {
+            rules += `- 🔍 **구체화 유도**: 막연한 문제를 구체적으로 명시하도록 안내\n`;
+            rules += `- "어떤 실험을 하고 계신가요?" "예상과 어떻게 달랐나요?" 질문 활용\n`;
+            rules += `- 문제를 단계별로 나누어 생각하도록 유도\n`;
+        }
+        
+        if (metacognitiveNeeds.requires_evaluation_prompt) {
+            rules += `- ✅ **평가 촉진**: 응답 후 학생의 이해도와 만족도 확인\n`;
+            rules += `- "이해가 되시나요?" "더 궁금한 점이 있나요?" 같은 평가 질문 필수\n`;
+            rules += `- 학생이 배운 내용을 자신만의 말로 설명하도록 요청\n`;
+        }
+        
+        // 대화 맥락 고려사항
+        const context = metacognitiveNeeds.conversation_context;
+        if (context.consecutive_executive_requests > 2) {
+            rules += `- ⚠️ **접근 방식 변경**: 연속된 직접적 요청 감지, 다른 방식으로 접근\n`;
+            rules += `- 학습자의 좌절감을 인정하고 단계를 더 세분화\n`;
+        }
+        
+        if (context.time_since_last_evaluation > 5) {
+            rules += `- 🔄 **중간 점검**: 오랜 대화 후 학습 상태 재확인 필요\n`;
+            rules += `- 지금까지의 대화 내용을 간단히 요약하고 이해도 점검\n`;
+        }
+        
+        rules += `\n**핵심 원칙**: 정답을 직접 제공하기보다, 학생이 스스로 발견할 수 있도록 사고 과정을 안내하세요.\n`;
+        
+        return rules;
+    }
+    
+    /**
+     * 성찰적 학습이 필요한지 판단합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @returns {boolean} 성찰적 학습 필요 여부
+     */
+    static requiresReflectiveLearning(reflectiveNeeds) {
+        return reflectiveNeeds.requires_summary ||
+               reflectiveNeeds.requires_connection_making ||
+               reflectiveNeeds.requires_metacognitive_reflection;
+    }
+    
+    /**
+     * 성찰적 학습용 프롬프트를 생성합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} subjectConfig - 과목별 설정
+     * @returns {string} 성찰적 학습 프롬프트
+     */
+    static async getReflectiveLearningPrompt(reflectiveNeeds, conversationHistory, subjectConfig) {
+        try {
+            // 성찰적 학습 설정 로드
+            const fs = require('fs').promises;
+            const path = require('path');
+            const configPath = path.join(__dirname, '../config/reflective_learning.json');
+            const configData = await fs.readFile(configPath, 'utf8');
+            const reflectiveConfig = JSON.parse(configData).reflective_learning;
+            
+            let basePrompt = '';
+            
+            // 1. 대화 요약이 필요한 경우
+            if (reflectiveNeeds.requires_summary) {
+                basePrompt += this.generateConversationSummary(reflectiveNeeds, conversationHistory, reflectiveConfig);
+            }
+            
+            // 2. 개념 연결이 필요한 경우
+            if (reflectiveNeeds.requires_connection_making) {
+                basePrompt += this.generateConnectionMaking(reflectiveNeeds, conversationHistory, reflectiveConfig);
+            }
+            
+            // 3. 메타인지적 성찰이 필요한 경우
+            if (reflectiveNeeds.requires_metacognitive_reflection) {
+                basePrompt += this.generateMetacognitiveReflection(reflectiveNeeds, reflectiveConfig);
+            }
+            
+            // 4. 학습 깊이에 따른 적응형 질문 추가
+            const depthLevel = reflectiveNeeds.conversation_context.learning_depth_level;
+            basePrompt += this.getDepthBasedQuestions(depthLevel, reflectiveConfig);
+            
+            // 5. 성찰적 학습 규칙 추가
+            basePrompt += this.getReflectiveLearningRules(reflectiveNeeds);
+            
+            return basePrompt || '지금까지의 학습 경험을 되돌아보며 깊이 생각해보세요.';
+            
+        } catch (error) {
+            console.error('성찰적 학습 프롬프트 생성 오류:', error);
+            return '지금까지의 대화를 되돌아보고 새롭게 알게 된 점을 생각해보세요.';
+        }
+    }
+    
+    /**
+     * 대화 요약 프롬프트를 생성합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} reflectiveConfig - 성찰적 학습 설정
+     * @returns {string} 대화 요약 프롬프트
+     */
+    static generateConversationSummary(reflectiveNeeds, conversationHistory, reflectiveConfig) {
+        const templates = reflectiveConfig.conversation_summary?.summary_templates || [];
+        if (templates.length === 0) {
+            return '지금까지의 대화를 요약하고 가장 중요한 학습 내용을 생각해보세요.';
+        }
+        
+        // 간단한 키 개념 추출
+        const keyConceptsFromHistory = this.extractKeyConcepts(conversationHistory);
+        const mainDiscoveryFromHistory = this.extractMainDiscovery(conversationHistory);
+        
+        // 템플릿 선택 및 치환
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        return template
+            .replace('{key_concepts}', keyConceptsFromHistory.join(', '))
+            .replace('{main_discovery}', mainDiscoveryFromHistory)
+            .replace('{learning_progression}', '가설 설정부터 검증까지')
+            + '\n\n';
+    }
+    
+    /**
+     * 개념 연결 프롬프트를 생성합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} reflectiveConfig - 성찰적 학습 설정
+     * @returns {string} 개념 연결 프롬프트
+     */
+    static generateConnectionMaking(reflectiveNeeds, conversationHistory, reflectiveConfig) {
+        const connectionTemplates = reflectiveConfig.connection_making?.previous_conversation_references?.connection_templates || [];
+        if (connectionTemplates.length === 0) {
+            return '앞서 나눠 낸 이야기와 지금 상황을 연결해보세요. ';
+        }
+        
+        const previousTopics = this.extractPreviousTopics(conversationHistory);
+        const currentTopic = this.extractCurrentTopic(conversationHistory);
+        
+        const template = connectionTemplates[Math.floor(Math.random() * connectionTemplates.length)];
+        return template
+            .replace('{previous_topic}', previousTopics[0] || '에너지 변환')
+            .replace('{current_topic}', currentTopic || '현재 실험')
+            + '\n\n';
+    }
+    
+    /**
+     * 메타인지적 성찰 프롬프트를 생성합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @param {Object} reflectiveConfig - 성찰적 학습 설정
+     * @returns {string} 메타인지적 성찰 프롬프트
+     */
+    static generateMetacognitiveReflection(reflectiveNeeds, reflectiveConfig) {
+        const thinkingReview = reflectiveConfig.metacognitive_reflection?.thinking_process_review || [];
+        const strategyAssessment = reflectiveConfig.metacognitive_reflection?.learning_strategy_assessment || [];
+        
+        let prompt = '';
+        
+        if (thinkingReview.length > 0) {
+            const randomReview = thinkingReview[Math.floor(Math.random() * thinkingReview.length)];
+            prompt += randomReview + ' ';
+        }
+        
+        if (strategyAssessment.length > 0) {
+            const randomAssessment = strategyAssessment[Math.floor(Math.random() * strategyAssessment.length)];
+            prompt += randomAssessment + ' ';
+        }
+        
+        return prompt + '\n\n';
+    }
+    
+    /**
+     * 학습 깊이에 따른 질문을 생성합니다
+     * @param {number} depthLevel - 학습 깊이 수준 (1-6)
+     * @param {Object} reflectiveConfig - 성찰적 학습 설정
+     * @returns {string} 깊이별 질문 프롬프트
+     */
+    static getDepthBasedQuestions(depthLevel, reflectiveConfig) {
+        const depthLevels = reflectiveConfig.progressive_questioning?.depth_levels || {};
+        
+        const levelKeys = [
+            'level_1_recall', 'level_2_comprehension', 'level_3_application',
+            'level_4_analysis', 'level_5_synthesis', 'level_6_evaluation'
+        ];
+        
+        let questions = '';
+        
+        // 현재 수준과 다음 단계 질문 제시
+        for (let i = depthLevel - 1; i <= Math.min(depthLevel, 5); i++) {
+            const levelKey = levelKeys[i];
+            const levelQuestions = depthLevels[levelKey] || [];
+            
+            if (levelQuestions.length > 0) {
+                const randomQuestion = levelQuestions[Math.floor(Math.random() * levelQuestions.length)];
+                questions += randomQuestion + ' ';
+                break; // 한 개만 선택
+            }
+        }
+        
+        return questions + '\n\n';
+    }
+    
+    /**
+     * 성찰적 학습 규칙을 생성합니다
+     * @param {Object} reflectiveNeeds - 성찰적 학습 분석 결과
+     * @returns {string} 성찰적 학습 규칙 문자열
+     */
+    static getReflectiveLearningRules(reflectiveNeeds) {
+        let rules = `\n### 성찰적 학습 지침 ###\n`;
+        
+        rules += `- 🔄 **연결 사고**: 이전 경험과 현재 상황을 연결하여 통합적 이해 촉진\n`;
+        rules += `- 🧐 **사고 과정 성찰**: 학생이 어떻게 생각하고 문제를 해결했는지 되돌아보도록 안내\n`;
+        
+        if (reflectiveNeeds.requires_summary) {
+            rules += `- 📝 **요약 및 정리**: 학습 내용을 체계적으로 정리하여 기억 정착도 증진\n`;
+        }
+        
+        if (reflectiveNeeds.requires_connection_making) {
+            rules += `- ⚡ **개념 연결**: 새로운 개념을 기존 지식과 연결하여 의미 있는 학습 창조\n`;
+        }
+        
+        if (reflectiveNeeds.requires_metacognitive_reflection) {
+            rules += `- 🎯 **전략 인식**: 효과적인 학습 방법을 인식하고 다음에 활용할 수 있도록 지원\n`;
+        }
+        
+        const depthLevel = reflectiveNeeds.conversation_context.learning_depth_level;
+        if (depthLevel >= 4) {
+            rules += `- 🔍 **심층 분석**: 고차원적 사고를 통해 복잡한 개념들을 종합적으로 이해\n`;
+        }
+        
+        rules += `\n**핵심 원칙**: 학생이 스스로 학습 경험을 되돌아보고 의미를 찾을 수 있도록 안내하세요.\n`;
+        
+        return rules;
+    }
+    
+    /**
+     * 대화에서 핵심 개념들을 추출합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {Array} 핵심 개념 배열
+     */
+    static extractKeyConcepts(conversationHistory) {
+        const concepts = [];
+        const keywords = ['에너지', '중력', '마찰', '운동', '속도', '힘'];
+        
+        conversationHistory.slice(-6).forEach(turn => {
+            if (turn.role === 'user' && turn.parts && turn.parts[0]) {
+                const text = turn.parts[0].text;
+                keywords.forEach(keyword => {
+                    if (text.includes(keyword) && !concepts.includes(keyword)) {
+                        concepts.push(keyword);
+                    }
+                });
+            }
+        });
+        
+        return concepts.length > 0 ? concepts : ['물리 현상'];
+    }
+    
+    /**
+     * 대화에서 주요 발견을 추출합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {string} 주요 발견
+     */
+    static extractMainDiscovery(conversationHistory) {
+        // 간단한 패턴 기반 발견 추출
+        const discoveryPatterns = ['알았어', '발견했어', '깨달았어', '이해했어'];
+        
+        for (let i = conversationHistory.length - 1; i >= 0; i--) {
+            const turn = conversationHistory[i];
+            if (turn.role === 'user' && turn.parts && turn.parts[0]) {
+                const text = turn.parts[0].text;
+                for (const pattern of discoveryPatterns) {
+                    if (text.includes(pattern)) {
+                        return text.substring(0, 50) + '...';
+                    }
+                }
+            }
+        }
+        
+        return '중요한 과학 원리를 이해하게 되었다는 점';
+    }
+    
+    /**
+     * 이전 주제들을 추출합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {Array} 이전 주제 배열
+     */
+    static extractPreviousTopics(conversationHistory) {
+        return ['에너지 변환', '운동과 정지', '마찰력의 영향']; // 예시
+    }
+    
+    /**
+     * 현재 주제를 추출합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {string} 현재 주제
+     */
+    static extractCurrentTopic(conversationHistory) {
+        return '현재 실험 결과'; // 예시
     }
 }
 

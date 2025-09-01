@@ -1,4 +1,6 @@
 const SubjectLoader = require('./subjectLoader');
+const fs = require('fs').promises;
+const path = require('path');
 
 /**
  * JSON 설정 기반 학생 응답 분석 시스템
@@ -10,7 +12,7 @@ class ResponseAnalyzer {
      * @param {string} userMessage - 학생 메시지
      * @param {string} subject - 과목명 (korean, math, science, social)
      * @param {Array} conversationHistory - 대화 이력 (선택사항)
-     * @returns {Object} 분석 결과 { type, config, confidence }
+     * @returns {Object} 분석 결과 { type, config, confidence, metacognitive_needs }
      */
     static async analyzeStudentResponse(userMessage, subject = 'science', conversationHistory = []) {
         try {
@@ -20,6 +22,12 @@ class ResponseAnalyzer {
             const subjectConfig = await SubjectLoader.loadSubjectConfig(subject);
             const responseTypes = subjectConfig.response_types;
             
+            // 메타인지 스캐폴딩 설정 로드
+            const metacognitiveConfig = await this.loadMetacognitiveConfig();
+            
+            // 성찰적 학습 설정 로드
+            const reflectiveConfig = await this.loadReflectiveLearningConfig();
+            
             console.log(`[응답 분석] 로드된 응답 유형들:`, Object.keys(responseTypes));
             
             // 메시지 전처리
@@ -27,7 +35,21 @@ class ResponseAnalyzer {
             
             console.log(`[응답 분석] 전처리된 메시지: "${processedMessage}"`);
             
-            // 각 응답 유형별로 매칭 점수 계산
+            // 1. 메타인지 스캐폴딩 필요성 분석
+            const metacognitiveAnalysis = this.analyzeMetacognitiveNeeds(
+                processedMessage, 
+                conversationHistory, 
+                metacognitiveConfig
+            );
+            
+            // 2. 성찰적 학습 필요성 분석
+            const reflectiveAnalysis = this.analyzeReflectiveLearningNeeds(
+                processedMessage,
+                conversationHistory,
+                reflectiveConfig
+            );
+            
+            // 3. 각 응답 유형별로 매칭 점수 계산
             const matchResults = [];
             
             for (const [typeKey, typeConfig] of Object.entries(responseTypes)) {
@@ -58,6 +80,12 @@ class ResponseAnalyzer {
                 // 맥락 정보 추가
                 const contextualAnalysis = this.addContextualInfo(bestMatch, conversationHistory, subjectConfig);
                 
+                // 메타인지 분석 결과 추가
+                contextualAnalysis.metacognitive_needs = metacognitiveAnalysis;
+                
+                // 성찰적 학습 분석 결과 추가
+                contextualAnalysis.reflective_needs = reflectiveAnalysis;
+                
                 return contextualAnalysis;
             }
             
@@ -70,7 +98,9 @@ class ResponseAnalyzer {
                 context: {
                     isFirstMessage: conversationHistory.length === 0,
                     previousTypes: this.extractPreviousTypes(conversationHistory)
-                }
+                },
+                metacognitive_needs: metacognitiveAnalysis,
+                reflective_needs: reflectiveAnalysis
             };
             
         } catch (error) {
@@ -331,6 +361,366 @@ class ResponseAnalyzer {
         }
         
         return baseActions;
+    }
+    
+    /**
+     * 메타인지 스캐폴딩 설정을 로드합니다
+     * @returns {Object} 메타인지 스캐폴딩 설정
+     */
+    static async loadMetacognitiveConfig() {
+        try {
+            const configPath = path.join(__dirname, '../config/metacognitive_scaffolding.json');
+            const configData = await fs.readFile(configPath, 'utf8');
+            return JSON.parse(configData).metacognitive_scaffolding;
+        } catch (error) {
+            console.warn('메타인지 스캐폴딩 설정 로드 실패:', error.message);
+            return { response_types: {}, conversation_flow_management: {}, adaptive_scaffolding: {} };
+        }
+    }
+    
+    /**
+     * 학생 메시지의 메타인지 스캐폴딩 필요성을 분석합니다
+     * @param {string} message - 전처리된 메시지
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} metacognitiveConfig - 메타인지 스캐폴딩 설정
+     * @returns {Object} 메타인지 분석 결과
+     */
+    static analyzeMetacognitiveNeeds(message, conversationHistory, metacognitiveConfig) {
+        const needs = {
+            requires_diagnosis_first: false,
+            requires_evaluation_prompt: false,
+            requires_problem_specification: false,
+            scaffolding_type: null,
+            student_ability_level: this.assessStudentAbility(message, conversationHistory, metacognitiveConfig),
+            conversation_context: {
+                consecutive_executive_requests: this.countConsecutiveExecutiveRequests(conversationHistory),
+                previous_scaffolding_attempts: this.countPreviousScaffoldingAttempts(conversationHistory),
+                time_since_last_evaluation: this.getTimeSinceLastEvaluation(conversationHistory)
+            }
+        };
+        
+        // 메타인지 응답 유형별 분석
+        const responseTypes = metacognitiveConfig.response_types || {};
+        
+        // 1. 실행적 요청 분석
+        if (responseTypes.EXECUTIVE_REQUEST) {
+            const executiveConfidence = this.calculateMatchConfidence(message, responseTypes.EXECUTIVE_REQUEST.patterns);
+            if (executiveConfidence > 0.5) {
+                needs.requires_diagnosis_first = true;
+                needs.scaffolding_type = 'EXECUTIVE_REQUEST';
+            }
+        }
+        
+        // 2. 막연한 문제 분석
+        if (responseTypes.VAGUE_PROBLEM) {
+            const vagueConfidence = this.calculateMatchConfidence(message, responseTypes.VAGUE_PROBLEM.patterns);
+            if (vagueConfidence > 0.4) {
+                needs.requires_problem_specification = true;
+                needs.scaffolding_type = needs.scaffolding_type || 'VAGUE_PROBLEM';
+            }
+        }
+        
+        // 3. 자기 평가 요청 분석
+        if (responseTypes.SELF_EVALUATION_REQUEST) {
+            const evaluationConfidence = this.calculateMatchConfidence(message, responseTypes.SELF_EVALUATION_REQUEST.patterns);
+            if (evaluationConfidence > 0.3 && conversationHistory.length > 0) {
+                needs.requires_evaluation_prompt = true;
+                needs.scaffolding_type = needs.scaffolding_type || 'SELF_EVALUATION_REQUEST';
+            }
+        }
+        
+        console.log('[메타인지 분석 결과]', needs);
+        return needs;
+    }
+    
+    /**
+     * 학생의 능력 수준을 평가합니다
+     * @param {string} message - 학생 메시지
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} metacognitiveConfig - 메타인지 설정
+     * @returns {string} 'high', 'medium', 'low'
+     */
+    static assessStudentAbility(message, conversationHistory, metacognitiveConfig) {
+        let score = 0;
+        const adaptive = metacognitiveConfig.adaptive_scaffolding || {};
+        
+        // 고능력 지표 확인
+        if (adaptive.high_ability_students) {
+            const highIndicators = adaptive.high_ability_students.indicators || [];
+            highIndicators.forEach(indicator => {
+                if (message.includes(indicator.toLowerCase()) || 
+                    this.checkPatternInHistory(conversationHistory, indicator)) {
+                    score += 2;
+                }
+            });
+        }
+        
+        // 저능력 지표 확인
+        if (adaptive.struggling_students) {
+            const lowIndicators = adaptive.struggling_students.indicators || [];
+            lowIndicators.forEach(indicator => {
+                if (message.includes(indicator.toLowerCase()) || 
+                    this.checkPatternInHistory(conversationHistory, indicator)) {
+                    score -= 1;
+                }
+            });
+        }
+        
+        // 메시지 길이와 복잡성
+        if (message.length > 50 && message.split(' ').length > 10) score += 1;
+        if (message.length < 10) score -= 1;
+        
+        if (score >= 3) return 'high';
+        if (score <= -2) return 'low';
+        return 'medium';
+    }
+    
+    /**
+     * 연속적인 실행적 요청 횟수를 계산합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {number} 연속 실행적 요청 횟수
+     */
+    static countConsecutiveExecutiveRequests(conversationHistory) {
+        let count = 0;
+        for (let i = conversationHistory.length - 1; i >= 0; i--) {
+            const turn = conversationHistory[i];
+            if (turn.role === 'user' && turn.metacognitive_analysis && 
+                turn.metacognitive_analysis.scaffolding_type === 'EXECUTIVE_REQUEST') {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count;
+    }
+    
+    /**
+     * 이전 스캐폴딩 시도 횟수를 계산합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {number} 스캐폴딩 시도 횟수
+     */
+    static countPreviousScaffoldingAttempts(conversationHistory) {
+        return conversationHistory.filter(turn => 
+            turn.role === 'model' && 
+            turn.scaffolding_applied === true
+        ).length;
+    }
+    
+    /**
+     * 마지막 평가 이후 시간을 계산합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {number} 마지막 평가 이후 턴 수
+     */
+    static getTimeSinceLastEvaluation(conversationHistory) {
+        for (let i = conversationHistory.length - 1; i >= 0; i--) {
+            const turn = conversationHistory[i];
+            if (turn.evaluation_requested === true) {
+                return conversationHistory.length - 1 - i;
+            }
+        }
+        return conversationHistory.length;
+    }
+    
+    /**
+     * 대화 이력에서 특정 패턴을 확인합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {string} pattern - 확인할 패턴
+     * @returns {boolean} 패턴 존재 여부
+     */
+    static checkPatternInHistory(conversationHistory, pattern) {
+        const recentTurns = conversationHistory.slice(-3);
+        return recentTurns.some(turn => 
+            turn.role === 'user' && 
+            turn.parts && 
+            turn.parts[0] && 
+            turn.parts[0].text && 
+            turn.parts[0].text.toLowerCase().includes(pattern.toLowerCase())
+        );
+    }
+    
+    /**
+     * 성찰적 학습 설정을 로드합니다
+     * @returns {Object} 성찰적 학습 설정
+     */
+    static async loadReflectiveLearningConfig() {
+        try {
+            const configPath = path.join(__dirname, '../config/reflective_learning.json');
+            const configData = await fs.readFile(configPath, 'utf8');
+            return JSON.parse(configData).reflective_learning;
+        } catch (error) {
+            console.warn('성찰적 학습 설정 로드 실패:', error.message);
+            return { conversation_summary: {}, connection_making: {}, metacognitive_reflection: {} };
+        }
+    }
+    
+    /**
+     * 학생 메시지의 성찰적 학습 필요성을 분석합니다
+     * @param {string} message - 전처리된 메시지
+     * @param {Array} conversationHistory - 대화 이력
+     * @param {Object} reflectiveConfig - 성찰적 학습 설정
+     * @returns {Object} 성찰적 학습 분석 결과
+     */
+    static analyzeReflectiveLearningNeeds(message, conversationHistory, reflectiveConfig) {
+        const needs = {
+            requires_summary: false,
+            requires_connection_making: false,
+            requires_metacognitive_reflection: false,
+            summary_trigger_type: null,
+            conversation_context: {
+                turn_count: conversationHistory.length,
+                topic_progression: this.analyzeTopicProgression(conversationHistory),
+                learning_depth_level: this.assessLearningDepth(message, conversationHistory)
+            },
+            suggested_reflective_actions: []
+        };
+        
+        // 1. 대화 요약 필요성 분석
+        const summaryTriggers = reflectiveConfig.conversation_summary?.trigger_conditions || [];
+        
+        // 턴 수 기반 트리거
+        const turnTrigger = summaryTriggers.find(t => t.type === 'turn_count');
+        if (turnTrigger && conversationHistory.length >= turnTrigger.value) {
+            needs.requires_summary = true;
+            needs.summary_trigger_type = 'turn_count';
+        }
+        
+        // 명시적 요청 트리거
+        const explicitTrigger = summaryTriggers.find(t => t.type === 'explicit_request');
+        if (explicitTrigger && explicitTrigger.patterns) {
+            const explicitConfidence = this.calculateMatchConfidence(message, explicitTrigger.patterns);
+            if (explicitConfidence > 0.4) {
+                needs.requires_summary = true;
+                needs.summary_trigger_type = 'explicit_request';
+            }
+        }
+        
+        // 2. 개념 연결 필요성 분석
+        const connectionPatterns = reflectiveConfig.connection_making?.previous_conversation_references?.patterns || [];
+        if (connectionPatterns.some(pattern => message.includes(pattern))) {
+            needs.requires_connection_making = true;
+            needs.suggested_reflective_actions.push('connect_to_previous_concepts');
+        }
+        
+        // 3. 메타인지적 성찰 필요성 분석
+        const reflectionTriggers = [
+            /어떻게.*했/,
+            /왜.*그렇게/,
+            /처음.*생각/,
+            /다르게.*접근/,
+            /배운.*것/
+        ];
+        
+        const reflectionConfidence = this.calculateMatchConfidence(message, reflectionTriggers.map(r => r.source));
+        if (reflectionConfidence > 0.3 || conversationHistory.length > 8) {
+            needs.requires_metacognitive_reflection = true;
+            needs.suggested_reflective_actions.push('encourage_thinking_process_review');
+        }
+        
+        // 4. 학습 깊이에 따른 성찰 활동 제안
+        const depthLevel = needs.conversation_context.learning_depth_level;
+        if (depthLevel >= 3) {
+            needs.suggested_reflective_actions.push('encourage_application_thinking');
+        }
+        if (depthLevel >= 4) {
+            needs.suggested_reflective_actions.push('encourage_analysis_synthesis');
+        }
+        
+        console.log('[성찰적 학습 분석 결과]', needs);
+        return needs;
+    }
+    
+    /**
+     * 대화에서 주제 진행 양상을 분석합니다
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {Object} 주제 진행 분석 결과
+     */
+    static analyzeTopicProgression(conversationHistory) {
+        if (conversationHistory.length < 3) {
+            return { stage: 'initial', topics: [], transitions: 0 };
+        }
+        
+        // 간단한 주제 변화 감지 (키워드 기반)
+        const scienceKeywords = {
+            energy: ['에너지', '힘', '속도', '운동'],
+            gravity: ['중력', '무게', '떨어지', '높이'],
+            friction: ['마찰', '저항', '표면', '거칠'],
+            motion: ['움직', '굴러', '미끄러', '회전']
+        };
+        
+        let topicTransitions = 0;
+        let currentTopics = [];
+        let previousTopic = null;
+        
+        conversationHistory.slice(-6).forEach(turn => {
+            if (turn.role === 'user' && turn.parts && turn.parts[0]) {
+                const text = turn.parts[0].text.toLowerCase();
+                
+                for (const [topic, keywords] of Object.entries(scienceKeywords)) {
+                    if (keywords.some(keyword => text.includes(keyword))) {
+                        if (previousTopic && previousTopic !== topic) {
+                            topicTransitions++;
+                        }
+                        if (!currentTopics.includes(topic)) {
+                            currentTopics.push(topic);
+                        }
+                        previousTopic = topic;
+                        break;
+                    }
+                }
+            }
+        });
+        
+        return {
+            stage: topicTransitions > 2 ? 'complex' : topicTransitions > 0 ? 'developing' : 'focused',
+            topics: currentTopics,
+            transitions: topicTransitions
+        };
+    }
+    
+    /**
+     * 학생의 학습 깊이 수준을 평가합니다 (Bloom's Taxonomy 기반)
+     * @param {string} message - 학생 메시지
+     * @param {Array} conversationHistory - 대화 이력
+     * @returns {number} 학습 깊이 수준 (1-6)
+     */
+    static assessLearningDepth(message, conversationHistory) {
+        let depth = 1; // 기본값: 기억/회상 수준
+        
+        // Level 2: 이해/이해 (Comprehension)
+        const comprehensionPatterns = [/왜/, /어떻게/, /무슨.*의미/, /.*뜻/];
+        if (comprehensionPatterns.some(pattern => pattern.test(message))) {
+            depth = Math.max(depth, 2);
+        }
+        
+        // Level 3: 적용 (Application)
+        const applicationPatterns = [/다른.*상황/, /만약.*라면/, /.*적용/, /일상.*에서/];
+        if (applicationPatterns.some(pattern => pattern.test(message))) {
+            depth = Math.max(depth, 3);
+        }
+        
+        // Level 4: 분석 (Analysis)
+        const analysisPatterns = [/.*분석/, /요인/, /원인.*결과/, /비교.*하면/, /차이점/];
+        if (analysisPatterns.some(pattern => pattern.test(message))) {
+            depth = Math.max(depth, 4);
+        }
+        
+        // Level 5: 종합 (Synthesis)
+        const synthesisPatterns = [/.*연결/, /결합.*하면/, /새로운.*방법/, /창의.*적/];
+        if (synthesisPatterns.some(pattern => pattern.test(message))) {
+            depth = Math.max(depth, 5);
+        }
+        
+        // Level 6: 평가 (Evaluation)
+        const evaluationPatterns = [/.*평가/, /장단점/, /더.*나은/, /.*비판/, /검증/];
+        if (evaluationPatterns.some(pattern => pattern.test(message))) {
+            depth = Math.max(depth, 6);
+        }
+        
+        // 대화 이력의 복잡성도 고려
+        const historyComplexity = Math.min(Math.floor(conversationHistory.length / 3), 2);
+        depth = Math.min(depth + historyComplexity, 6);
+        
+        return depth;
     }
 }
 
