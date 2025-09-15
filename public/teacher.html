@@ -36,6 +36,44 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+        
+        /* 템플릿 모드 버튼 스타일 */
+        .template-mode-buttons, .edit-template-mode-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .template-mode-btn {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .template-mode-btn:hover {
+            background-color: #e5e7eb;
+            color: #111827;
+        }
+        
+        .template-mode-btn.selected {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+        
+        /* 템플릿 버튼 컨테이너 */
+        .template-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 
@@ -418,7 +456,7 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             과목 선택
                                         </label>
-                                        <select id="lesson-subject-select"
+                                        <select id="lesson-subject"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required>
                                             <option value="">과목을 선택하세요</option>
@@ -437,13 +475,58 @@
                             <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
                         </span>
                     </label>
-                    <textarea id="lesson-ai-instructions-input" rows="5"
+                    
+                    <!-- 사고력 증진 템플릿 선택 영역 -->
+                    <div id="template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-purple-800 flex items-center">
+                                <span class="mr-2">🎯</span>사고력 증진 템플릿 모드
+                            </h4>
+                            <button type="button" id="template-help-btn" class="text-xs text-purple-600 hover:text-purple-800 focus:outline-none">
+                                ❓ 도움말
+                            </button>
+                        </div>
+                        
+                        <!-- 템플릿 모드 버튼 그리드 -->
+                        <div class="template-mode-buttons">
+                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
+                        </div>
+                        
+                        <!-- 선택된 템플릿 정보 표시 -->
+                        <div id="selected-template-info" class="hidden p-3 bg-white border border-purple-200 rounded-md">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h5 id="template-title" class="font-semibold text-purple-800 mb-1"></h5>
+                                    <p id="template-description" class="text-xs text-gray-600 mb-2"></p>
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span id="template-subjects"></span>
+                                        <span id="template-difficulty"></span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-1 ml-2">
+                                    <button id="preview-template-btn" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none" type="button">
+                                        👁 미리보기
+                                    </button>
+                                    <button id="apply-template-btn" class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none" type="button">
+                                        적용하기
+                                    </button>
+                                    <button id="clear-template-btn" class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none" type="button">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <textarea id="lesson-ai-instructions" rows="5"
                         placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
 • 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
-• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
+• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘.
+
+💡 위의 '사고력 증진 템플릿'을 사용하면 전문적인 교육 방법론에 기반한 프롬프트를 쉽게 적용할 수 있습니다!"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
                         <p class="text-xs text-amber-700">
@@ -639,13 +722,55 @@
                             <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
                         </span>
                     </label>
+                    
+                    <!-- 편집 모달 사고력 증진 템플릿 선택 영역 -->
+                    <div id="edit-template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-purple-800 flex items-center">
+                                <span class="mr-2">🎯</span>사고력 증진 템플릿 모드
+                            </h4>
+                        </div>
+                        
+                        <!-- 템플릿 모드 버튼 그리드 -->
+                        <div class="edit-template-mode-buttons">
+                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
+                        </div>
+                        
+                        <!-- 선택된 템플릿 정보 표시 -->
+                        <div id="edit-selected-template-info" class="hidden p-3 bg-white border border-purple-200 rounded-md">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h5 id="edit-template-title" class="font-semibold text-purple-800 mb-1"></h5>
+                                    <p id="edit-template-description" class="text-xs text-gray-600 mb-2"></p>
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span id="edit-template-subjects"></span>
+                                        <span id="edit-template-difficulty"></span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-1 ml-2">
+                                    <button id="edit-preview-template-btn" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none" type="button">
+                                        👁 미리보기
+                                    </button>
+                                    <button id="edit-apply-template-btn" class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none" type="button">
+                                        적용하기
+                                    </button>
+                                    <button id="edit-clear-template-btn" class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none" type="button">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <textarea id="edit-lesson-ai-instructions" rows="5"
                         placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
 • 너는 분수의 나눗셈을 가르치는 수학 선생님이야. 피자나 케이크 같은 구체적인 예시를 들어가며 설명해줘.
-• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘."
+• 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘.
+
+💡 위의 '사고력 증진 템플릿'을 사용하면 전문적인 교육 방법론에 기반한 프롬프트를 쉽게 적용할 수 있습니다!"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
                         <p class="text-xs text-amber-700">
@@ -746,15 +871,21 @@
                                     </div>
                                 </div>
                                 
-                                <div class="flex justify-end space-x-3 pt-4 border-t">
-                                    <button type="button" id="cancel-edit-btn" 
-                                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
-                                        취소
+                                <div class="flex justify-between items-center pt-4 border-t">
+                                    <button type="button" id="delete-lesson-btn" 
+                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium">
+                                        수업 삭제
                                     </button>
-                                    <button type="submit" id="save-lesson-btn"
-                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-                                        수정 완료
-                                    </button>
+                                    <div class="flex space-x-3">
+                                        <button type="button" id="cancel-edit-btn" 
+                                            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
+                                            취소
+                                        </button>
+                                        <button type="submit" id="save-lesson-btn"
+                                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                            수정 완료
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -1111,6 +1242,288 @@
                 'science': '과학',
                 'social': '사회'
             };
+            
+            // 사고력 증진 템플릿 모드 데이터
+            const THINKING_MODES = {
+                inquiry: {
+                    id: 'inquiry',
+                    name: '🔍 탐구 모드',
+                    subtitle: 'Inquiry Mode',
+                    description: '과학적 탐구나 사회 현상 탐구에서 AI가 선배 연구원 역할',
+                    subjects: ['science', 'social'],
+                    difficulty: '중급',
+                    keywords: ['탐구', '관찰', '가설', '실험', '검증'],
+                    template: `**역할**: 너는 호기심 많고 친절한 선배 과학 탐험가야.
+
+**목표**: 학생이 '{학습주제}'에 대해 스스로 탐구 질문을 만들고, 가설을 세우며, 간단한 실험을 설계하여 결론을 내리는 과정을 완성하도록 도와야 해.
+
+**핵심 규칙**:
+1. 절대로 정답을 직접 알려주면 안 돼.
+2. 항상 학생의 관찰과 생각에서 출발해야 해. "무엇을 발견했니?", "왜 그렇게 생각했어?" 와 같이 질문해줘.
+3. 학생이 막막해하면, "다른 조건을 생각해볼까?", "만약 다른 상황이라면 어떻게 될까?" 와 같이 사고를 확장하는 힌트를 질문 형태로 제공해.
+4. 모든 답변은 반드시 학생의 다음 행동이나 생각을 유도하는 질문으로 끝나야 해.
+
+**상호작용 방식**: 학생의 어떤 가설이든 "아주 흥미로운 생각이야!", "그렇게 생각해 볼 수도 있겠구나!" 와 같이 긍정적으로 반응하며 탐구 의욕을 북돋아 줘.
+
+**학습 내용**: 이 탐구의 핵심 개념들을 직접 사용하기보다는 학생이 경험과 관찰을 통해 이 개념들을 스스로 설명하게 유도해줘.`
+                },
+                debate: {
+                    id: 'debate',
+                    name: '💬 토론 모드',
+                    subtitle: 'Debate Mode',
+                    description: '사회적 쟁점이나 문학 해석에서 AI가 중립적 토론 진행자 역할',
+                    subjects: ['social', 'korean'],
+                    difficulty: '고급',
+                    keywords: ['토론', '논리', '근거', '반박', '균형'],
+                    template: `**역할**: 너는 논리적이고 공정한 토론 진행자(모더레이터)야.
+
+**목표**: 학생이 '{학습주제}'라는 논제에 대해 자신의 입장을 정하고, 타당한 근거를 들어 주장을 펼치는 능력을 기르도록 도와야 해.
+
+**핵심 규칙**:
+1. 너의 의견을 드러내지 말고 항상 중립을 지켜야 해.
+2. 학생의 주장에 대해 항상 "왜 그렇게 생각하니? 너의 주장을 뒷받침하는 근거나 예시가 있을까?"라고 질문하며 근거를 요구해야 해.
+3. 학생이 한쪽으로 치우친 주장을 하면, "네 의견과 다른 관점도 있어. 예를 들어..." 와 같이 균형 잡힌 반대 관점을 제시하여 사고를 자극해야 해.
+4. 토론 마지막에는 학생의 주장과 근거를 간략하게 요약해주고, "오늘 토론을 통해 어떤 생각이 더 명확해졌니?"라고 물으며 성찰의 기회를 줘.
+
+**상호작용 방식**: 차분하고 이성적인 말투를 사용하며, 학생의 의견을 존중하는 태도를 보여줘.
+
+**학습 내용**: 이 토론에서 학생들이 다양한 가치를 고려하며 토론하도록 유도해줘.`
+                },
+                problemSolving: {
+                    id: 'problemSolving',
+                    name: '🧩 문제해결 모드',
+                    subtitle: 'Problem-Solving Mode',
+                    description: '수학/코딩 문제에서 AI가 페어 프로그래머나 수학 코치 역할',
+                    subjects: ['math'],
+                    difficulty: '중급',
+                    keywords: ['문제해결', '단계', '계획', '검토', '폴리아'],
+                    template: `**역할**: 너는 친절하고 인내심 있는 수학 문제 해결 코치야. 폴리아의 문제 해결 4단계를 완벽히 이해하고 있어.
+
+**목표**: 학생이 '{학습주제}' 문제를 스스로 풀 수 있도록 도와야 해.
+
+**핵심 규칙**:
+1. 절대 답이나 계산 과정을 직접 보여주면 안 돼. 학생이 계산 실수를 해도 "어디서 틀렸네"라고 말하지 말고, "계산 과정을 다시 한번 차근차근 살펴볼까?"라고 유도해야 해.
+2. 반드시 폴리아의 4단계(문제 이해 → 계획 수립 → 계획 실행 → 반성)에 따라 질문해야 해.
+   - (1단계) "이 문제에서 우리가 구해야 할 것은 무엇이지? 주어진 정보는 무엇이 있을까?"
+   - (2단계) "이 문제를 풀기 위해 어떤 방법부터 시작해볼 수 있을까? 그림을 그려볼까?"
+   - (3단계) "좋은 계획이야. 그 계획대로 한번 차근차근 계산해볼래?"
+   - (4단계) "정답을 구했구나! 어떻게 그 답이 나왔는지 설명해줄 수 있니? 다른 방법은 없을까?"
+
+**상호작용 방식**: 학생이 막막해할 때 "괜찮아, 어려운 문제는 원래 한 번에 풀리지 않아. 우리 함께 단서를 찾아보자" 와 같이 격려하는 말투를 사용해.
+
+**학습 내용**: 이 문제의 핵심 개념들의 관계를 학생이 스스로 발견하도록 질문을 설계해줘.`
+                },
+                creative: {
+                    id: 'creative',
+                    name: '🎨 창작 모드',
+                    subtitle: 'Creative Mode',
+                    description: '글짓기, 그림 그리기 등에서 AI가 영감의 원천 역할',
+                    subjects: ['korean'],
+                    difficulty: '초급',
+                    keywords: ['창작', '상상력', '아이디어', '표현', '영감'],
+                    template: `**역할**: 너는 상상력이 풍부하고 긍정적인 아이디어 파트너야.
+
+**목표**: 학생이 '{학습주제}'라는 주제로 창작 활동을 할 수 있도록 상상력을 자극하고 아이디어를 구체화하는 것을 도와야 해.
+
+**핵심 규칙**:
+1. 절대 학생의 아이디어를 "그건 좀 이상한데" 와 같이 비판하거나 평가하면 안 돼.
+2. 항상 "와, 정말 재미있는 생각이다! 더 자세히 이야기해줄래?" 와 같이 긍정적으로 반응해야 해.
+3. 학생의 이야기가 막히면, 새로운 관점의 질문을 던져줘.
+4. 오감을 활용하는 질문을 던져줘. "그 장소에서는 어떤 소리가 들릴까?", "그때 기분은 어떨까?"
+
+**상호작용 방식**: 즐겁고 유쾌한 말투로 학생의 창의적인 시도를 칭찬하고 격려해줘.
+
+**학습 내용**: 이 활동의 핵심은 논리보다는 '창의성'과 '표현력'이야. 학생이 자유롭게 상상의 나래를 펼치도록 최대한 허용적인 분위기를 만들어줘.`
+                },
+                rolePlaying: {
+                    id: 'rolePlaying',
+                    name: '🎭 역할극 모드',
+                    subtitle: 'Role-Playing Mode',
+                    description: 'AI가 역사적 인물, 전문가 등 특정 역할을 맡아 상호작용',
+                    subjects: ['social', 'korean'],
+                    difficulty: '고급',
+                    keywords: ['역할극', '몰입', '인터뷰', '캐릭터', '상황'],
+                    template: `**역할**: 너는 '{역할설정}' 이야.
+
+**목표**: 학생이 {상대역할}가 되어 너와 상호작용하면서, {학습주제}를 자연스럽게 학습하도록 해야 해.
+
+**핵심 규칙**:
+1. 답변은 반드시 설정된 인물의 말투와 관점에서 해야 해. 현대 기술이나 개념에 대해서는 모르는 척해야 해.
+2. 역사적 사실이나 설정에 기반하여 감정을 담아 대답해야 해.
+3. 갈등 상황이나 어려움에 대한 질문이 나오면, 그 시대의 맥락을 고려하여 대답해.
+4. 학생이 너의 정체(AI)에 대해 물으면, 끝까지 역할을 유지해야 해.
+
+**상호작용 방식**: 설정된 캐릭터에 맞는 어조와 감정을 사용해줘.
+
+**학습 내용**: 핵심 학습 내용이 대화 속에 자연스럽게 녹아나도록 해줘.
+
+**추가 설정 필요**: 구체적인 역할, 시대 배경, 학습 목표를 명시해주세요.`
+                },
+                flipped: {
+                    id: 'flipped',
+                    name: '🧑‍🏫 거꾸로 학습 모드',
+                    subtitle: 'Flipped Learning Mode',
+                    description: '학생이 선생님, AI가 학생이 되어 역할을 바꾼 학습',
+                    subjects: ['science', 'math', 'social', 'korean'],
+                    difficulty: '고급',
+                    keywords: ['메타인지', '설명', '역할전환', '이해점검', '구조화'],
+                    template: `**역할**: 너는 오늘 배울 내용에 대해 아무런 사전 지식이 없는, 총명하고 호기심 많은 학생이야. 너의 유일한 목표는 학생 선생님의 설명을 듣고 완벽하게 이해하는 것이야.
+
+**목표**: 학생이 '{학습주제}'에 대해 다른 사람에게 설명하는 과정을 통해, 자신의 이해도를 스스로 점검하고 지식을 완벽하게 내재화하도록 도와야 해.
+
+**핵심 규칙**:
+1. 너는 학생 선생님보다 더 많이 알아서는 안 돼. 절대로 학생이 설명하지 않은 새로운 개념이나 정보를 먼저 이야기하면 안 돼.
+2. 학생의 설명이 불분명하거나 논리적으로 건너뛰는 부분이 있으면, 순진하게 이해가 안 된다는 듯이 질문해야 해.
+3. 추상적인 설명이 나오면 반드시 구체적인 예시를 요구해야 해.
+4. 중간중간 자신이 이해한 내용을 요약하며 맞는지 확인해야 해.
+5. 끝까지 너는 배우는 학생의 역할을 유지해야 하며, 학생의 설명을 평가하거나 가르치려 들면 안 돼.
+
+**상호작용 방식**: 항상 존댓말을 사용하며, 학생 선생님의 설명에 "아, 그렇구나!", "정말 설명 잘한다!" 와 같이 감탄하고 긍정적인 피드백을 주어 학생의 자신감을 북돋아 줘.
+
+**학습 내용**: 학생이 핵심 내용을 명확히 설명할 수 있는지 확인하는 데 모든 질문을 집중해줘.`
+                }
+            };
+            
+            // 템플릿 관리 클래스
+            class TemplateManager {
+                constructor() {
+                    this.currentSubject = null;
+                    this.currentMode = null;
+                    this.targetTextarea = null;
+                }
+                
+                // 과목에 맞는 템플릿 모드들을 필터링
+                getModesForSubject(subject) {
+                    if (!subject) return Object.values(THINKING_MODES);
+                    return Object.values(THINKING_MODES).filter(mode => 
+                        mode.subjects.includes(subject)
+                    );
+                }
+                
+                // 템플릿 모드 버튼들을 렌더링
+                renderModeButtons(containerSelector, subject, targetTextarea) {
+                    const container = document.querySelector(containerSelector);
+                    if (!container) return;
+                    
+                    this.currentSubject = subject;
+                    this.targetTextarea = targetTextarea;
+                    
+                    const modes = this.getModesForSubject(subject);
+                    
+                    container.innerHTML = modes.map(mode => `
+                        <button type="button" class="template-mode-btn" 
+                                data-mode-id="${mode.id}"
+                                title="${mode.description}">
+                            ${mode.name}
+                        </button>
+                    `).join('');
+                    
+                    // 버튼 클릭 이벤트 추가
+                    container.querySelectorAll('.template-mode-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const modeId = e.target.dataset.modeId;
+                            this.selectMode(modeId);
+                        });
+                    });
+                }
+                
+                // 모드 선택
+                selectMode(modeId) {
+                    this.currentMode = THINKING_MODES[modeId];
+                    
+                    // 모든 버튼에서 선택 상태 제거
+                    document.querySelectorAll('.template-mode-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    // 현재 선택된 버튼에 선택 상태 추가
+                    document.querySelectorAll(`[data-mode-id="${modeId}"]`).forEach(btn => {
+                        btn.classList.add('selected');
+                    });
+                    
+                    console.log('템플릿 모드 선택됨:', this.currentMode.name);
+                    
+                    // 바로 템플릿 적용
+                    this.applySelectedTemplate();
+                }
+                
+                // 선택된 템플릿을 텍스트영역에 적용
+                applySelectedTemplate() {
+                    if (!this.currentMode || !this.targetTextarea) {
+                        alert('먼저 템플릿 모드를 선택해주세요.');
+                        return false;
+                    }
+                    
+                    const textarea = document.querySelector(this.targetTextarea);
+                    if (!textarea) {
+                        console.error('대상 텍스트영역을 찾을 수 없습니다:', this.targetTextarea);
+                        return false;
+                    }
+                    
+                    // 기존 내용이 있으면 확인
+                    if (textarea.value.trim() && !confirm('기존 내용을 덮어쓸까요?')) {
+                        return false;
+                    }
+                    
+                    textarea.value = this.currentMode.template;
+                    
+                    // 텍스트영역 크기 자동 조정 (있다면)
+                    if (textarea.style.height) {
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                    }
+                    
+                    alert(`"${this.currentMode.name}" 템플릿이 적용되었습니다!`);
+                    return true;
+                }
+                
+                // 현재 텍스트영역 내용 지우기
+                clearContent() {
+                    if (!this.targetTextarea) {
+                        alert('텍스트영역을 선택할 수 없습니다.');
+                        return;
+                    }
+                    
+                    const textarea = document.querySelector(this.targetTextarea);
+                    if (!textarea) {
+                        console.error('대상 텍스트영역을 찾을 수 없습니다:', this.targetTextarea);
+                        return;
+                    }
+                    
+                    if (!textarea.value.trim()) {
+                        alert('지울 내용이 없습니다.');
+                        return;
+                    }
+                    
+                    if (confirm('현재 내용을 모두 지울까요?')) {
+                        textarea.value = '';
+                        // 선택된 모드도 해제
+                        document.querySelectorAll('.template-mode-btn').forEach(btn => {
+                            btn.classList.remove('selected');
+                        });
+                        this.currentMode = null;
+                    }
+                }
+                
+                // 템플릿 미리보기 (추후 모달용)
+                previewTemplate(modeId) {
+                    const mode = THINKING_MODES[modeId];
+                    if (!mode) return null;
+                    
+                    return {
+                        title: mode.name,
+                        subtitle: mode.subtitle,
+                        description: mode.description,
+                        difficulty: mode.difficulty,
+                        subjects: mode.subjects.map(s => subjectNames[s] || s).join(', '),
+                        keywords: mode.keywords.join(', '),
+                        template: mode.template
+                    };
+                }
+            }
+            
+            // 전역 템플릿 매니저 인스턴스
+            const templateManager = new TemplateManager();
 
             // 과목별 응답 유형 로드 및 탭 생성
             async function loadSubjectResponseTypes(subject) {
@@ -2095,8 +2508,8 @@
             // 수업 관리 관련 요소들
             const createLessonForm = document.getElementById('create-lesson-form');
             const lessonTitleInput = document.getElementById('lesson-title-input');
-            const lessonSubjectSelect = document.getElementById('lesson-subject-select');
-            const lessonAiInstructionsInput = document.getElementById('lesson-ai-instructions-input');
+            const lessonSubjectSelect = document.getElementById('lesson-subject');
+            const lessonAiInstructionsInput = document.getElementById('lesson-ai-instructions');
             const lessonStudentDescriptionInput = document.getElementById('lesson-student-description-input');
             const createLessonBtn = document.getElementById('create-lesson-btn');
             const refreshLessonsBtn = document.getElementById('refresh-lessons-btn');
@@ -2590,6 +3003,51 @@
             });
 
             // 수업 편집 모달 이벤트 핸들러들
+            
+            // 수업 삭제 버튼
+            const deleteLessonBtn = document.getElementById('delete-lesson-btn');
+            deleteLessonBtn.addEventListener('click', async () => {
+                const lessonId = editLessonIdInput.value;
+                const lessonTitle = editLessonTitleInput.value;
+                
+                if (!lessonId) {
+                    showStatus('수업 ID를 찾을 수 없습니다.', 'error');
+                    return;
+                }
+                
+                // 삭제 확인
+                const confirmMessage = `정말로 "${lessonTitle}" 수업을 삭제하시게습니까?\n\n삭제된 수업은 복구할 수 없습니다.`;
+                
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                try {
+                    deleteLessonBtn.textContent = '삭제 중...';
+                    deleteLessonBtn.disabled = true;
+                    
+                    // deleteLesson Firebase Function 호출
+                    const deleteLesson = httpsCallable(functions, 'deleteLesson');
+                    await deleteLesson({ lessonId });
+                    
+                    showStatus('수업이 성공적으로 삭제되었습니다!', 'success');
+                    
+                    // 모달 닫기
+                    editLessonModal.classList.add('hidden');
+                    editTempResources = []; // 임시 자료 배열 초기화
+                    renderEditResources(); // 자료 목록 UI 초기화
+                    
+                    // 수업 목록 새로고침
+                    await loadLessons();
+                    
+                } catch (error) {
+                    console.error('수업 삭제 실패:', error);
+                    showStatus(`수업 삭제 실패: ${error.message}`, 'error');
+                } finally {
+                    deleteLessonBtn.textContent = '수업 삭제';
+                    deleteLessonBtn.disabled = false;
+                }
+            });
             
             // 편집 모달 닫기 버튼
             closeEditModalBtn.addEventListener('click', () => {
@@ -3680,6 +4138,103 @@
                     }
                 });
             }
+
+            // 템플릿 적용 함수들
+            function applyTemplate() {
+                templateManager.applySelectedTemplate();
+            }
+            
+            function clearTemplate() {
+                templateManager.clearContent();
+            }
+            
+            // 수업 생성/편집 시 템플릿 UI 초기화
+            function initTemplateUI() {
+                console.log('템플릿 UI 초기화 시작');
+                
+                // 수업 생성 폼의 템플릿 버튼들에 이벤트 연결
+                const createApplyBtn = document.getElementById('apply-template-btn');
+                const createClearBtn = document.getElementById('clear-template-btn');
+                
+                if (createApplyBtn) {
+                    createApplyBtn.addEventListener('click', applyTemplate);
+                    console.log('수업 생성 템플릿 적용 버튼 이벤트 연결됨');
+                }
+                
+                if (createClearBtn) {
+                    createClearBtn.addEventListener('click', clearTemplate);
+                    console.log('수업 생성 템플릿 클리어 버튼 이벤트 연결됨');
+                }
+                
+                // 수업 편집 폼의 템플릿 버튼들에 이벤트 연결
+                const editApplyBtn = document.getElementById('edit-apply-template-btn');
+                const editClearBtn = document.getElementById('edit-clear-template-btn');
+                
+                if (editApplyBtn) {
+                    editApplyBtn.addEventListener('click', applyTemplate);
+                    console.log('수업 편집 템플릿 적용 버튼 이벤트 연결됨');
+                }
+                
+                if (editClearBtn) {
+                    editClearBtn.addEventListener('click', clearTemplate);
+                    console.log('수업 편집 템플릿 클리어 버튼 이벤트 연결됨');
+                }
+                
+                // 과목 변경 시 템플릿 모드 버튼들 업데이트
+                const lessonSubjectSelect = document.getElementById('lesson-subject');
+                const editLessonSubjectSelect = document.getElementById('edit-lesson-subject');
+                
+                if (lessonSubjectSelect) {
+                    console.log('수업 과목 선택 요소를 찾았음');
+                    
+                    lessonSubjectSelect.addEventListener('change', (e) => {
+                        const subject = e.target.value;
+                        console.log('과목 변경됨:', subject);
+                        templateManager.renderModeButtons(
+                            '.template-mode-buttons',
+                            subject,
+                            '#lesson-ai-instructions'
+                        );
+                    });
+                    
+                    // 초기 로드 시 현재 선택된 과목으로 템플릿 버튼들 생성
+                    const currentSubject = lessonSubjectSelect.value;
+                    if (currentSubject) {
+                        console.log('초기 과목으로 템플릿 버튼 생성:', currentSubject);
+                        templateManager.renderModeButtons(
+                            '.template-mode-buttons',
+                            currentSubject,
+                            '#lesson-ai-instructions'
+                        );
+                    }
+                } else {
+                    console.log('수업 과목 선택 요소를 찾을 수 없음');
+                }
+                
+                if (editLessonSubjectSelect) {
+                    console.log('수업 편집 과목 선택 요소를 찾았음');
+                    
+                    editLessonSubjectSelect.addEventListener('change', (e) => {
+                        const subject = e.target.value;
+                        console.log('편집 모달 과목 변경됨:', subject);
+                        templateManager.renderModeButtons(
+                            '.edit-template-mode-buttons',
+                            subject,
+                            '#edit-lesson-ai-instructions'
+                        );
+                    });
+                } else {
+                    console.log('수업 편집 과목 선택 요소를 찾을 수 없음');
+                }
+                
+                console.log('템플릿 UI 초기화 완료');
+            }
+            
+            // DOMContentLoaded 이벤트에서 템플릿 UI 초기화
+            document.addEventListener('DOMContentLoaded', function() {
+                // 페이지 로드 후 약간의 지연을 두고 초기화 (다른 초기화가 완료된 후)
+                setTimeout(initTemplateUI, 500);
+            });
 
             // 기존 loadTeacherInfo 함수 수정하여 섹션별 UI 업데이트
             const originalLoadTeacherInfo = loadTeacherInfo;

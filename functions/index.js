@@ -1432,3 +1432,99 @@ exports.deleteSession = onCall(async (request) => {
     }
 });
 
+// 수업 삭제 함수
+exports.deleteLesson = onCall(async (request) => {
+    const { data, auth } = request;
+    const { lessonId } = data;
+    
+    if (!auth) {
+      throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    if (!lessonId) {
+      throw new HttpsError('invalid-argument', '수업 ID가 필요합니다.');
+    }
+    
+    try {
+      const userId = auth.uid;
+      
+      // 수업 문서 가져오기
+      const lessonDoc = await db.collection('lessons').doc(lessonId).get();
+      
+      if (!lessonDoc.exists) {
+        throw new HttpsError('not-found', '수업을 찾을 수 없습니다.');
+      }
+      
+      const lessonData = lessonDoc.data();
+      
+      // 교사 권한 확인 - 수업을 생성한 교사인지 확인
+      const teacherSnapshot = await db.collection('teacher_keys')
+        .where('userId', '==', userId)
+        .limit(1)
+        .get();
+        
+      if (teacherSnapshot.empty) {
+        throw new HttpsError('permission-denied', '교사 정보를 찾을 수 없습니다.');
+      }
+      
+      const teacherDoc = teacherSnapshot.docs[0];
+      const teacherCode = teacherDoc.id;
+      
+      // 해당 수업이 이 교사가 생성한 것인지 확인
+      if (lessonData.teacherCode !== teacherCode) {
+        throw new HttpsError('permission-denied', '이 수업을 삭제할 권한이 없습니다.');
+      }
+      
+      // 일괄 삭제를 위한 batch 생성
+      const batch = db.batch();
+      
+      // 1. 해당 수업과 관련된 모든 대화 기록 삭제
+      const conversationsSnapshot = await db.collection('conversations')
+        .where('lessonId', '==', lessonId)
+        .get();
+      
+      conversationsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // 2. 해당 수업과 관련된 모든 세션 삭제
+      const sessionsSnapshot = await db.collection('sessions')
+        .where('lessonCode', '==', lessonData.lessonCode)
+        .get();
+      
+      sessionsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // 3. 해당 수업과 관련된 분석 결과 삭제
+      const analysesSnapshot = await db.collection('conversation_analyses')
+        .where('lessonId', '==', lessonId)
+        .get();
+      
+      analysesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // 4. 수업 자체 삭제
+      batch.delete(lessonDoc.ref);
+      
+      // 일괄 삭제 실행
+      await batch.commit();
+      
+      console.log(`수업 '${lessonData.title}' (ID: ${lessonId})이 성공적으로 삭제되었습니다.`);
+      
+      return {
+        success: true,
+        message: '수업이 성공적으로 삭제되었습니다.',
+        deletedLessonTitle: lessonData.title
+      };
+      
+    } catch (error) {
+      console.error("수업 삭제 오류:", error);
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      throw new HttpsError('internal', '수업 삭제 중 오류가 발생했습니다.');
+    }
+});
+
