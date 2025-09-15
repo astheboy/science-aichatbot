@@ -1528,3 +1528,366 @@ exports.deleteLesson = onCall(async (request) => {
     }
 });
 
+// 수업별 종합 분석 리포트 생성
+exports.generateLessonSummaryReport = onCall(async (request) => {
+    const { data, auth } = request;
+    const { lessonId } = data;
+    
+    if (!auth) {
+        throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    if (!lessonId) {
+        throw new HttpsError('invalid-argument', '수업 ID가 필요합니다.');
+    }
+    
+    try {
+        const userId = auth.uid;
+        
+        // 교사 인증 및 수업 검증
+        const teacherSnapshot = await db.collection('teacher_keys')
+            .where('userId', '==', userId)
+            .limit(1)
+            .get();
+            
+        if (teacherSnapshot.empty) {
+            throw new HttpsError('permission-denied', '교사 정보를 찾을 수 없습니다.');
+        }
+        
+        const teacherDoc = teacherSnapshot.docs[0];
+        const teacherCode = teacherDoc.id;
+        
+        // 수업 정보 가져오기
+        const lessonDoc = await db.collection('lessons').doc(lessonId).get();
+        if (!lessonDoc.exists) {
+            throw new HttpsError('not-found', '수업을 찾을 수 없습니다.');
+        }
+        
+        const lessonData = lessonDoc.data();
+        
+        // 수업 권한 확인
+        if (lessonData.teacherCode !== teacherCode) {
+            throw new HttpsError('permission-denied', '이 수업에 대한 접근 권한이 없습니다.');
+        }
+        
+        // 해당 수업의 모든 대화 기록 가져오기
+        const conversationsSnapshot = await db.collection('conversations')
+            .where('lessonId', '==', lessonId)
+            .orderBy('timestamp', 'asc')
+            .get();
+            
+        const conversations = conversationsSnapshot.docs.map(doc => doc.data());
+        
+        if (conversations.length === 0) {
+            return {
+                success: true,
+                report: {
+                    lessonTitle: lessonData.title,
+                    subject: lessonData.subject,
+                    totalStudents: 0,
+                    totalConversations: 0,
+                    summary: '이 수업에서는 아직 학생 대화가 없습니다.'
+                }
+            };
+        }
+        
+        // 학생별 통계 생성
+        const studentStats = {};
+        let totalMessages = 0;
+        
+        conversations.forEach(conv => {
+            if (!studentStats[conv.studentName]) {
+                studentStats[conv.studentName] = {
+                    messageCount: 0,
+                    sessions: new Set(),
+                    responseTypes: {},
+                    firstActivity: conv.timestamp,
+                    lastActivity: conv.timestamp
+                };
+            }
+            
+            const student = studentStats[conv.studentName];
+            student.messageCount++;
+            if (conv.sessionId) student.sessions.add(conv.sessionId);
+            if (conv.responseType) {
+                student.responseTypes[conv.responseType] = (student.responseTypes[conv.responseType] || 0) + 1;
+            }
+            
+            // 시간 업데이트
+            if (conv.timestamp < student.firstActivity) student.firstActivity = conv.timestamp;
+            if (conv.timestamp > student.lastActivity) student.lastActivity = conv.timestamp;
+            
+            totalMessages++;
+        });
+        
+        // AI를 이용한 종합 분석 생성
+        const analysisPrompt = `다음은 "${lessonData.title}" 수업에서 ${Object.keys(studentStats).length}명의 학생들이 AI 튜터와 나눠 대화 내용의 요약입니다.
+
+**수업 정보:**
+- 과목: ${lessonData.subject}
+- 수업명: ${lessonData.title}
+- 참여 학생 수: ${Object.keys(studentStats).length}명
+- 총 대화 횟수: ${totalMessages}회
+
+**학생별 참여 현황:**
+${Object.entries(studentStats).map(([name, stats]) => 
+`- ${name}: ${stats.messageCount}개 대화, ${stats.sessions.size}개 세션`
+).join('\n')}
+
+**대화 예시 (최근 5개):**
+${conversations.slice(-5).map(conv => 
+`[${conv.studentName}] ${conv.userMessage.substring(0, 100)}...\n[AI] ${conv.aiResponse.substring(0, 100)}...`
+).join('\n\n')}
+
+위 데이터를 바탕으로 다음 형식으로 교사를 위한 종합 분석 보고서를 작성해주세요:
+
+## 🏆 수업 성과 요약
+- 참여도 평가
+- 학습 목표 달성도
+
+## 📊 주요 발견 사항
+- 공통적으로 잘 이해한 개념
+- 많은 학생들이 어려워한 부분
+
+## 🎆 개별 지도 제언
+- 우수 학생 (3명 이하)
+- 집중 지도 필요 학생 (3명 이하)
+
+## 🚀 다음 수업 개선 제언
+- 교수법 개선 방안
+- 추가 설명이 필요한 개념
+
+각 항목을 구체적이고 실용적으로 작성해주세요.`;
+        
+        // Gemini API 호출
+        const model = genAI.getGenerativeModel({ model: lessonData.modelName || 'gemini-2.0-flash-lite' });
+        const result = await model.generateContent(analysisPrompt);
+        const analysis = result.response.text();
+        
+        const report = {
+            lessonId,
+            lessonTitle: lessonData.title,
+            subject: lessonData.subject,
+            createdAt: lessonData.createdAt,
+            totalStudents: Object.keys(studentStats).length,
+            totalConversations: totalMessages,
+            totalSessions: new Set(conversations.map(c => c.sessionId)).size,
+            studentStats: Object.entries(studentStats).map(([name, stats]) => ({
+                studentName: name,
+                messageCount: stats.messageCount,
+                sessionCount: stats.sessions.size,
+                topResponseTypes: Object.entries(stats.responseTypes)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 3)
+                    .map(([type, count]) => ({ type, count })),
+                participationDuration: stats.lastActivity - stats.firstActivity
+            })),
+            aiAnalysis: analysis,
+            generatedAt: new Date().toISOString()
+        };
+        
+        // 분석 결과를 데이터베이스에 저장
+        await db.collection('lesson_summary_reports').doc(lessonId).set(report);
+        
+        return {
+            success: true,
+            report
+        };
+        
+    } catch (error) {
+        console.error('수업 종합 분석 오류:', error);
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError('internal', '수업 분석 중 오류가 발생했습니다.');
+    }
+});
+
+// 전체 수업 데이터 다운로드
+exports.exportAllLessonsData = onCall(async (request) => {
+    const { data, auth } = request;
+    
+    if (!auth) {
+        throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    try {
+        const userId = auth.uid;
+        
+        // 교사 인증
+        const teacherSnapshot = await db.collection('teacher_keys')
+            .where('userId', '==', userId)
+            .limit(1)
+            .get();
+            
+        if (teacherSnapshot.empty) {
+            throw new HttpsError('permission-denied', '교사 정보를 찾을 수 없습니다.');
+        }
+        
+        const teacherDoc = teacherSnapshot.docs[0];
+        const teacherCode = teacherDoc.id;
+        
+        // 교사의 모든 수업 가져오기
+        const lessonsSnapshot = await db.collection('lessons')
+            .where('teacherCode', '==', teacherCode)
+            .orderBy('createdAt', 'desc')
+            .get();
+            
+        const allData = [];
+        
+        for (const lessonDoc of lessonsSnapshot.docs) {
+            const lessonData = lessonDoc.data();
+            const lessonId = lessonDoc.id;
+            
+            // 각 수업의 대화 기록 가져오기
+            const conversationsSnapshot = await db.collection('conversations')
+                .where('lessonId', '==', lessonId)
+                .orderBy('timestamp', 'asc')
+                .get();
+                
+            conversationsSnapshot.docs.forEach(convDoc => {
+                const convData = convDoc.data();
+                allData.push({
+                    수업ID: lessonId,
+                    수업명: lessonData.title,
+                    과목: lessonData.subject,
+                    수업생성일: lessonData.createdAt ? new Date(lessonData.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '',
+                    학생명: convData.studentName,
+                    세션ID: convData.sessionId,
+                    대화시간: convData.timestamp ? new Date(convData.timestamp.seconds * 1000).toLocaleString('ko-KR') : '',
+                    사용자메시지: convData.userMessage,
+                    AI응답: convData.aiResponse,
+                    응답유형: convData.responseType || '',
+                    대화번호: convData.conversationLength || 0
+                });
+            });
+        }
+        
+        return {
+            success: true,
+            data: allData,
+            totalRecords: allData.length,
+            exportedAt: new Date().toISOString()
+        };
+        
+    } catch (error) {
+        console.error('전체 데이터 내보내기 오류:', error);
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError('internal', '데이터 내보내기 중 오류가 발생했습니다.');
+    }
+});
+
+// 학생 참여도 분석 보고서 생성
+exports.generateParticipationReport = onCall(async (request) => {
+    const { data, auth } = request;
+    
+    if (!auth) {
+        throw new HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+    
+    try {
+        const userId = auth.uid;
+        
+        // 교사 인증
+        const teacherSnapshot = await db.collection('teacher_keys')
+            .where('userId', '==', userId)
+            .limit(1)
+            .get();
+            
+        if (teacherSnapshot.empty) {
+            throw new HttpsError('permission-denied', '교사 정보를 찾을 수 없습니다.');
+        }
+        
+        const teacherDoc = teacherSnapshot.docs[0];
+        const teacherCode = teacherDoc.id;
+        
+        // 교사의 모든 수업 가져오기
+        const lessonsSnapshot = await db.collection('lessons')
+            .where('teacherCode', '==', teacherCode)
+            .orderBy('createdAt', 'desc')
+            .get();
+            
+        const participationData = [];
+        
+        for (const lessonDoc of lessonsSnapshot.docs) {
+            const lessonData = lessonDoc.data();
+            const lessonId = lessonDoc.id;
+            
+            // 각 수업의 세션 데이터 가져오기
+            const sessionsSnapshot = await db.collection('sessions')
+                .where('lessonCode', '==', lessonData.lessonCode)
+                .get();
+                
+            const studentParticipation = {};
+            
+            for (const sessionDoc of sessionsSnapshot.docs) {
+                const sessionData = sessionDoc.data();
+                const studentName = sessionData.studentName;
+                
+                if (!studentParticipation[studentName]) {
+                    studentParticipation[studentName] = {
+                        학생명: studentName,
+                        세션수: 0,
+                        총대화수: 0,
+                        총참여시간: 0,
+                        첫번째접속: null,
+                        마지막접속: null
+                    };
+                }
+                
+                const student = studentParticipation[studentName];
+                student.세션수++;
+                student.총대화수 += sessionData.messageCount || 0;
+                
+                // 시간 계산 (마지막 활동 시간 - 세션 생성 시간)
+                if (sessionData.lastActive && sessionData.createdAt) {
+                    const duration = sessionData.lastActive.seconds - sessionData.createdAt.seconds;
+                    student.총참여시간 += Math.max(0, duration);
+                }
+                
+                // 첫번째/마지막 접속 시간 업데이트
+                const sessionTime = sessionData.createdAt;
+                if (sessionTime) {
+                    if (!student.첫번째접속 || sessionTime.seconds < student.첫번째접속.seconds) {
+                        student.첫번째접속 = sessionTime;
+                    }
+                    if (!student.마지막접속 || sessionTime.seconds > student.마지막접속.seconds) {
+                        student.마지막접속 = sessionTime;
+                    }
+                }
+            }
+            
+            // 수업별 참여도 데이터 추가
+            Object.values(studentParticipation).forEach(student => {
+                participationData.push({
+                    수업ID: lessonId,
+                    수업명: lessonData.title,
+                    과목: lessonData.subject,
+                    수업생성일: lessonData.createdAt ? new Date(lessonData.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '',
+                    ...student,
+                    평균대화수: student.세션수 > 0 ? Math.round(student.총대화수 / student.세션수 * 10) / 10 : 0,
+                    평균참여시간: student.세션수 > 0 ? Math.round(student.총참여시간 / student.세션수 / 60 * 10) / 10 : 0, // 분 단위
+                    첫번째접속시간: student.첫번째접속 ? new Date(student.첫번째접속.seconds * 1000).toLocaleString('ko-KR') : '',
+                    마지막접속시간: student.마지막접속 ? new Date(student.마지막접속.seconds * 1000).toLocaleString('ko-KR') : ''
+                });
+            });
+        }
+        
+        return {
+            success: true,
+            data: participationData,
+            totalRecords: participationData.length,
+            exportedAt: new Date().toISOString()
+        };
+        
+    } catch (error) {
+        console.error('참여도 보고서 생성 오류:', error);
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError('internal', '참여도 보고서 생성 중 오류가 발생했습니다.');
+    }
+});
+
