@@ -75,6 +75,46 @@
             margin-top: 0.5rem;
         }
     </style>
+    
+    <style>
+        /* 템플릿 모드 버튼 스타일링 */
+        .template-mode-buttons, .edit-template-mode-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .template-mode-btn {
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            color: #374151;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .template-mode-btn:hover {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .template-mode-btn.selected {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-color: #7c3aed;
+            color: white;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .template-mode-btn.selected:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -477,10 +517,10 @@
                     </label>
                     
                     <!-- 사고력 증진 템플릿 선택 영역 -->
-                    <div id="template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                    <div id="template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
                         <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-sm font-semibold text-purple-800 flex items-center">
-                                <span class="mr-2">🎯</span>사고력 증진 템플릿 모드
+                            <h4 id="template-mode-title" class="text-sm font-semibold text-purple-800 flex items-center">
+                                <span class="mr-2">🎯</span>템플릿을 선택하세요
                             </h4>
                             <button type="button" id="template-help-btn" class="text-xs text-purple-600 hover:text-purple-800 focus:outline-none">
                                 ❓ 도움말
@@ -724,10 +764,10 @@
                     </label>
                     
                     <!-- 편집 모달 사고력 증진 템플릿 선택 영역 -->
-                    <div id="edit-template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                    <div id="edit-template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
                         <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-sm font-semibold text-purple-800 flex items-center">
-                                <span class="mr-2">🎯</span>사고력 증진 템플릿 모드
+                            <h4 id="edit-template-mode-title" class="text-sm font-semibold text-purple-800 flex items-center">
+                                <span class="mr-2">🎯</span>템플릿을 선택하세요
                             </h4>
                         </div>
                         
@@ -1402,13 +1442,22 @@
                 
                 // 템플릿 모드 버튼들을 렌더링
                 renderModeButtons(containerSelector, subject, targetTextarea) {
+                    console.log('renderModeButtons 호출됨:', { containerSelector, subject, targetTextarea });
+                    
                     const container = document.querySelector(containerSelector);
-                    if (!container) return;
+                    if (!container) {
+                        console.error('컨테이너를 찾을 수 없습니다:', containerSelector);
+                        return;
+                    }
                     
                     this.currentSubject = subject;
                     this.targetTextarea = targetTextarea;
                     
+                    // 템플릿 섹션 표시/숨김 및 제목 업데이트
+                    this.updateTemplateSection(containerSelector, subject);
+                    
                     const modes = this.getModesForSubject(subject);
+                    console.log('과목별 템플릿 모드:', modes.length, '개');
                     
                     container.innerHTML = modes.map(mode => `
                         <button type="button" class="template-mode-btn" 
@@ -1425,6 +1474,42 @@
                             this.selectMode(modeId);
                         });
                     });
+                }
+                
+                // 템플릿 섹션 표시/숨김 및 제목 업데이트
+                updateTemplateSection(containerSelector, subject) {
+                    const subjectTitles = {
+                        'korean': '국어 템플릿 모드',
+                        'math': '수학 템플릿 모드', 
+                        'science': '과학 탐구 템플릿 모드',
+                        'social': '사회 탐구 템플릿 모드'
+                    };
+                    
+                    // 컨테이너에 따라 적절한 섹션과 제목 요소 찾기
+                    let templateSection, titleElement;
+                    
+                    if (containerSelector.includes('edit-template')) {
+                        templateSection = document.getElementById('edit-template-mode-section');
+                        titleElement = document.getElementById('edit-template-mode-title');
+                    } else {
+                        templateSection = document.getElementById('template-mode-section');
+                        titleElement = document.getElementById('template-mode-title');
+                    }
+                    
+                    if (!templateSection || !titleElement) {
+                        console.error('템플릿 섹션 요소를 찾을 수 없습니다');
+                        return;
+                    }
+                    
+                    if (subject && this.getModesForSubject(subject).length > 0) {
+                        // 과목이 선택되고 해당 과목에 템플릿이 있으면 섹션 표시
+                        templateSection.classList.remove('hidden');
+                        titleElement.innerHTML = `<span class="mr-2">🎯</span>${subjectTitles[subject] || '템플릿 모드'}`;
+                    } else {
+                        // 과목이 선택되지 않았거나 해당 과목에 템플릿이 없으면 섹션 숨김
+                        templateSection.classList.add('hidden');
+                        titleElement.innerHTML = `<span class="mr-2">🎯</span>템플릿을 선택하세요`;
+                    }
                 }
                 
                 // 모드 선택
@@ -3900,6 +3985,15 @@
                     editTempResources = Array.isArray(lesson.resources) ? [...lesson.resources] : [];
                     console.log('editTempResources에 로드된 자료:', editTempResources);
                     renderEditResources();
+                    
+                    // 편집 모달에서 템플릿 UI 초기화 (과목에 맞는 템플릿 버튼들 표시)
+                    if (subject && templateManager) {
+                        templateManager.renderModeButtons(
+                            '.edit-template-mode-buttons',
+                            subject,
+                            '#edit-lesson-ai-instructions'
+                        );
+                    }
                     
                     // 편집 모달 표시
                     editLessonModal.classList.remove('hidden');
