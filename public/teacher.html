@@ -1021,36 +1021,10 @@
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <h2 class="text-lg font-semibold text-gray-800">수업 선택</h2>
-                                    <div class="flex items-center space-x-2">
-                                        <div class="relative" id="bulk-download-dropdown">
-                                            <button id="bulk-download-btn" class="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 font-medium flex items-center space-x-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                </svg>
-                                                <span>일괄 다운로드</span>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                                </svg>
-                                            </button>
-                                            <div id="bulk-download-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
-                                                <div class="py-1">
-                                                    <a href="#" id="download-all-lessons" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                        📊 전체 수업 데이터 (CSV)
-                                                    </a>
-                                                    <a href="#" id="download-lesson-summary" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                        📋 수업별 요약 보고서
-                                                    </a>
-                                                    <a href="#" id="download-participation-report" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                        📈 학생 참여도 분석
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button id="refresh-lessons-for-analysis-btn"
-                                            class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
-                                            새로고침
-                                        </button>
-                                    </div>
+                                    <button id="refresh-lessons-for-analysis-btn"
+                                        class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
+                                        새로고침
+                                    </button>
                                 </div>
                             </div>
 
@@ -1089,10 +1063,36 @@
                                         </h2>
                                         <p class="text-sm text-gray-600" id="selected-lesson-info">수업 정보</p>
                                     </div>
-                                    <button id="back-to-lessons-btn"
-                                        class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
-                                        수업 목록으로 돌아가기
-                                    </button>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="relative" id="bulk-download-dropdown">
+                                            <button id="bulk-download-btn" class="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 font-medium flex items-center space-x-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                <span>일괄 다운로드</span>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </button>
+                                            <div id="bulk-download-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
+                                                <div class="py-1">
+                                                    <a href="#" id="download-all-lessons" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <span id="download-all-lessons-text">📊 이 수업 데이터 (CSV)</span>
+                                                    </a>
+                                                    <a href="#" id="download-lesson-summary" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        📋 이 수업 요약 보고서
+                                                    </a>
+                                                    <a href="#" id="download-participation-report" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        📈 학생 참여도 분석
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="back-to-lessons-btn"
+                                            class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium">
+                                            수업 목록으로 돌아가기
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -2260,6 +2260,21 @@
 
             // 현재 선택된 세션 정보
             let currentSelectedSession = null;
+            
+            // 현재 선택된 수업 정보 
+            let currentSelectedLesson = null;
+            
+            // 다운로드 버튼 텍스트 업데이트 함수
+            function updateDownloadButtonText() {
+                const downloadAllLessonsText = document.getElementById('download-all-lessons-text');
+                if (downloadAllLessonsText) {
+                    if (currentSelectedLesson) {
+                        downloadAllLessonsText.textContent = `📊 '${currentSelectedLesson.title}' 수업 데이터 (CSV)`;
+                    } else {
+                        downloadAllLessonsText.textContent = '📊 전체 수업 데이터 (CSV)';
+                    }
+                }
+            }
 
             // 새로고침 버튼 이벤트
             if (refreshSessionsBtn) {
@@ -2278,6 +2293,11 @@
                 lessonStudentsSection.classList.add('hidden');
                 conversationDetail.classList.add('hidden');
                 currentSelectedSession = null;
+                currentSelectedLesson = null; // 선택된 수업 정보 초기화
+                
+                // 다운로드 버튼 텍스트 업데이트
+                updateDownloadButtonText();
+                
                 // 수업 선택 카드 다시 표시
                 document.querySelector('.bg-white.rounded-lg.shadow-sm.border.mb-6').classList.remove('hidden');
             });
@@ -3323,6 +3343,12 @@
             // 수업별 학생 세션 로드
             async function loadLessonStudents(lesson) {
                 try {
+                    // 현재 선택된 수업 정보 저장
+                    currentSelectedLesson = lesson;
+                    
+                    // 다운로드 버튼 텍스트 업데이트
+                    updateDownloadButtonText();
+                    
                     // 수업 선택 카드 숨기기
                     document.querySelector('.bg-white.rounded-lg.shadow-sm.border.mb-6').classList.add('hidden');
 
@@ -4388,7 +4414,7 @@
                     });
                 }
                 
-                // 전체 수업 데이터 다운로드
+                // 전체 수업 데이터 다운로드 (선택된 수업이 있으면 해당 수업만, 없으면 전체)
                 const downloadAllLessonsBtn = document.getElementById('download-all-lessons');
                 if (downloadAllLessonsBtn) {
                     downloadAllLessonsBtn.addEventListener('click', async (e) => {
@@ -4396,67 +4422,73 @@
                         bulkDownloadMenu.classList.add('hidden');
                         
                         try {
-                            showStatus('전체 수업 데이터를 생성하고 있습니다...', 'info');
-                            
-                            const exportAllLessonsData = httpsCallable(functions, 'exportAllLessonsData');
-                            const result = await exportAllLessonsData();
-                            
-                            if (result.data.success) {
-                                downloadCSV(result.data.data, `전체수업데이터_${new Date().toISOString().split('T')[0]}.csv`);
-                                showStatus(`전체 ${result.data.totalRecords}건의 데이터를 다운로드했습니다.`, 'success');
+                            if (currentSelectedLesson) {
+                                // 선택된 수업의 데이터만 다운로드
+                                showStatus(`'${currentSelectedLesson.title}' 수업 데이터를 생성하고 있습니다...`, 'info');
+                                
+                                const exportLessonData = httpsCallable(functions, 'exportLessonData');
+                                const result = await exportLessonData({ lessonId: currentSelectedLesson.id });
+                                
+                                if (result.data.success) {
+                                    const fileName = `${currentSelectedLesson.title}_수업데이터_${new Date().toISOString().split('T')[0]}.csv`;
+                                    downloadCSV(result.data.data, fileName);
+                                    showStatus(`'${currentSelectedLesson.title}' 수업의 ${result.data.totalRecords}건 데이터를 다운로드했습니다.`, 'success');
+                                }
+                            } else {
+                                // 전체 수업 데이터 다운로드
+                                showStatus('전체 수업 데이터를 생성하고 있습니다...', 'info');
+                                
+                                const exportAllLessonsData = httpsCallable(functions, 'exportAllLessonsData');
+                                const result = await exportAllLessonsData();
+                                
+                                if (result.data.success) {
+                                    downloadCSV(result.data.data, `전체수업데이터_${new Date().toISOString().split('T')[0]}.csv`);
+                                    showStatus(`전체 ${result.data.totalRecords}건의 데이터를 다운로드했습니다.`, 'success');
+                                }
                             }
                         } catch (error) {
-                            console.error('전체 데이터 다운로드 오류:', error);
+                            console.error('데이터 다운로드 오류:', error);
                             showStatus('데이터 다운로드에 실패했습니다.', 'error');
                         }
                     });
                 }
                 
-                // 수업별 요약 보고서 다운로드
+                // 선택된 수업 요약 보고서 다운로드
                 const downloadLessonSummaryBtn = document.getElementById('download-lesson-summary');
                 if (downloadLessonSummaryBtn) {
                     downloadLessonSummaryBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
                         bulkDownloadMenu.classList.add('hidden');
                         
+                        if (!currentSelectedLesson) {
+                            showStatus('수업을 먼저 선택해주세요.', 'warning');
+                            return;
+                        }
+                        
                         try {
-                            showStatus('수업별 요약 보고서를 생성하고 있습니다...', 'info');
+                            showStatus(`'${currentSelectedLesson.title}' 수업 요약 보고서를 생성하고 있습니다...`, 'info');
                             
-                            // 모든 수업에 대해 요약 보고서 생성
-                            const lessonsResult = await getLessons();
-                            const lessons = lessonsResult.data.lessons || [];
-                            
-                            const summaryReports = [];
                             const generateLessonSummaryReport = httpsCallable(functions, 'generateLessonSummaryReport');
+                            const reportResult = await generateLessonSummaryReport({ lessonId: currentSelectedLesson.id });
                             
-                            for (const lesson of lessons) {
-                                try {
-                                    const reportResult = await generateLessonSummaryReport({ lessonId: lesson.id });
-                                    if (reportResult.data.success) {
-                                        const report = reportResult.data.report;
-                                        summaryReports.push({
-                                            수업ID: report.lessonId,
-                                            수업명: report.lessonTitle,
-                                            과목: report.subject,
-                                            생성일: report.createdAt ? new Date(report.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '',
-                                            참여학생수: report.totalStudents,
-                                            총대화수: report.totalConversations,
-                                            총세션수: report.totalSessions,
-                                            AI분석: report.aiAnalysis.replace(/\n/g, ' '),
-                                            분석생성일: report.generatedAt
-                                        });
-                                    }
-                                } catch (lessonError) {
-                                    console.warn(`수업 ${lesson.id} 분석 실패:`, lessonError);
-                                    // 계속 진행
-                                }
-                            }
-                            
-                            if (summaryReports.length > 0) {
-                                downloadCSV(summaryReports, `수업별요약보고서_${new Date().toISOString().split('T')[0]}.csv`);
-                                showStatus(`${summaryReports.length}개 수업의 요약 보고서를 다운로드했습니다.`, 'success');
+                            if (reportResult.data.success) {
+                                const report = reportResult.data.report;
+                                const reportData = [{
+                                    수업명: report.lessonTitle,
+                                    과목: report.subject,
+                                    생성일: report.createdAt ? new Date(report.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '',
+                                    참여학생수: report.totalStudents,
+                                    총대화수: report.totalConversations,
+                                    총세션수: report.totalSessions,
+                                    AI분석: report.aiAnalysis.replace(/\n/g, ' '),
+                                    분석생성일: report.generatedAt
+                                }];
+                                
+                                const fileName = `${currentSelectedLesson.title}_요약보고서_${new Date().toISOString().split('T')[0]}.csv`;
+                                downloadCSV(reportData, fileName);
+                                showStatus(`'${currentSelectedLesson.title}' 수업의 요약 보고서를 다운로드했습니다.`, 'success');
                             } else {
-                                showStatus('생성할 보고서가 없습니다.', 'warning');
+                                showStatus('보고서 생성에 실패했습니다.', 'error');
                             }
                         } catch (error) {
                             console.error('요약 보고서 다운로드 오류:', error);
@@ -4465,22 +4497,28 @@
                     });
                 }
                 
-                // 학생 참여도 분석 다운로드
+                // 선택된 수업 학생 참여도 분석 다운로드
                 const downloadParticipationReportBtn = document.getElementById('download-participation-report');
                 if (downloadParticipationReportBtn) {
                     downloadParticipationReportBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
                         bulkDownloadMenu.classList.add('hidden');
                         
+                        if (!currentSelectedLesson) {
+                            showStatus('수업을 먼저 선택해주세요.', 'warning');
+                            return;
+                        }
+                        
                         try {
-                            showStatus('학생 참여도 분석을 생성하고 있습니다...', 'info');
+                            showStatus(`'${currentSelectedLesson.title}' 수업의 학생 참여도 분석을 생성하고 있습니다...`, 'info');
                             
-                            const generateParticipationReport = httpsCallable(functions, 'generateParticipationReport');
-                            const result = await generateParticipationReport();
+                            const generateLessonParticipationReport = httpsCallable(functions, 'generateLessonParticipationReport');
+                            const result = await generateLessonParticipationReport({ lessonId: currentSelectedLesson.id });
                             
                             if (result.data.success) {
-                                downloadCSV(result.data.data, `학생참여도분석_${new Date().toISOString().split('T')[0]}.csv`);
-                                showStatus(`${result.data.totalRecords}건의 참여도 데이터를 다운로드했습니다.`, 'success');
+                                const fileName = `${currentSelectedLesson.title}_학생참여도분석_${new Date().toISOString().split('T')[0]}.csv`;
+                                downloadCSV(result.data.data, fileName);
+                                showStatus(`'${currentSelectedLesson.title}' 수업의 ${result.data.totalRecords}건 참여도 데이터를 다운로드했습니다.`, 'success');
                             }
                         } catch (error) {
                             console.error('참여도 분석 다운로드 오류:', error);
