@@ -296,23 +296,58 @@ class PromptBuilder {
             systemInstruction += `위의 수업 목표와 맥락을 바탕으로 학생을 가르치는 전문 AI 튜터로서 활동하세요.\n\n`;
         }
         
-        // 1-1. 학습 자료 정보 추가
+        // 1-1. 학습 자료 정보 추가 (지능형 처리)
         if (lessonResources && lessonResources.length > 0) {
             systemInstruction += `### 📚 참고 학습 자료 ###\n`;
-            systemInstruction += `교사가 이 수업을 위해 준비한 참고 자료들이 있습니다:\n\n`;
             
-            lessonResources.forEach((resource, index) => {
-                const icon = resource.type === 'link' ? '🔗' : '📎';
-                systemInstruction += `${index + 1}. ${icon} ${resource.title}\n`;
-                if (resource.type === 'link') {
-                    systemInstruction += `   - URL: ${resource.url}\n`;
-                } else if (resource.type === 'file') {
-                    systemInstruction += `   - 파일명: ${resource.fileName || resource.title}\n`;
-                }
-            });
+            // 지능형 자료인지 기본 목록인지 확인
+            const hasIntelligentData = lessonResources.some(r => r.relevanceScore !== undefined);
             
-            systemInstruction += `\n학생이 탐구 과정에서 막히거나 추가 학습이 필요할 때, 위 자료를 적절히 안내해주세요.\n`;
-            systemInstruction += `단, 학생이 스스로 탐구할 기회를 먼저 주고, 2-3회 이상 어려움을 표현할 때 자료를 제안하세요.\n\n`;
+            if (hasIntelligentData) {
+                // 지능형 자료: 관련성과 내용 포함
+                systemInstruction += `학생의 현재 질문과 관련도 높은 자료들입니다:\n\n`;
+                
+                lessonResources.forEach((resource, index) => {
+                    const relevance = resource.relevanceScore ? `(관련도: ${(resource.relevanceScore * 100).toFixed(0)}%)` : '';
+                    const icon = resource.resource ? (resource.resource.type === 'link' ? '🔗' : '📎') : '📄';
+                    const title = resource.resource ? resource.resource.title : resource.title;
+                    
+                    systemInstruction += `${index + 1}. ${icon} ${title} ${relevance}\n`;
+                    
+                    // 추출된 내용이 있으면 핵심 내용 포함
+                    if (resource.extractedContent && resource.extractedContent.text) {
+                        const preview = resource.extractedContent.text.substring(0, 150);
+                        systemInstruction += `   핵심 내용: ${preview}${resource.extractedContent.text.length > 150 ? '...' : ''}\n`;
+                    }
+                    
+                    // 관련 콘텐츠 청크가 있으면 포함
+                    if (resource.relevantChunks && resource.relevantChunks.length > 0) {
+                        systemInstruction += `   관련 부분: "${resource.relevantChunks[0].substring(0, 100)}..."\n`;
+                    }
+                    
+                    systemInstruction += `\n`;
+                });
+                
+                systemInstruction += `위 자료의 관련 내용을 바탕으로 학생에게 더 구체적이고 정확한 안내를 제공하세요.\n`;
+                systemInstruction += `학생이 2-3회 이상 어려움을 표현할 때만 자료를 제안하고, 자료 내용을 직접 언급하여 학습을 도우세요.\n\n`;
+                
+            } else {
+                // 기존 방식: 메타데이터만 사용
+                systemInstruction += `교사가 이 수업을 위해 준비한 참고 자료들이 있습니다:\n\n`;
+                
+                lessonResources.forEach((resource, index) => {
+                    const icon = resource.type === 'link' ? '🔗' : '📎';
+                    systemInstruction += `${index + 1}. ${icon} ${resource.title}\n`;
+                    if (resource.type === 'link') {
+                        systemInstruction += `   - URL: ${resource.url}\n`;
+                    } else if (resource.type === 'file') {
+                        systemInstruction += `   - 파일명: ${resource.fileName || resource.title}\n`;
+                    }
+                });
+                
+                systemInstruction += `\n학생이 탐구 과정에서 막히거나 추가 학습이 필요할 때, 위 자료를 적절히 안내해주세요.\n`;
+                systemInstruction += `단, 학생이 스스로 탐구할 기회를 먼저 주고, 2-3회 이상 어려움을 표현할 때 자료를 제안하세요.\n\n`;
+            }
         }
         
         // 2. 기존 프롬프트 요소들 추가
