@@ -9,6 +9,10 @@ const ResponseAnalyzer = require('./lib/responseAnalyzer');
 const PromptBuilder = require('./lib/promptBuilder');
 const gamificationModule = require('./lib/gamificationManager');
 
+// 지능형 학습 자료 처리 모듈
+const ContentExtractor = require('./lib/contentExtractor');
+const SemanticSearch = require('./lib/semanticSearch');
+
 // 글로벌 설정
 setGlobalOptions({ region: "asia-northeast3" });
 
@@ -149,12 +153,57 @@ exports.getTutorResponse = onCall(async (request) => {
       const aiInstructions = lessonData.aiInstructions || null;
       const lessonResources = lessonData.resources || null;
       
-      // 학습 자료가 있으면 로그 출력
+      // 학습 자료 내용 추출 및 지능형 검색
+      let intelligentResources = null;
       if (lessonResources && lessonResources.length > 0) {
-        console.log(`수업 '${lessonData.title}'의 학습 자료 ${lessonResources.length}개를 프롬프트에 포함합니다.`);
+        console.log(`수업 '${lessonData.title}'의 학습 자료 ${lessonResources.length}개 처리 시작`);
+        
+        try {
+          // 1. 자료 내용 추출
+          const extractionPromises = lessonResources.map(resource => 
+            ContentExtractor.extractContent(resource)
+          );
+          const extractedResources = await Promise.all(extractionPromises);
+          
+          console.log(`[IntelligentResources] 추출 완료: 성공 ${extractedResources.filter(r => r.success).length}개, 실패 ${extractedResources.filter(r => !r.success).length}개`);
+          
+          // 2. 학생 질문과 관련성 분석
+          const searchContext = {
+            subject: subject,
+            responseType: responseType,
+            gradeLevel: teacherData.grade_level
+          };
+          
+          const relevantResources = await SemanticSearch.findRelevantContent(
+            userMessage, 
+            extractedResources, 
+            apiKey, 
+            searchContext
+          );
+          
+          if (relevantResources.length > 0) {
+            console.log(`[IntelligentResources] 관련 자료 ${relevantResources.length}개 발견`);
+            intelligentResources = relevantResources.slice(0, 2); // 상위 2개만 사용
+          } else {
+            console.log('[IntelligentResources] 관련 자료 없음 - 기본 목록 사용');
+            intelligentResources = lessonResources; // 폴백: 기존 목록 사용
+          }
+          
+        } catch (error) {
+          console.error('[IntelligentResources] 자료 처리 오류:', error);
+          // 오류 시 기존 방식으로 폴백
+          intelligentResources = lessonResources;
+        }
       }
       
-      const fullPrompt = await buildFullPrompt(analysisResult, userMessage, conversationHistory, teacherDataWithSubject, aiInstructions, lessonResources);
+      const fullPrompt = await buildFullPrompt(
+        analysisResult, 
+        userMessage, 
+        conversationHistory, 
+        teacherDataWithSubject, 
+        aiInstructions, 
+        intelligentResources
+      );
       
       // 6. Gemini API 호출
       const genAI = new GoogleGenerativeAI(apiKey);
