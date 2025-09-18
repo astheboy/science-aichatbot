@@ -1,0 +1,72 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for Science AI Chatbot
+// 이 규칙은 교육용 AI 챗봇의 파일 업로드 및 접근을 관리합니다
+// 30일 후 자동 만료되는 테스트 모드 대체용 규칙
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // 📁 교사 수업 자료 (lessons/ 경로)
+    // teacher.html에서 사용되는 파일 업로드 경로
+    match /lessons/{fileName} {
+      // 읽기: 모든 사용자 허용 (학생들이 수업 자료에 접근)
+      allow read: if true;
+      
+      // 쓰기: 인증된 교사만 허용 (Google OAuth 로그인 필요)
+      allow write: if request.auth != null 
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        // 파일 크기 제한 (10MB)
+        && request.resource.size < 10 * 1024 * 1024
+        // 지원 파일 형식 제한
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType == 'application/pdf' ||
+          request.resource.contentType == 'text/plain' ||
+          request.resource.contentType.matches('application/.*document.*') ||
+          request.resource.contentType.matches('application/.*presentation.*')
+        );
+    }
+    
+    // 📝 학생 제출 자료
+    match /submissions/{lessonId}/{studentId}/{fileName} {
+      // 읽기: 모든 사용자 허용
+      allow read: if true;
+      
+      // 쓰기: 기본적으로 허용 (학생들이 자유롭게 제출 가능)
+      // 파일 크기 및 형식 제한
+      allow write: if request.resource.size < 5 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType == 'application/pdf' ||
+          request.resource.contentType == 'text/plain'
+        );
+    }
+    
+    // 📊 QR 코드 이미지
+    match /qr_codes/{lessonId} {
+      // 읽기: 모든 사용자 허용 (PNG 파일만)
+      allow read: if true;
+      
+      // 쓰기: 인증된 교사만 허용
+      allow write: if request.auth != null 
+        && request.auth.token.email != null
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // 🎨 임시 파일 (contentExtractor가 사용할 수 있는 임시 저장소)
+    match /temp/{fileName} {
+      // 읽기: 모든 사용자 허용
+      allow read: if true;
+      
+      // 쓰기: 인증된 사용자만 + 소용량 데이터
+      allow write: if request.auth != null
+        && request.resource.size < 2 * 1024 * 1024; // 2MB 제한
+    }
+    
+    // 🚫 기타 모든 경로는 접근 금지
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
