@@ -13,8 +13,12 @@ const gamificationModule = require('./lib/gamificationManager');
 const ContentExtractor = require('./lib/contentExtractor');
 const SemanticSearch = require('./lib/semanticSearch');
 
-// 글로벌 설정
-setGlobalOptions({ region: "asia-northeast3" });
+// 글로벌 설정 (타임아웃 및 메모리 증설)
+setGlobalOptions({ 
+    region: "asia-northeast3",
+    timeoutSeconds: 300, // 5분으로 증설
+    memory: "1GiB"       // 메모리 증설
+});
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -89,7 +93,7 @@ async function buildFullPrompt(analysisResult, userMessage, conversationHistory 
     }
 }
 
-exports.getTutorResponse = onCall(async (request) => {
+exports.getTutorResponse = onCall({ cors: true }, async (request) => {
     const { data } = request;
     
     // 클라이언트로부터 lessonCode, userMessage, conversationHistory, 그리고 학생 정보를 받습니다.
@@ -140,7 +144,7 @@ exports.getTutorResponse = onCall(async (request) => {
       console.log(`응답 분석 결과 (${subject}): ${responseType} (신뢰도: ${analysisResult.confidence})`);
       
       // 4. 교사 설정과 모델 정보 가져오기
-      const modelName = teacherData.modelName || 'gemini-2.0-flash';
+      const modelName = teacherData.modelName || 'gemini-2.5-flash';
       
       // 5. JSON 기반 프롬프트 생성 시스템 사용 (과목 정보 + 수업 설명 추가)
       const teacherDataWithSubject = {
@@ -159,9 +163,9 @@ exports.getTutorResponse = onCall(async (request) => {
         console.log(`수업 '${lessonData.title}'의 학습 자료 ${lessonResources.length}개 처리 시작`);
         
         try {
-          // 1. 자료 내용 추출
+          // 1. 자료 내용 추출 (캐싱 적용)
           const extractionPromises = lessonResources.map(resource => 
-            ContentExtractor.extractContent(resource)
+            ContentExtractor.extractAndCacheContent(db, resource)
           );
           const extractedResources = await Promise.all(extractionPromises);
           
@@ -206,17 +210,39 @@ exports.getTutorResponse = onCall(async (request) => {
       );
       
       // 6. Gemini API 호출
+      console.log(`[Gemini] 모델 '${modelName}' 초기화 중...`);
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: modelName });
+      let model = genAI.getGenerativeModel({ model: modelName });
       
-      const result = await model.generateContent({
-        contents: fullPrompt,
-        generationConfig: {
-          "temperature": 0.7,
-          "topP": 0.9,
-          "maxOutputTokens": 300
+      let result;
+      try {
+        result = await model.generateContent({
+          contents: fullPrompt,
+          generationConfig: {
+            "temperature": 0.7,
+            "topP": 0.9,
+            "maxOutputTokens": 500
+          }
+        });
+      } catch (apiError) {
+        console.warn(`[Gemini] 모델 '${modelName}' 호출 실패. 기본 모델(gemini-2.5-flash)로 재시도합니다. 오류:`, apiError.message);
+        // 폴백: 기본 모델로 재시도
+        try {
+            model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+            result = await model.generateContent({
+                contents: fullPrompt,
+                generationConfig: {
+                    "temperature": 0.7,
+                    "topP": 0.9,
+                    "maxOutputTokens": 500
+                }
+            });
+            console.log('[Gemini] 기본 모델로 재시도 성공');
+        } catch (fallbackError) {
+            console.error('[Gemini] 기본 모델 재시도 실패:', fallbackError);
+            throw new HttpsError('internal', `AI 모델 호출 실패: ${apiError.message}`);
         }
-      });
+      }
       
       const response = await result.response;
       const aiResponseText = response.text();
@@ -397,7 +423,7 @@ exports.getTeacherInfo = onCall(async (request) => {
         hasApiKey: !!teacherData.apiKey,
         teacherCode: teacherData.teacherCode,
         customPrompt: teacherData.customPrompt || '',
-        modelName: teacherData.modelName || 'gemini-2.0-flash'
+        modelName: teacherData.modelName || 'gemini-2.5-flash'
       };
       
     } catch (error) {
@@ -462,12 +488,12 @@ exports.updateTeacherModel = onCall(async (request) => {
       throw new HttpsError('invalid-argument', '모델명이 필요합니다.');
     }
 
-    // 사용 가능한 모델 목록 (최신 Gemini 2.0 모델 포함)
+    // 사용 가능한 모델 목록 (최신 Gemini 3.0 모델 포함)
     const availableModels = [
         
         'gemini-2.5-flash-lite',
-        'gemini-2.0-flash',
-        'gemini-2.0-flash-lite'
+        'gemini-2.5-flash',
+        'gemini-3-pro'
     ];
 
     if (!availableModels.includes(modelName)) {
@@ -822,6 +848,38 @@ exports.getStudentConversation = onCall(async (request) => {
         throw error;
       }
       throw new HttpsError('internal', '대화 기록 조회 중 오류가 발생했습니다.');
+    }
+});
+
+// 학생 학습 통계 조회 (게임화 정보 포함)
+exports.getStudentStats = onCall({ cors: true }, async (request) => {
+    const { data } = request;
+    const { sessionId } = data;
+    
+    if (!sessionId) {
+      throw new HttpsError('invalid-argument', '세션 ID가 필요합니다.');
+    }
+
+    try {
+      // GamificationManager를 통해 통계 조회
+      const stats = await GamificationManager.getStudentStats(sessionId);
+      
+      if (!stats) {
+        // 세션이 없거나 통계가 없는 경우 기본값 반환
+        return {
+          level: 1,
+          exp: 0,
+          nextLevelExp: 50,
+          currentTitle: { name: '탐구자', icon: '🌱' },
+          achievements: []
+        };
+      }
+      
+      return stats;
+      
+    } catch (error) {
+      console.error("학생 통계 조회 오류:", error);
+      throw new HttpsError('internal', '학생 통계 조회 중 오류가 발생했습니다.');
     }
 });
 

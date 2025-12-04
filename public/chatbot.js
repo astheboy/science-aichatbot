@@ -1,4 +1,4 @@
-import { callGeminiApi } from "./api.js";
+import { callGeminiApi, fetchStudentStats } from "./api.js";
 import { db } from "./firebase-config.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -224,12 +224,17 @@ async function handleChatSubmit(e) {
     
     // 응답이 문자열인 경우 (이전 버전 호환)
     let aiResponseText = response;
+    console.log("[handleChatSubmit] API Response:", response); // 디버깅용 로그 추가
+
     if (typeof response === 'object' && response.text) {
       aiResponseText = response.text;
       
       // 게임화 정보 처리
       if (response.gamification) {
+        console.log("[handleChatSubmit] Gamification Data Received:", response.gamification); // 디버깅용 로그 추가
         updateGamificationStats(response.gamification);
+      } else {
+        console.warn("[handleChatSubmit] No gamification data in response");
       }
       
       // 성취 처리
@@ -285,12 +290,31 @@ function displayAiMessage(message, isFirst = false) {
 }
 
 // 게임화 UI 초기화
-function initializeGamificationUI() {
+async function initializeGamificationUI() {
   const gamificationPanel = document.getElementById('gamification-panel');
   
-  // 학생 이름이 있을 때만 게임화 패널 표시
+  // 학생 이름과 세션 ID가 있을 때만 게임화 패널 표시 및 데이터 로드
   if (studentName && sessionId) {
     gamificationPanel?.classList.remove('hidden');
+    
+    // 서버에서 최신 통계 가져오기
+    try {
+      console.log("[initializeGamificationUI] 통계 불러오기 시작:", sessionId);
+      const stats = await fetchStudentStats(sessionId);
+      if (stats) {
+        console.log("[initializeGamificationUI] 통계 로드 완료:", stats);
+        updateGamificationStats({
+          currentLevel: stats.level,
+          currentExp: stats.exp,
+          nextLevelExp: stats.nextLevelExp,
+          newTitle: stats.currentTitle,
+          // achievements: stats.achievements // 성취 목록은 별도 처리 필요시 추가
+        });
+      }
+    } catch (error) {
+      console.error("[initializeGamificationUI] 통계 로드 실패:", error);
+    }
+    
     updateGamificationDisplay();
   } else {
     gamificationPanel?.classList.add('hidden');

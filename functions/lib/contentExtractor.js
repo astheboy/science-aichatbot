@@ -3,13 +3,80 @@ const pdfParse = require('pdf-parse');
 const { createWorker } = require('tesseract.js');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const crypto = require('crypto');
 
 /**
  * 학습 자료 내용 추출 시스템
  * PDF, 이미지(OCR), 텍스트 파일의 실제 내용을 추출합니다
+ * Firestore 캐싱을 지원하여 반복적인 추출 작업을 방지합니다.
  */
 class ContentExtractor {
     
+    /**
+     * 자료 내용을 추출하고 캐싱합니다. (권장 사용 메서드)
+     * @param {Object} db - Firestore 인스턴스
+     * @param {Object} resource - 자료 객체
+     * @returns {Object} 추출된 내용
+     */
+    static async extractAndCacheContent(db, resource) {
+        try {
+            // 1. 캐시 키 생성 (URL 기반 해시)
+            const cacheKey = this.generateCacheKey(resource.url);
+            const cacheRef = db.collection('resource_cache').doc(cacheKey);
+            
+            // 2. 캐시 확인
+            const cacheDoc = await cacheRef.get();
+            if (cacheDoc.exists) {
+                const cacheData = cacheDoc.data();
+                // 캐시 유효기간 체크 (예: 30일)
+                const cacheAge = Date.now() - cacheData.cachedAt.toDate().getTime();
+                const MAX_CACHE_AGE = 30 * 24 * 60 * 60 * 1000;
+                
+                if (cacheAge < MAX_CACHE_AGE) {
+                    console.log(`[ContentExtractor] 캐시 히트: ${resource.title} (${cacheKey})`);
+                    return {
+                        ...cacheData.result,
+                        fromCache: true
+                    };
+                }
+            }
+            
+            // 3. 캐시 미스 - 실제 추출 수행
+            console.log(`[ContentExtractor] 캐시 미스 - 추출 시작: ${resource.title}`);
+            const result = await this.extractContent(resource);
+            
+            // 4. 성공 시 캐시 저장
+            if (result.success) {
+                await cacheRef.set({
+                    url: resource.url,
+                    type: resource.type,
+                    title: resource.title || '',
+                    result: result,
+                    cachedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    hash: cacheKey
+                });
+                console.log(`[ContentExtractor] 캐시 저장 완료: ${cacheKey}`);
+            }
+            
+            return {
+                ...result,
+                fromCache: false
+            };
+            
+        } catch (error) {
+            console.error(`[ContentExtractor] 캐싱 처리 중 오류:`, error);
+            // 캐싱 오류가 발생해도 추출은 시도하거나, 이미 추출된 결과를 반환
+            return await this.extractContent(resource);
+        }
+    }
+
+    /**
+     * URL 기반 고유 해시 생성
+     */
+    static generateCacheKey(url) {
+        return crypto.createHash('md5').update(url).digest('hex');
+    }
+
     /**
      * 파일 유형에 따른 내용 추출 라우터
      * @param {Object} resource - 자료 객체 {type, url, fileName, title}
@@ -103,6 +170,7 @@ class ContentExtractor {
      */
     static async extractFromImage(buffer) {
         try {
+            console.log('[ContentExtractor] OCR extraction started...');
             const worker = await createWorker('kor');
             await worker.setParameters({
                 tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz가-힣ㄱ-ㅎㅏ-ㅣ ',
@@ -111,11 +179,12 @@ class ContentExtractor {
             const { data: { text } } = await worker.recognize(buffer);
             await worker.terminate();
             
-            console.log(`[ContentExtractor] OCR 추출 완료: ${text.length}자`);
+            console.log(`[ContentExtractor] OCR extraction complete: ${text.length} chars`);
             return text.trim();
         } catch (error) {
-            console.error('[ContentExtractor] OCR 추출 실패:', error);
-            throw new Error('이미지에서 텍스트를 추출할 수 없습니다.');
+            console.error('[ContentExtractor] OCR extraction failed:', error);
+            // OCR 실패 시 에러를 던지지 않고 대체 텍스트 반환 (시스템 안정성)
+            return "이미지 텍스트 추출 실패 (OCR 오류)";
         }
     }
     

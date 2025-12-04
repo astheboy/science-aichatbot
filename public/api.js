@@ -7,7 +7,7 @@ const getTutorResponseFunction = httpsCallable(functions, 'getTutorResponse');
 export async function callGeminiApi(apiData) {
     try {
         const result = await getTutorResponseFunction(apiData);
-        return result.data.text;
+        return result.data;
     } catch (error) {
         console.error("Firebase Function 호출 중 오류:", error);
         
@@ -22,4 +22,23 @@ export async function callGeminiApi(apiData) {
         
         throw new Error(error.message || "서버 연결에 실패했습니다.");
     }
+}
+
+// 학생 통계 조회 함수
+export async function fetchStudentStats(sessionId) {
+  try {
+    const getStudentStats = httpsCallable(functions, 'getStudentStats');
+    const result = await getStudentStats({ sessionId });
+    return result.data;
+  } catch (error) {
+    console.error("통계 조회 중 오류:", error);
+    // 오류 발생 시 기본값 반환하여 UI가 깨지지 않도록 함
+    return {
+      level: 1,
+      exp: 0,
+      nextLevelExp: 50,
+      currentTitle: { name: '탐구자', icon: '🌱' },
+      achievements: []
+    };
+  }
 }

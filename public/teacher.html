@@ -36,15 +36,16 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* 템플릿 모드 버튼 스타일 */
-        .template-mode-buttons, .edit-template-mode-buttons {
+        .template-mode-buttons,
+        .edit-template-mode-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 0.75rem;
         }
-        
+
         .template-mode-btn {
             padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
@@ -56,18 +57,18 @@
             transition: all 0.2s ease;
             white-space: nowrap;
         }
-        
+
         .template-mode-btn:hover {
             background-color: #e5e7eb;
             color: #111827;
         }
-        
+
         .template-mode-btn.selected {
             background-color: #dbeafe;
             color: #1e40af;
             border-color: #93c5fd;
         }
-        
+
         /* 템플릿 버튼 컨테이너 */
         .template-controls {
             display: flex;
@@ -75,16 +76,17 @@
             margin-top: 0.5rem;
         }
     </style>
-    
+
     <style>
         /* 템플릿 모드 버튼 스타일링 */
-        .template-mode-buttons, .edit-template-mode-buttons {
+        .template-mode-buttons,
+        .edit-template-mode-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 1rem;
         }
-        
+
         .template-mode-btn {
             padding: 0.5rem 0.75rem;
             background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
@@ -97,20 +99,20 @@
             transition: all 0.2s ease;
             white-space: nowrap;
         }
-        
+
         .template-mode-btn:hover {
             background: linear-gradient(135deg, #e5e7eb, #d1d5db);
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .template-mode-btn.selected {
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             border-color: #7c3aed;
             color: white;
             box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
         }
-        
+
         .template-mode-btn.selected:hover {
             background: linear-gradient(135deg, #7c3aed, #6d28d9);
         }
@@ -375,61 +377,96 @@
                                     </label>
                                     <select id="model-select"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="gemini-3-pro">Gemini 3.0 Pro</option>
+                                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                                         <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
-                                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                                        <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
+
+
                                     </select>
                                     <div class="mt-2 text-sm text-gray-600">
-                                        <p><strong>추천:</strong> Gemini 2.0 Flash은 속도와 실시간 스트리밍, 비용 측면에서 가장 적절합니다.</p>
+                                        <p><strong>추천:</strong> Gemini 2.5 Flash-lite은 속도와 실시간 스트리밍, 비용 측면에서 가장 적절합니다.
+                                        </p>
                                     </div>
                                     <!-- 모델별 사용량 안내 카드 -->
                                     <div class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm">
                                         <h4 class="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
-                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                </path>
+                                            </svg>
                                             <span>모델별 예상 사용량 및 비용 안내</span>
                                         </h4>
                                         <p class="text-gray-600 mb-4">
-                                            아래 정보는 <strong>1개 학급(20명)</strong>이 <strong>1시간 동안 활발히 수업</strong>하는 상황을 가정한 <strong class="text-blue-600">무료 티어</strong> 기준 예상치입니다.
+                                            아래 정보는 <strong>1개 학급(20명)</strong>이 <strong>1시간 동안 활발히 수업</strong>하는 상황을 가정한
+                                            <strong class="text-blue-600">무료 티어</strong> 기준 예상치입니다.
                                         </p>
-                                        
+
                                         <div class="overflow-x-auto">
                                             <table class="w-full text-left border-collapse">
                                                 <thead>
                                                     <tr class="bg-gray-100">
-                                                        <th class="border-b-2 border-gray-200 p-2 font-medium text-gray-600">모델명</th>
-                                                        <th class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">예상 비용</th>
-                                                        <th class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">분당 요청수 (RPM)</th>
-                                                        <th class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">분당 토큰 수 (TPM)</th>
-                                                        <th class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">일일 요청수 (RPD)</th>
+                                                        <th
+                                                            class="border-b-2 border-gray-200 p-2 font-medium text-gray-600">
+                                                            모델명</th>
+                                                        <th
+                                                            class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">
+                                                            예상 비용</th>
+                                                        <th
+                                                            class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">
+                                                            분당 요청수 (RPM)</th>
+                                                        <th
+                                                            class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">
+                                                            분당 토큰 수 (TPM)</th>
+                                                        <th
+                                                            class="border-b-2 border-gray-200 p-2 font-medium text-gray-600 text-center">
+                                                            일일 요청수 (RPD)</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="text-gray-700">
                                                     <tr class="hover:bg-gray-100">
-                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">gemini-2.5-flash-lite</td>
-                                                        <td class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">무료</td>
+                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">
+                                                            gemini-2.5-flash-lite</td>
+                                                        <td
+                                                            class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">
+                                                            무료</td>
                                                         <td class="border-b border-gray-200 p-2 text-center">15회</td>
-                                                        <td class="border-b border-gray-200 p-2 text-center">250,000</td>
+                                                        <td class="border-b border-gray-200 p-2 text-center">250,000
+                                                        </td>
                                                         <td class="border-b border-gray-200 p-2 text-center">1,000회</td>
                                                     </tr>
                                                     <tr class="hover:bg-gray-100">
-                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">gemini-2.0-flash</td>
-                                                        <td class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">무료</td>
+                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">
+                                                            gemini-2.0-flash</td>
+                                                        <td
+                                                            class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">
+                                                            무료</td>
                                                         <td class="border-b border-gray-200 p-2 text-center">15회</td>
-                                                        <td class="border-b border-gray-200 p-2 text-center">1,000,000</td>
+                                                        <td class="border-b border-gray-200 p-2 text-center">1,000,000
+                                                        </td>
                                                         <td class="border-b border-gray-200 p-2 text-center">200회</td>
                                                     </tr>
                                                     <tr class="hover:bg-gray-100">
-                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">gemini-2.0-flash-lite</td>
-                                                        <td class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">무료</td>
+                                                        <td class="border-b border-gray-200 p-2 font-mono text-xs">
+                                                            gemini-2.0-flash-lite</td>
+                                                        <td
+                                                            class="border-b border-gray-200 p-2 text-green-600 font-semibold text-center">
+                                                            무료</td>
                                                         <td class="border-b border-gray-200 p-2 text-center">30회</td>
-                                                        <td class="border-b border-gray-200 p-2 text-center">1,000,000</td>
+                                                        <td class="border-b border-gray-200 p-2 text-center">1,000,000
+                                                        </td>
                                                         <td class="border-b border-gray-200 p-2 text-center">200회</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <p class="text-gray-600 mt-4">일반적인 수업 환경에서는 무료 사용량 제한에 도달할 가능성이 낮습니다. 결제 계정을 등록한 경우 비율 제한 범위(Tier1)가 더 확대되니 더 자세한 정보는 아래 링크를 참고하세요.</p>
-                                        <a href="https://ai.google.dev/gemini-api/docs/rate-limits?hl=ko" target="_blank" class="text-blue-600 hover:underline font-medium mt-2 inline-block">모델별 비율 제한에 대해 더 알아보기 &rarr;</a>
+                                        <p class="text-gray-600 mt-4">일반적인 수업 환경에서는 무료 사용량 제한에 도달할 가능성이 낮습니다. 결제 계정을 등록한
+                                            경우 비율 제한 범위(Tier1)가 더 확대되니 더 자세한 정보는 아래 링크를 참고하세요.</p>
+                                        <a href="https://ai.google.dev/gemini-api/docs/rate-limits?hl=ko"
+                                            target="_blank"
+                                            class="text-blue-600 hover:underline font-medium mt-2 inline-block">모델별 비율
+                                            제한에 대해 더 알아보기 &rarr;</a>
                                     </div>
                                 </div>
 
@@ -441,7 +478,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- 교사 코드 표시 카드 -->
                         <div id="teacher-code-section" class="bg-white rounded-lg shadow-sm border p-6 hidden">
                             <div class="flex items-center justify-between mb-6">
@@ -508,58 +545,69 @@
                                     </div>
                                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <span class="flex items-center space-x-2">
-                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
-                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
-                        </span>
-                    </label>
-                    
-                    <!-- 사고력 증진 템플릿 선택 영역 -->
-                    <div id="template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 id="template-mode-title" class="text-sm font-semibold text-purple-800 flex items-center">
-                                <span class="mr-2">🎯</span>템플릿을 선택하세요
-                            </h4>
-                            <button type="button" id="template-help-btn" class="text-xs text-purple-600 hover:text-purple-800 focus:outline-none">
-                                ❓ 도움말
-                            </button>
-                        </div>
-                        
-                        <!-- 템플릿 모드 버튼 그리드 -->
-                        <div class="template-mode-buttons">
-                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
-                        </div>
-                        
-                        <!-- 선택된 템플릿 정보 표시 -->
-                        <div id="selected-template-info" class="hidden p-3 bg-white border border-purple-200 rounded-md">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <h5 id="template-title" class="font-semibold text-purple-800 mb-1"></h5>
-                                    <p id="template-description" class="text-xs text-gray-600 mb-2"></p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span id="template-subjects"></span>
-                                        <span id="template-difficulty"></span>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사
+                                                전용</span>
+                                        </span>
+                                    </label>
+
+                                    <!-- 사고력 증진 템플릿 선택 영역 -->
+                                    <div id="template-mode-section"
+                                        class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 id="template-mode-title"
+                                                class="text-sm font-semibold text-purple-800 flex items-center">
+                                                <span class="mr-2">🎯</span>템플릿을 선택하세요
+                                            </h4>
+                                            <button type="button" id="template-help-btn"
+                                                class="text-xs text-purple-600 hover:text-purple-800 focus:outline-none">
+                                                ❓ 도움말
+                                            </button>
+                                        </div>
+
+                                        <!-- 템플릿 모드 버튼 그리드 -->
+                                        <div class="template-mode-buttons">
+                                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
+                                        </div>
+
+                                        <!-- 선택된 템플릿 정보 표시 -->
+                                        <div id="selected-template-info"
+                                            class="hidden p-3 bg-white border border-purple-200 rounded-md">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex-1">
+                                                    <h5 id="template-title" class="font-semibold text-purple-800 mb-1">
+                                                    </h5>
+                                                    <p id="template-description" class="text-xs text-gray-600 mb-2"></p>
+                                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                                        <span id="template-subjects"></span>
+                                                        <span id="template-difficulty"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex space-x-1 ml-2">
+                                                    <button id="preview-template-btn"
+                                                        class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none"
+                                                        type="button">
+                                                        👁 미리보기
+                                                    </button>
+                                                    <button id="apply-template-btn"
+                                                        class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none"
+                                                        type="button">
+                                                        적용하기
+                                                    </button>
+                                                    <button id="clear-template-btn"
+                                                        class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none"
+                                                        type="button">
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex space-x-1 ml-2">
-                                    <button id="preview-template-btn" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none" type="button">
-                                        👁 미리보기
-                                    </button>
-                                    <button id="apply-template-btn" class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none" type="button">
-                                        적용하기
-                                    </button>
-                                    <button id="clear-template-btn" class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none" type="button">
-                                        ✕
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <textarea id="lesson-ai-instructions" rows="5"
-                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+
+                                    <textarea id="lesson-ai-instructions" rows="5" placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
@@ -567,49 +615,51 @@
 • 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘.
 
 💡 위의 '사고력 증진 템플릿'을 사용하면 전문적인 교육 방법론에 기반한 프롬프트를 쉽게 적용할 수 있습니다!"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                        <p class="text-xs text-amber-700">
-                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
-                        </p>
-                    </div>
-                </div>
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-xs text-amber-700">
+                                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
+                                        </p>
+                                    </div>
+                                </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <span class="flex items-center space-x-2">
-                            <span>📝 수업 설명</span>
-                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게 표시</span>
-                        </span>
-                    </label>
-                    <textarea id="lesson-student-description-input" rows="3"
-                        placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>📝 수업 설명</span>
+                                            <span
+                                                class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게
+                                                표시</span>
+                                        </span>
+                                    </label>
+                                    <textarea id="lesson-student-description-input" rows="3" placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
 
 예시:
 • 오늘은 조선시대 백성들의 일상생활과 문화에 대해 알아봅니다.
 • 분수의 나눗셈을 실생활 예시와 함께 배워봅시다.
 • 식물의 광합성 과정과 우리 생활에 미치는 영향을 탐구합니다."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                        <p class="text-xs text-blue-700">
-                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
-                        </p>
-                    </div>
-                </div>
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <p class="text-xs text-blue-700">
+                                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
+                                        </p>
+                                    </div>
+                                </div>
 
                                 <!-- 학습 자료 추가 섹션 -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         <span class="flex items-center space-x-2">
                                             <span>📚 학습 자료 및 힌트</span>
-                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새 기능</span>
+                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새
+                                                기능</span>
                                         </span>
                                     </label>
                                     <p class="text-xs text-gray-600 mb-3">학생들이 막힐 때 AI 튜터가 제공할 보충 자료를 추가하세요.</p>
-                                    
+
                                     <!-- 자료 추가 버튼들 -->
                                     <div class="flex space-x-3 mb-3">
-                                        <button type="button" id="add-link-btn" 
+                                        <button type="button" id="add-link-btn"
                                             class="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 font-medium">
                                             🔗 웹 링크 추가
                                         </button>
@@ -618,12 +668,12 @@
                                             📎 파일 업로드
                                         </button>
                                     </div>
-                                    
+
                                     <!-- 추가된 자료 목록 -->
                                     <div id="resources-list" class="space-y-2 mb-3">
                                         <!-- 자료가 여기에 동적으로 추가됩니다 -->
                                     </div>
-                                    
+
                                     <!-- 링크 추가 입력 영역 (숨김 상태) -->
                                     <div id="link-input-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
                                         <div class="flex space-x-2">
@@ -641,11 +691,12 @@
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- 파일 업로드 영역 (숨김 상태) -->
                                     <div id="file-upload-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
                                         <div class="space-y-2">
-                                            <input type="file" id="file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
+                                            <input type="file" id="file-input"
+                                                accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
                                                 class="text-sm file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                             <div class="flex space-x-2">
                                                 <button type="button" id="upload-file-btn"
@@ -660,12 +711,14 @@
                                             <div id="upload-progress" class="hidden">
                                                 <div class="text-xs text-gray-600 mb-1">업로드 중...</div>
                                                 <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                                    <div id="upload-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                                    <div id="upload-progress-bar"
+                                                        class="bg-blue-600 h-1.5 rounded-full transition-all"
+                                                        style="width: 0%"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
                                         <p class="text-xs text-blue-700">
                                             <strong>💡 팁:</strong> 학생이 2회 이상 막힐 때 AI 튜터가 이 자료들을 적절히 제공합니다.
@@ -721,27 +774,29 @@
                     </div>
 
                     <!-- 수업 편집 모달 -->
-                    <div id="edit-lesson-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div id="edit-lesson-modal"
+                        class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
                         <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4 max-h-full overflow-y-auto">
                             <div class="flex items-center justify-between mb-6">
                                 <h3 class="text-xl font-semibold text-gray-900">수업 편집</h3>
                                 <button id="close-edit-modal" class="text-gray-400 hover:text-gray-600 p-1">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
                             </div>
-                            
+
                             <form id="edit-lesson-form" class="space-y-4">
                                 <input type="hidden" id="edit-lesson-id">
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">수업 제목</label>
                                     <input type="text" id="edit-lesson-title" placeholder="예: 분수의 나눗셈, 조선시대 문화"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         required>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">과목 선택</label>
                                     <select id="edit-lesson-subject"
@@ -754,56 +809,67 @@
                                         <option value="science">과학</option>
                                     </select>
                                 </div>
-                                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <span class="flex items-center space-x-2">
-                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
-                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사 전용</span>
-                        </span>
-                    </label>
-                    
-                    <!-- 편집 모달 사고력 증진 템플릿 선택 영역 -->
-                    <div id="edit-template-mode-section" class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 id="edit-template-mode-title" class="text-sm font-semibold text-purple-800 flex items-center">
-                                <span class="mr-2">🎯</span>템플릿을 선택하세요
-                            </h4>
-                        </div>
-                        
-                        <!-- 템플릿 모드 버튼 그리드 -->
-                        <div class="edit-template-mode-buttons">
-                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
-                        </div>
-                        
-                        <!-- 선택된 템플릿 정보 표시 -->
-                        <div id="edit-selected-template-info" class="hidden p-3 bg-white border border-purple-200 rounded-md">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <h5 id="edit-template-title" class="font-semibold text-purple-800 mb-1"></h5>
-                                    <p id="edit-template-description" class="text-xs text-gray-600 mb-2"></p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span id="edit-template-subjects"></span>
-                                        <span id="edit-template-difficulty"></span>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>🎯 AI 튜터 역할 및 교수 방법 지시</span>
+                                            <span class="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">교사
+                                                전용</span>
+                                        </span>
+                                    </label>
+
+                                    <!-- 편집 모달 사고력 증진 템플릿 선택 영역 -->
+                                    <div id="edit-template-mode-section"
+                                        class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg hidden">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 id="edit-template-mode-title"
+                                                class="text-sm font-semibold text-purple-800 flex items-center">
+                                                <span class="mr-2">🎯</span>템플릿을 선택하세요
+                                            </h4>
+                                        </div>
+
+                                        <!-- 템플릿 모드 버튼 그리드 -->
+                                        <div class="edit-template-mode-buttons">
+                                            <!-- 템플릿 모드 버튼들이 여기에 동적으로 생성됩니다 -->
+                                        </div>
+
+                                        <!-- 선택된 템플릿 정보 표시 -->
+                                        <div id="edit-selected-template-info"
+                                            class="hidden p-3 bg-white border border-purple-200 rounded-md">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex-1">
+                                                    <h5 id="edit-template-title"
+                                                        class="font-semibold text-purple-800 mb-1"></h5>
+                                                    <p id="edit-template-description"
+                                                        class="text-xs text-gray-600 mb-2"></p>
+                                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                                        <span id="edit-template-subjects"></span>
+                                                        <span id="edit-template-difficulty"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex space-x-1 ml-2">
+                                                    <button id="edit-preview-template-btn"
+                                                        class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none"
+                                                        type="button">
+                                                        👁 미리보기
+                                                    </button>
+                                                    <button id="edit-apply-template-btn"
+                                                        class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none"
+                                                        type="button">
+                                                        적용하기
+                                                    </button>
+                                                    <button id="edit-clear-template-btn"
+                                                        class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none"
+                                                        type="button">
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex space-x-1 ml-2">
-                                    <button id="edit-preview-template-btn" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 focus:outline-none" type="button">
-                                        👁 미리보기
-                                    </button>
-                                    <button id="edit-apply-template-btn" class="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none" type="button">
-                                        적용하기
-                                    </button>
-                                    <button id="edit-clear-template-btn" class="px-1 py-1 text-xs text-gray-500 hover:text-red-600 focus:outline-none" type="button">
-                                        ✕
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <textarea id="edit-lesson-ai-instructions" rows="5"
-                        placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
+
+                                    <textarea id="edit-lesson-ai-instructions" rows="5" placeholder="AI 튜터의 역할, 핵심 개념, 답변 톤, 학습 목표를 구체적으로 지시해주세요.
 
 예시:
 • 너는 조선시대 문화를 설명하는 역사학자야. 왕 중심이 아닌 백성의 삶에 초점을 맞춰 설명해줘.
@@ -811,49 +877,51 @@
 • 너는 식물의 광합성을 설명하는 과학자야. 아이들이 직접 관찰할 수 있는 현상들과 연결지어 설명해줘.
 
 💡 위의 '사고력 증진 템플릿'을 사용하면 전문적인 교육 방법론에 기반한 프롬프트를 쉽게 적용할 수 있습니다!"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                        <p class="text-xs text-amber-700">
-                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
-                        </p>
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <span class="flex items-center space-x-2">
-                            <span>📝 수업 설명</span>
-                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게 표시</span>
-                        </span>
-                    </label>
-                    <textarea id="edit-lesson-student-description" rows="3"
-                        placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-xs text-amber-700">
+                                            <strong>💡 중요:</strong> 이 내용은 AI 튜터의 동작을 제어하는 내부 지시사항으로, 학생에게는 표시되지 않습니다.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <span class="flex items-center space-x-2">
+                                            <span>📝 수업 설명</span>
+                                            <span
+                                                class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">학생에게
+                                                표시</span>
+                                        </span>
+                                    </label>
+                                    <textarea id="edit-lesson-student-description" rows="3" placeholder="학생들이 볼 수 있는 수업 설명을 입력하세요.
 
 예시:
 • 오늘은 조선시대 백성들의 일상생활과 문화에 대해 알아봅니다.
 • 분수의 나눗셈을 실생활 예시와 함께 배워봅시다.
 • 식물의 광합성 과정과 우리 생활에 미치는 영향을 탐구합니다."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                        <p class="text-xs text-blue-700">
-                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
-                        </p>
-                    </div>
-                </div>
-                                
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
+                                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <p class="text-xs text-blue-700">
+                                            <strong>💡 팁:</strong> 학생들이 수업에 접속할 때 볼 수 있는 설명입니다. 학습 목표와 내용을 간단명료하게 작성하세요.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <!-- 학습 자료 관리 섹션 (편집 모달) -->
                                 <div class="border-t pt-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         <span class="flex items-center space-x-2">
                                             <span>📚 학습 자료 및 힌트</span>
-                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새 기능</span>
+                                            <span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">새
+                                                기능</span>
                                         </span>
                                     </label>
                                     <p class="text-xs text-gray-600 mb-3">학생들이 막힐 때 AI 튜터가 제공할 보충 자료를 관리하세요.</p>
-                                    
+
                                     <!-- 자료 추가 버튼들 -->
                                     <div class="flex space-x-3 mb-3">
-                                        <button type="button" id="edit-add-link-btn" 
+                                        <button type="button" id="edit-add-link-btn"
                                             class="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 font-medium">
                                             🔗 웹 링크 추가
                                         </button>
@@ -862,16 +930,17 @@
                                             📎 파일 업로드
                                         </button>
                                     </div>
-                                    
+
                                     <!-- 추가된 자료 목록 -->
                                     <div id="edit-resources-list" class="space-y-2 mb-3">
                                         <!-- 자료가 여기에 동적으로 추가됩니다 -->
                                     </div>
-                                    
+
                                     <!-- 링크 추가 입력 영역 (숨김 상태) -->
                                     <div id="edit-link-input-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
                                         <div class="flex space-x-2">
-                                            <input type="text" id="edit-link-title-input" placeholder="링크 제목 (예: 개념 설명 영상)"
+                                            <input type="text" id="edit-link-title-input"
+                                                placeholder="링크 제목 (예: 개념 설명 영상)"
                                                 class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
                                             <input type="url" id="edit-link-url-input" placeholder="https://..."
                                                 class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
@@ -885,11 +954,12 @@
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- 파일 업로드 영역 (숨김 상태) -->
                                     <div id="edit-file-upload-area" class="hidden p-3 bg-gray-50 rounded-md mb-3">
                                         <div class="space-y-2">
-                                            <input type="file" id="edit-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
+                                            <input type="file" id="edit-file-input"
+                                                accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
                                                 class="text-sm file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                             <div class="flex space-x-2">
                                                 <button type="button" id="edit-upload-file-btn"
@@ -904,20 +974,22 @@
                                             <div id="edit-upload-progress" class="hidden">
                                                 <div class="text-xs text-gray-600 mb-1">업로드 중...</div>
                                                 <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                                    <div id="edit-upload-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                                                    <div id="edit-upload-progress-bar"
+                                                        class="bg-blue-600 h-1.5 rounded-full transition-all"
+                                                        style="width: 0%"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="flex justify-between items-center pt-4 border-t">
-                                    <button type="button" id="delete-lesson-btn" 
+                                    <button type="button" id="delete-lesson-btn"
                                         class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium">
                                         수업 삭제
                                     </button>
                                     <div class="flex space-x-3">
-                                        <button type="button" id="cancel-edit-btn" 
+                                        <button type="button" id="cancel-edit-btn"
                                             class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
                                             취소
                                         </button>
@@ -1065,24 +1137,35 @@
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         <div class="relative" id="bulk-download-dropdown">
-                                            <button id="bulk-download-btn" class="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 font-medium flex items-center space-x-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            <button id="bulk-download-btn"
+                                                class="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 font-medium flex items-center space-x-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                    </path>
                                                 </svg>
                                                 <span>일괄 다운로드</span>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
                                             </button>
-                                            <div id="bulk-download-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
+                                            <div id="bulk-download-menu"
+                                                class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
                                                 <div class="py-1">
-                                                    <a href="#" id="download-all-lessons" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <a href="#" id="download-all-lessons"
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         <span id="download-all-lessons-text">📊 이 수업 데이터 (CSV)</span>
                                                     </a>
-                                                    <a href="#" id="download-lesson-summary" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <a href="#" id="download-lesson-summary"
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         📋 이 수업 요약 보고서
                                                     </a>
-                                                    <a href="#" id="download-participation-report" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <a href="#" id="download-participation-report"
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         📈 학생 참여도 분석
                                                     </a>
                                                 </div>
@@ -1223,7 +1306,7 @@
             import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
             import { ref, uploadBytesResumable, getDownloadURL, getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
             import { auth, functions } from './firebase-config.js';
-            
+
             // Storage를 직접 초기화
             const storage = getStorage();
 
@@ -1308,7 +1391,7 @@
                 'science': '과학',
                 'social': '사회'
             };
-            
+
             // 사고력 증진 템플릿 모드 데이터
             const THINKING_MODES = {
                 inquiry: {
@@ -1449,7 +1532,7 @@
 **학습 내용**: 학생이 핵심 내용을 명확히 설명할 수 있는지 확인하는 데 모든 질문을 집중해줘.`
                 }
             };
-            
+
             // 템플릿 관리 클래스
             class TemplateManager {
                 constructor() {
@@ -1457,34 +1540,34 @@
                     this.currentMode = null;
                     this.targetTextarea = null;
                 }
-                
+
                 // 과목에 맞는 템플릿 모드들을 필터링
                 getModesForSubject(subject) {
                     if (!subject) return Object.values(THINKING_MODES);
-                    return Object.values(THINKING_MODES).filter(mode => 
+                    return Object.values(THINKING_MODES).filter(mode =>
                         mode.subjects.includes(subject)
                     );
                 }
-                
+
                 // 템플릿 모드 버튼들을 렌더링
                 renderModeButtons(containerSelector, subject, targetTextarea) {
                     console.log('renderModeButtons 호출됨:', { containerSelector, subject, targetTextarea });
-                    
+
                     const container = document.querySelector(containerSelector);
                     if (!container) {
                         console.error('컨테이너를 찾을 수 없습니다:', containerSelector);
                         return;
                     }
-                    
+
                     this.currentSubject = subject;
                     this.targetTextarea = targetTextarea;
-                    
+
                     // 템플릿 섹션 표시/숨김 및 제목 업데이트
                     this.updateTemplateSection(containerSelector, subject);
-                    
+
                     const modes = this.getModesForSubject(subject);
                     console.log('과목별 템플릿 모드:', modes.length, '개');
-                    
+
                     container.innerHTML = modes.map(mode => `
                         <button type="button" class="template-mode-btn" 
                                 data-mode-id="${mode.id}"
@@ -1492,7 +1575,7 @@
                             ${mode.name}
                         </button>
                     `).join('');
-                    
+
                     // 버튼 클릭 이벤트 추가
                     container.querySelectorAll('.template-mode-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -1501,19 +1584,19 @@
                         });
                     });
                 }
-                
+
                 // 템플릿 섹션 표시/숨김 및 제목 업데이트
                 updateTemplateSection(containerSelector, subject) {
                     const subjectTitles = {
                         'korean': '국어 템플릿 모드',
-                        'math': '수학 템플릿 모드', 
+                        'math': '수학 템플릿 모드',
                         'science': '과학 탐구 템플릿 모드',
                         'social': '사회 탐구 템플릿 모드'
                     };
-                    
+
                     // 컨테이너에 따라 적절한 섹션과 제목 요소 찾기
                     let templateSection, titleElement;
-                    
+
                     if (containerSelector.includes('edit-template')) {
                         templateSection = document.getElementById('edit-template-mode-section');
                         titleElement = document.getElementById('edit-template-mode-title');
@@ -1521,12 +1604,12 @@
                         templateSection = document.getElementById('template-mode-section');
                         titleElement = document.getElementById('template-mode-title');
                     }
-                    
+
                     if (!templateSection || !titleElement) {
                         console.error('템플릿 섹션 요소를 찾을 수 없습니다');
                         return;
                     }
-                    
+
                     if (subject && this.getModesForSubject(subject).length > 0) {
                         // 과목이 선택되고 해당 과목에 템플릿이 있으면 섹션 표시
                         templateSection.classList.remove('hidden');
@@ -1537,75 +1620,75 @@
                         titleElement.innerHTML = `<span class="mr-2">🎯</span>템플릿을 선택하세요`;
                     }
                 }
-                
+
                 // 모드 선택
                 selectMode(modeId) {
                     this.currentMode = THINKING_MODES[modeId];
-                    
+
                     // 모든 버튼에서 선택 상태 제거
                     document.querySelectorAll('.template-mode-btn').forEach(btn => {
                         btn.classList.remove('selected');
                     });
-                    
+
                     // 현재 선택된 버튼에 선택 상태 추가
                     document.querySelectorAll(`[data-mode-id="${modeId}"]`).forEach(btn => {
                         btn.classList.add('selected');
                     });
-                    
+
                     console.log('템플릿 모드 선택됨:', this.currentMode.name);
-                    
+
                     // 바로 템플릿 적용
                     this.applySelectedTemplate();
                 }
-                
+
                 // 선택된 템플릿을 텍스트영역에 적용
                 applySelectedTemplate() {
                     if (!this.currentMode || !this.targetTextarea) {
                         alert('먼저 템플릿 모드를 선택해주세요.');
                         return false;
                     }
-                    
+
                     const textarea = document.querySelector(this.targetTextarea);
                     if (!textarea) {
                         console.error('대상 텍스트영역을 찾을 수 없습니다:', this.targetTextarea);
                         return false;
                     }
-                    
+
                     // 기존 내용이 있으면 확인
                     if (textarea.value.trim() && !confirm('기존 내용을 덮어쓸까요?')) {
                         return false;
                     }
-                    
+
                     textarea.value = this.currentMode.template;
-                    
+
                     // 텍스트영역 크기 자동 조정 (있다면)
                     if (textarea.style.height) {
                         textarea.style.height = 'auto';
                         textarea.style.height = textarea.scrollHeight + 'px';
                     }
-                    
+
                     alert(`"${this.currentMode.name}" 템플릿이 적용되었습니다!`);
                     return true;
                 }
-                
+
                 // 현재 텍스트영역 내용 지우기
                 clearContent() {
                     if (!this.targetTextarea) {
                         alert('텍스트영역을 선택할 수 없습니다.');
                         return;
                     }
-                    
+
                     const textarea = document.querySelector(this.targetTextarea);
                     if (!textarea) {
                         console.error('대상 텍스트영역을 찾을 수 없습니다:', this.targetTextarea);
                         return;
                     }
-                    
+
                     if (!textarea.value.trim()) {
                         alert('지울 내용이 없습니다.');
                         return;
                     }
-                    
+
                     if (confirm('현재 내용을 모두 지울까요?')) {
                         textarea.value = '';
                         // 선택된 모드도 해제
@@ -1615,12 +1698,12 @@
                         this.currentMode = null;
                     }
                 }
-                
+
                 // 템플릿 미리보기 (추후 모달용)
                 previewTemplate(modeId) {
                     const mode = THINKING_MODES[modeId];
                     if (!mode) return null;
-                    
+
                     return {
                         title: mode.name,
                         subtitle: mode.subtitle,
@@ -1632,7 +1715,7 @@
                     };
                 }
             }
-            
+
             // 전역 템플릿 매니저 인스턴스
             const templateManager = new TemplateManager();
 
@@ -2260,10 +2343,10 @@
 
             // 현재 선택된 세션 정보
             let currentSelectedSession = null;
-            
+
             // 현재 선택된 수업 정보 
             let currentSelectedLesson = null;
-            
+
             // 다운로드 버튼 텍스트 업데이트 함수
             function updateDownloadButtonText() {
                 const downloadAllLessonsText = document.getElementById('download-all-lessons-text');
@@ -2294,10 +2377,10 @@
                 conversationDetail.classList.add('hidden');
                 currentSelectedSession = null;
                 currentSelectedLesson = null; // 선택된 수업 정보 초기화
-                
+
                 // 다운로드 버튼 텍스트 업데이트
                 updateDownloadButtonText();
-                
+
                 // 수업 선택 카드 다시 표시
                 document.querySelector('.bg-white.rounded-lg.shadow-sm.border.mb-6').classList.remove('hidden');
             });
@@ -2685,7 +2768,7 @@
             let editTempResources = [];
 
             // === 자료 관리 이벤트 핸들러 (새 수업 생성) ===
-            
+
             // 웹 링크 추가 버튼
             addLinkBtn.addEventListener('click', () => {
                 linkInputArea.classList.remove('hidden');
@@ -2705,17 +2788,17 @@
             saveLinkBtn.addEventListener('click', () => {
                 const title = linkTitleInput.value.trim();
                 const url = linkUrlInput.value.trim();
-                
+
                 if (!title || !url) {
                     showStatus('링크 제목과 URL을 모두 입력해주세요.', 'error');
                     return;
                 }
-                
+
                 if (!isValidUrl(url)) {
                     showStatus('올바른 URL 형식을 입력해주세요.', 'error');
                     return;
                 }
-                
+
                 const resource = {
                     id: generateResourceId(),
                     type: 'link',
@@ -2723,14 +2806,14 @@
                     url: url,
                     createdAt: new Date().toISOString()
                 };
-                
+
                 tempResources.push(resource);
                 renderResources();
-                
+
                 linkInputArea.classList.add('hidden');
                 linkTitleInput.value = '';
                 linkUrlInput.value = '';
-                
+
                 showStatus('링크가 추가되었습니다.', 'success', 2000);
             });
 
@@ -2744,29 +2827,29 @@
             // 파일 업로드 버튼
             uploadFileBtn.addEventListener('click', async () => {
                 const file = fileInput.files[0];
-                
+
                 if (!file) {
                     showStatus('파일을 선택해주세요.', 'error');
                     return;
                 }
-                
+
                 // 파일 크기 제한 (10MB)
                 const maxSize = 10 * 1024 * 1024;
                 if (file.size > maxSize) {
                     showStatus('파일 크기는 10MB 이하여야 합니다.', 'error');
                     return;
                 }
-                
+
                 try {
                     uploadFileBtn.disabled = true;
                     uploadFileBtn.textContent = '업로드 중...';
                     uploadProgress.classList.remove('hidden');
-                    
+
                     // Firebase Storage에 파일 업로드
                     const fileName = `lessons/${Date.now()}_${file.name}`;
                     const storageRef = ref(storage, fileName);
                     const uploadTask = uploadBytesResumable(storageRef, file);
-                    
+
                     uploadTask.on('state_changed',
                         (snapshot) => {
                             // 업로드 진행 상황 표시
@@ -2783,7 +2866,7 @@
                         async () => {
                             // 업로드 완료 후 다운로드 URL 획득
                             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            
+
                             const resource = {
                                 id: generateResourceId(),
                                 type: 'file',
@@ -2795,21 +2878,21 @@
                                 storagePath: fileName,
                                 createdAt: new Date().toISOString()
                             };
-                            
+
                             tempResources.push(resource);
                             renderResources();
-                            
+
                             fileUploadArea.classList.add('hidden');
                             fileInput.value = '';
                             uploadProgress.classList.add('hidden');
                             uploadProgressBar.style.width = '0%';
                             uploadFileBtn.disabled = false;
                             uploadFileBtn.textContent = '업로드';
-                            
+
                             showStatus('파일이 성공적으로 업로드되었습니다.', 'success');
                         }
                     );
-                    
+
                 } catch (error) {
                     console.error('파일 업로드 오류:', error);
                     showStatus('파일 업로드 중 오류가 발생했습니다.', 'error');
@@ -2828,7 +2911,7 @@
             });
 
             // === 자료 관리 이벤트 핸들러 (수업 편집) ===
-            
+
             // 편집 모달 - 웹 링크 추가 버튼
             editAddLinkBtn.addEventListener('click', () => {
                 editLinkInputArea.classList.remove('hidden');
@@ -2848,17 +2931,17 @@
             editSaveLinkBtn.addEventListener('click', () => {
                 const title = editLinkTitleInput.value.trim();
                 const url = editLinkUrlInput.value.trim();
-                
+
                 if (!title || !url) {
                     showStatus('링크 제목과 URL을 모두 입력해주세요.', 'error');
                     return;
                 }
-                
+
                 if (!isValidUrl(url)) {
                     showStatus('올바른 URL 형식을 입력해주세요.', 'error');
                     return;
                 }
-                
+
                 const resource = {
                     id: generateResourceId(),
                     type: 'link',
@@ -2866,14 +2949,14 @@
                     url: url,
                     createdAt: new Date().toISOString()
                 };
-                
+
                 editTempResources.push(resource);
                 renderEditResources();
-                
+
                 editLinkInputArea.classList.add('hidden');
                 editLinkTitleInput.value = '';
                 editLinkUrlInput.value = '';
-                
+
                 showStatus('링크가 추가되었습니다.', 'success', 2000);
             });
 
@@ -2887,29 +2970,29 @@
             // 편집 모달 - 파일 업로드 버튼
             editUploadFileBtn.addEventListener('click', async () => {
                 const file = editFileInput.files[0];
-                
+
                 if (!file) {
                     showStatus('파일을 선택해주세요.', 'error');
                     return;
                 }
-                
+
                 // 파일 크기 제한 (10MB)
                 const maxSize = 10 * 1024 * 1024;
                 if (file.size > maxSize) {
                     showStatus('파일 크기는 10MB 이하여야 합니다.', 'error');
                     return;
                 }
-                
+
                 try {
                     editUploadFileBtn.disabled = true;
                     editUploadFileBtn.textContent = '업로드 중...';
                     editUploadProgress.classList.remove('hidden');
-                    
+
                     // Firebase Storage에 파일 업로드
                     const fileName = `lessons/${Date.now()}_${file.name}`;
                     const storageRef = ref(storage, fileName);
                     const uploadTask = uploadBytesResumable(storageRef, file);
-                    
+
                     uploadTask.on('state_changed',
                         (snapshot) => {
                             // 업로드 진행 상황 표시
@@ -2926,7 +3009,7 @@
                         async () => {
                             // 업로드 완료 후 다운로드 URL 획득
                             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            
+
                             const resource = {
                                 id: generateResourceId(),
                                 type: 'file',
@@ -2938,21 +3021,21 @@
                                 storagePath: fileName,
                                 createdAt: new Date().toISOString()
                             };
-                            
+
                             editTempResources.push(resource);
                             renderEditResources();
-                            
+
                             editFileUploadArea.classList.add('hidden');
                             editFileInput.value = '';
                             editUploadProgress.classList.add('hidden');
                             editUploadProgressBar.style.width = '0%';
                             editUploadFileBtn.disabled = false;
                             editUploadFileBtn.textContent = '업로드';
-                            
+
                             showStatus('파일이 성공적으로 업로드되었습니다.', 'success');
                         }
                     );
-                    
+
                 } catch (error) {
                     console.error('파일 업로드 오류:', error);
                     showStatus('파일 업로드 중 오류가 발생했습니다.', 'error');
@@ -2971,7 +3054,7 @@
             });
 
             // === 유틸리티 함수들 ===
-            
+
             // URL 유효성 검사
             function isValidUrl(string) {
                 try {
@@ -2981,12 +3064,12 @@
                     return false;
                 }
             }
-            
+
             // 리소스 ID 생성
             function generateResourceId() {
                 return 'resource_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
-            
+
             // 파일 크기 포맷팅
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
@@ -2995,45 +3078,45 @@
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
             }
-            
+
             // 자료 목록 렌더링 (새 수업 생성)
             function renderResources() {
                 resourcesList.innerHTML = '';
-                
+
                 if (tempResources.length === 0) {
                     resourcesList.innerHTML = '<p class="text-xs text-gray-500 italic">아직 추가된 자료가 없습니다.</p>';
                     return;
                 }
-                
+
                 tempResources.forEach(resource => {
                     const resourceEl = createResourceElement(resource, false);
                     resourcesList.appendChild(resourceEl);
                 });
             }
-            
+
             // 자료 목록 렌더링 (수업 편집)
             function renderEditResources() {
                 editResourcesList.innerHTML = '';
-                
+
                 if (editTempResources.length === 0) {
                     editResourcesList.innerHTML = '<p class="text-xs text-gray-500 italic">아직 추가된 자료가 없습니다.</p>';
                     return;
                 }
-                
+
                 editTempResources.forEach(resource => {
                     const resourceEl = createResourceElement(resource, true);
                     editResourcesList.appendChild(resourceEl);
                 });
             }
-            
+
             // 자료 요소 생성
             function createResourceElement(resource, isEdit) {
                 const div = document.createElement('div');
                 div.className = 'flex items-center justify-between p-2 bg-gray-50 rounded-md';
-                
+
                 const icon = resource.type === 'link' ? '🔗' : '📎';
                 const typeLabel = resource.type === 'link' ? '링크' : '파일';
-                
+
                 div.innerHTML = `
                     <div class="flex items-center space-x-2 flex-1 min-w-0">
                         <span class="text-lg">${icon}</span>
@@ -3050,13 +3133,13 @@
                         삭제
                     </button>
                 `;
-                
+
                 // 삭제 버튼 이벤트
                 const removeBtn = div.querySelector('.remove-resource-btn');
                 removeBtn.addEventListener('click', () => {
                     const resourceId = removeBtn.dataset.resourceId;
                     const isEditMode = removeBtn.dataset.isEdit === 'true';
-                    
+
                     if (isEditMode) {
                         editTempResources = editTempResources.filter(r => r.id !== resourceId);
                         renderEditResources();
@@ -3064,10 +3147,10 @@
                         tempResources = tempResources.filter(r => r.id !== resourceId);
                         renderResources();
                     }
-                    
+
                     showStatus('자료가 삭제되었습니다.', 'info', 2000);
                 });
-                
+
                 return div;
             }
 
@@ -3134,43 +3217,43 @@
             });
 
             // 수업 편집 모달 이벤트 핸들러들
-            
+
             // 수업 삭제 버튼
             const deleteLessonBtn = document.getElementById('delete-lesson-btn');
             deleteLessonBtn.addEventListener('click', async () => {
                 const lessonId = editLessonIdInput.value;
                 const lessonTitle = editLessonTitleInput.value;
-                
+
                 if (!lessonId) {
                     showStatus('수업 ID를 찾을 수 없습니다.', 'error');
                     return;
                 }
-                
+
                 // 삭제 확인
                 const confirmMessage = `정말로 "${lessonTitle}" 수업을 삭제하시게습니까?\n\n삭제된 수업은 복구할 수 없습니다.`;
-                
+
                 if (!confirm(confirmMessage)) {
                     return;
                 }
-                
+
                 try {
                     deleteLessonBtn.textContent = '삭제 중...';
                     deleteLessonBtn.disabled = true;
-                    
+
                     // deleteLesson Firebase Function 호출
                     const deleteLesson = httpsCallable(functions, 'deleteLesson');
                     await deleteLesson({ lessonId });
-                    
+
                     showStatus('수업이 성공적으로 삭제되었습니다!', 'success');
-                    
+
                     // 모달 닫기
                     editLessonModal.classList.add('hidden');
                     editTempResources = []; // 임시 자료 배열 초기화
                     renderEditResources(); // 자료 목록 UI 초기화
-                    
+
                     // 수업 목록 새로고침
                     await loadLessons();
-                    
+
                 } catch (error) {
                     console.error('수업 삭제 실패:', error);
                     showStatus(`수업 삭제 실패: ${error.message}`, 'error');
@@ -3179,7 +3262,7 @@
                     deleteLessonBtn.disabled = false;
                 }
             });
-            
+
             // 편집 모달 닫기 버튼
             closeEditModalBtn.addEventListener('click', () => {
                 editLessonModal.classList.add('hidden');
@@ -3237,12 +3320,12 @@
                     });
 
                     showStatus('수업이 성공적으로 수정되었습니다!', 'success');
-                    
+
                     // 모달 닫기
                     editLessonModal.classList.add('hidden');
                     editTempResources = []; // 임시 자료 배열 초기화
                     renderEditResources(); // 자료 목록 UI 초기화
-                    
+
                     // 수업 목록 새로고침
                     await loadLessons();
 
@@ -3345,10 +3428,10 @@
                 try {
                     // 현재 선택된 수업 정보 저장
                     currentSelectedLesson = lesson;
-                    
+
                     // 다운로드 버튼 텍스트 업데이트
                     updateDownloadButtonText();
-                    
+
                     // 수업 선택 카드 숨기기
                     document.querySelector('.bg-white.rounded-lg.shadow-sm.border.mb-6').classList.add('hidden');
 
@@ -3400,14 +3483,14 @@
                 const responseTypeMap = {
                     // 기본 유형
                     'DEFAULT': '기본 안내',
-                    
+
                     // 과학 과목 응답 유형
                     'CONCEPT_QUESTION': '개념 질문',
-                    'EXPLORATION_DEADLOCK': '탐색 교착 상태', 
+                    'EXPLORATION_DEADLOCK': '탐색 교착 상태',
                     'FAILURE_REPORT': '실패 보고',
                     'SUCCESS_WITHOUT_PRINCIPLE': '원칙 없는 성공',
                     'HYPOTHESIS_INQUIRY': '가설 탐구',
-                    
+
                     // 수학 과목 응답 유형
                     'CONCEPT_CONFUSION': '개념 혼란',
                     'PROCEDURE_ERROR': '절차 오류',
@@ -3415,7 +3498,7 @@
                     'PATTERN_RECOGNITION_STRUGGLE': '패턴 인식 어려움',
                     'MATHEMATICAL_REASONING': '수학적 추론',
                     'CALCULATION_ANXIETY': '계산 불안',
-                    
+
                     // 사회 과목 응답 유형
                     'FACTUAL_CONFUSION': '사실 혼란',
                     'PERSPECTIVE_LIMITATION': '관점 제한',
@@ -3423,19 +3506,19 @@
                     'SOCIAL_APATHY': '사회적 무관심',
                     'CRITICAL_INQUIRY': '비판적 탐구',
                     'STEREOTYPE_BIAS': '고정관념 편견',
-                    
+
                     // 국어 과목 응답 유형
                     'TEXT_COMPREHENSION_QUESTION': '텍스트 이해 질문',
                     'EXPRESSION_STRUGGLE': '표현 어려움',
                     'INTERPRETATION_CONFUSION': '해석 혼란',
                     'SURFACE_UNDERSTANDING': '표면적 이해',
-                    
+
                     // 기타 일반적 유형들 (기존 시스템에서 사용될 수 있는)
                     'CURIOSITY_DRIVEN': '호기심 주도',
                     'DIFFICULTY_EXPRESSION': '어려움 표현',
                     'CONFIRMATION_SEEKING': '확인 요청'
                 };
-                
+
                 return responseTypeMap[responseType] || responseType;
             }
 
@@ -3452,12 +3535,12 @@
                     hasNanoseconds: timestamp?.nanoseconds !== undefined,
                     objectKeys: timestamp && typeof timestamp === 'object' ? Object.keys(timestamp) : null
                 });
-                
+
                 if (!timestamp) {
                     console.log(`[TIMESTAMP DEBUG] ${fieldName} is null/undefined for session ${sessionId}`);
                     return null;
                 }
-                
+
                 try {
                     // Firestore Timestamp 객체인 경우 (toDate 메서드가 있는 경우)
                     if (timestamp && typeof timestamp === 'object' && typeof timestamp.toDate === 'function') {
@@ -3465,14 +3548,14 @@
                         console.log(`[TIMESTAMP DEBUG] ${fieldName} converted using toDate():`, result);
                         return result;
                     }
-                    
+
                     // Firebase v10에서 Timestamp가 plain object로 serialized된 경우
-                    if (timestamp && typeof timestamp === 'object' && 
+                    if (timestamp && typeof timestamp === 'object' &&
                         (timestamp.seconds !== undefined || timestamp._seconds !== undefined)) {
-                        
+
                         const seconds = timestamp.seconds || timestamp._seconds;
                         const nanoseconds = timestamp.nanoseconds || timestamp._nanoseconds || 0;
-                        
+
                         if (seconds !== undefined) {
                             // seconds를 밀리초로 변환하고 nanoseconds를 더함
                             const milliseconds = (seconds * 1000) + Math.floor(nanoseconds / 1000000);
@@ -3486,13 +3569,13 @@
                             return result;
                         }
                     }
-                    
+
                     // Date 객체인 경우 그대로 반환
                     if (timestamp instanceof Date) {
                         console.log(`[TIMESTAMP DEBUG] ${fieldName} is already a Date object:`, timestamp);
                         return timestamp;
                     }
-                    
+
                     // 숫자인 경우 (timestamp milliseconds)
                     if (typeof timestamp === 'number') {
                         const result = new Date(timestamp);
@@ -3501,7 +3584,7 @@
                             return result;
                         }
                     }
-                    
+
                     // 문자열인 경우
                     if (typeof timestamp === 'string') {
                         const result = new Date(timestamp);
@@ -3510,10 +3593,10 @@
                             return result;
                         }
                     }
-                    
+
                     console.log(`[TIMESTAMP DEBUG] ${fieldName} conversion failed - unsupported format:`, timestamp);
                     return null;
-                    
+
                 } catch (error) {
                     console.error(`[TIMESTAMP DEBUG] Error converting ${fieldName} for session ${sessionId}:`, error);
                     return null;
@@ -3524,11 +3607,11 @@
             function groupSessionsByStudentName(sessions) {
                 console.log('세션 그룹화 시작 - 총 세션 수:', sessions.length);
                 const grouped = {};
-                
+
                 sessions.forEach((session, index) => {
                     // 삭제 버튼 조건 디버깅 강화
                     const showDeleteButton = (session.messageCount <= 1 || session.messageCount === null || session.messageCount === undefined);
-                    
+
                     console.log(`[DELETE BUTTON DEBUG] 세션 ${index + 1}:`, {
                         sessionId: session.sessionId,
                         studentName: session.studentName,
@@ -3545,7 +3628,7 @@
                             '최종삭제버튼표시': showDeleteButton
                         }
                     });
-                    
+
                     const studentName = session.studentName;
                     if (!grouped[studentName]) {
                         grouped[studentName] = {
@@ -3555,21 +3638,21 @@
                             lastActivity: null
                         };
                     }
-                    
+
                     grouped[studentName].sessions.push(session);
                     grouped[studentName].totalMessages += session.messageCount || 0;
-                    
+
                     // 가장 최근 활동 시간 찾기 - 세션의 여러 시간 필드 확인 (강화된 로직)
                     let sessionActivity = null;
-                    
+
                     // 모든 가능한 시간 필드 확인 (우선순위 순서)
                     const timeFields = ['lastActivity', 'updatedAt', 'createdAt', 'timestamp'];
-                    
+
                     console.log(`[TIMESTAMP FALLBACK] ${studentName} 세션 ${session.sessionId}의 시간 필드 탐색:`);
-                    
+
                     for (const field of timeFields) {
                         console.log(`[TIMESTAMP FALLBACK] ${field} 필드 확인:`, session[field]);
-                        
+
                         if (session[field]) {
                             sessionActivity = convertFirestoreTimestamp(session[field], field, session.sessionId);
                             if (sessionActivity) {
@@ -3582,18 +3665,18 @@
                             console.log(`[TIMESTAMP FALLBACK] ${field} 필드가 null/undefined`);
                         }
                     }
-                    
+
                     if (!sessionActivity) {
                         console.warn(`[TIMESTAMP FALLBACK] ⚠️ ${studentName} 세션 ${session.sessionId}에서 유효한 시간 정보를 찾지 못함. 현재 시간으로 대체합니다.`);
                         // 마지막 수단으로 현재 시간 사용
                         sessionActivity = new Date();
                     }
-                    
+
                     if (sessionActivity && (!grouped[studentName].lastActivity || sessionActivity > grouped[studentName].lastActivity)) {
                         grouped[studentName].lastActivity = sessionActivity;
                     }
                 });
-                
+
                 // 배열로 변환하고 최근 활동 순으로 정렬
                 const groupedArray = Object.values(grouped);
                 groupedArray.sort((a, b) => {
@@ -3603,14 +3686,14 @@
                     if (!b.lastActivity) return -1;
                     return b.lastActivity - a.lastActivity;
                 });
-                
+
                 console.log('그룹화 완료:', groupedArray.map(g => ({
                     studentName: g.studentName,
                     sessionCount: g.sessions.length,
                     totalMessages: g.totalMessages,
                     lastActivity: g.lastActivity
                 })));
-                
+
                 return groupedArray;
             }
 
@@ -3663,11 +3746,11 @@
                     <div class="sessions-list hidden">
                         <div class="p-4 space-y-2">
                             ${studentGroup.sessions.map((session, index) => {
-                                // 개별 세션의 날짜 포맷팅
-                                const sessionDate = convertFirestoreTimestamp(session.lastActivity);
-                                const sessionDateText = sessionDate ? sessionDate.toLocaleString('ko-KR') : '';
-                                
-                                return `
+                    // 개별 세션의 날짜 포맷팅
+                    const sessionDate = convertFirestoreTimestamp(session.lastActivity);
+                    const sessionDateText = sessionDate ? sessionDate.toLocaleString('ko-KR') : '';
+
+                    return `
                                 <div class="session-item flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
                                     <div class="flex-1 cursor-pointer session-content" data-session-id="${session.sessionId}">
                                         <div class="flex items-center space-x-3">
@@ -3696,7 +3779,7 @@
                                     </div>
                                 </div>
                             `;
-                            }).join('')}
+                }).join('')}
                         </div>
                     </div>
                 `;
@@ -3704,7 +3787,7 @@
                 // 세션 목록 토글 이벤트
                 const toggleBtn = div.querySelector('.toggle-sessions-btn');
                 const sessionsList = div.querySelector('.sessions-list');
-                
+
                 toggleBtn.addEventListener('click', () => {
                     const isHidden = sessionsList.classList.contains('hidden');
                     if (isHidden) {
@@ -3731,28 +3814,28 @@
                 div.querySelectorAll('.delete-session-btn').forEach(deleteBtn => {
                     deleteBtn.addEventListener('click', async (e) => {
                         e.stopPropagation(); // 클릭 이벤트 버블링 방지
-                        
+
                         const sessionId = deleteBtn.getAttribute('data-session-id');
                         const studentName = deleteBtn.getAttribute('data-student-name');
-                        
+
                         if (!confirm(`${studentName} 학생의 세션을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
                             return;
                         }
-                        
+
                         try {
                             deleteBtn.textContent = '삭제중...';
                             deleteBtn.disabled = true;
-                            
+
                             await deleteSession({ sessionId });
-                            
+
                             showStatus('세션이 성공적으로 삭제되었습니다.', 'success');
-                            
+
                             // DOM에서 해당 세션 요소 제거
                             const sessionItem = deleteBtn.closest('.session-item');
                             if (sessionItem) {
                                 sessionItem.remove();
                             }
-                            
+
                             // 해당 학생 그룹의 세션 수 업데이트
                             const studentGroupElement = deleteBtn.closest('.bg-white.rounded-lg.border.border-gray-200');
                             if (studentGroupElement) {
@@ -3761,11 +3844,11 @@
                                 if (sessionCountSpan) {
                                     sessionCountSpan.textContent = `${remainingSessions.length}개 세션`;
                                 }
-                                
+
                                 // 세션이 모두 삭제되면 학생 그룹 자체를 제거
                                 if (remainingSessions.length === 0) {
                                     studentGroupElement.remove();
-                                    
+
                                     // 학생이 모두 없어지면 빈 상태 표시
                                     const remainingStudents = lessonStudentsList.querySelectorAll('.bg-white.rounded-lg.border.border-gray-200');
                                     if (remainingStudents.length === 0) {
@@ -3773,11 +3856,11 @@
                                     }
                                 }
                             }
-                            
+
                         } catch (error) {
                             console.error('세션 삭제 실패:', error);
                             showStatus(`세션 삭제 실패: ${error.message}`, 'error');
-                            
+
                             deleteBtn.textContent = '삭제';
                             deleteBtn.disabled = false;
                         }
@@ -3789,44 +3872,44 @@
                 if (deleteAllBtn) {
                     deleteAllBtn.addEventListener('click', async (e) => {
                         e.stopPropagation(); // 클릭 이벤트 버블링 방지
-                        
+
                         const studentName = deleteAllBtn.getAttribute('data-student-name');
                         const sessionCount = studentGroup.sessions.length;
-                        
+
                         if (!confirm(`${studentName} 학생의 모든 세션 ${sessionCount}개를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
                             return;
                         }
-                        
+
                         try {
                             deleteAllBtn.textContent = '삭제중...';
                             deleteAllBtn.disabled = true;
-                            
+
                             // 해당 학생의 모든 세션 ID 수집
                             const sessionIds = studentGroup.sessions.map(session => session.sessionId);
-                            
+
                             // 각 세션을 순차적으로 삭제
                             for (const sessionId of sessionIds) {
                                 await deleteSession({ sessionId });
                             }
-                            
+
                             showStatus(`${studentName} 학생의 모든 세션 ${sessionCount}개가 성공적으로 삭제되었습니다.`, 'success');
-                            
+
                             // DOM에서 해당 학생 그룹 전체 제거
                             const studentGroupElement = deleteAllBtn.closest('.bg-white.rounded-lg.border.border-gray-200');
                             if (studentGroupElement) {
                                 studentGroupElement.remove();
-                                
+
                                 // 학생이 모두 없어지면 빈 상태 표시
                                 const remainingStudents = lessonStudentsList.querySelectorAll('.bg-white.rounded-lg.border.border-gray-200');
                                 if (remainingStudents.length === 0) {
                                     lessonStudentsEmpty.classList.remove('hidden');
                                 }
                             }
-                            
+
                         } catch (error) {
                             console.error('모든 세션 삭제 실패:', error);
                             showStatus(`모든 세션 삭제 실패: ${error.message}`, 'error');
-                            
+
                             deleteAllBtn.textContent = '모든 세션 삭제';
                             deleteAllBtn.disabled = false;
                         }
@@ -3887,7 +3970,7 @@
 
                     const result = await getLessons();
                     const lessons = result.data.lessons || [];
-                    
+
                     // 디버깅: 로드된 수업 목록 확인
                     console.log('로드된 수업 목록:', lessons);
 
@@ -3924,14 +4007,14 @@
                 if (lesson.createdAt) {
                     try {
                         let date;
-                        
+
                         // Firestore Timestamp 객체인 경우
                         if (lesson.createdAt && typeof lesson.createdAt === 'object' && lesson.createdAt.toDate) {
                             date = lesson.createdAt.toDate();
                         }
                         // Firestore v9+ 에서 직렬화된 timestamp 객체인 경우
-                        else if (lesson.createdAt && typeof lesson.createdAt === 'object' && 
-                                (lesson.createdAt._seconds || lesson.createdAt.seconds)) {
+                        else if (lesson.createdAt && typeof lesson.createdAt === 'object' &&
+                            (lesson.createdAt._seconds || lesson.createdAt.seconds)) {
                             const seconds = lesson.createdAt._seconds || lesson.createdAt.seconds;
                             const nanoseconds = lesson.createdAt._nanoseconds || lesson.createdAt.nanoseconds || 0;
                             date = new Date((seconds * 1000) + Math.floor(nanoseconds / 1000000));
@@ -3940,7 +4023,7 @@
                         else {
                             date = new Date(lesson.createdAt);
                         }
-                        
+
                         if (date && !isNaN(date.getTime())) {
                             createdAtText = date.toLocaleString('ko-KR');
                         }
@@ -4021,23 +4104,23 @@
                     const title = editBtn.dataset.title;
                     const subject = editBtn.dataset.subject;
                     const description = editBtn.dataset.description;
-                    
+
                     // 디버깅: lesson 객체 확인
                     console.log('편집할 수업 데이터:', lesson);
                     console.log('수업 자료(resources):', lesson.resources);
-                    
+
                     // 편집 모달에 데이터 로드
                     editLessonIdInput.value = lessonId;
                     editLessonTitleInput.value = title;
                     editLessonSubjectSelect.value = subject;
                     editLessonAiInstructionsInput.value = lesson.aiInstructions || '';
                     editLessonStudentDescriptionInput.value = lesson.studentDescription || '';
-                    
+
                     // 기존 자료 로드 (resources 필드가 없는 경우 빈 배열로 초기화)
                     editTempResources = Array.isArray(lesson.resources) ? [...lesson.resources] : [];
                     console.log('editTempResources에 로드된 자료:', editTempResources);
                     renderEditResources();
-                    
+
                     // 편집 모달에서 템플릿 UI 초기화 (과목에 맞는 템플릿 버튼들 표시)
                     if (subject && templateManager) {
                         templateManager.renderModeButtons(
@@ -4046,7 +4129,7 @@
                             '#edit-lesson-ai-instructions'
                         );
                     }
-                    
+
                     // 편집 모달 표시
                     editLessonModal.classList.remove('hidden');
                 });
@@ -4289,50 +4372,50 @@
             function applyTemplate() {
                 templateManager.applySelectedTemplate();
             }
-            
+
             function clearTemplate() {
                 templateManager.clearContent();
             }
-            
+
             // 수업 생성/편집 시 템플릿 UI 초기화
             function initTemplateUI() {
                 console.log('템플릿 UI 초기화 시작');
-                
+
                 // 수업 생성 폼의 템플릿 버튼들에 이벤트 연결
                 const createApplyBtn = document.getElementById('apply-template-btn');
                 const createClearBtn = document.getElementById('clear-template-btn');
-                
+
                 if (createApplyBtn) {
                     createApplyBtn.addEventListener('click', applyTemplate);
                     console.log('수업 생성 템플릿 적용 버튼 이벤트 연결됨');
                 }
-                
+
                 if (createClearBtn) {
                     createClearBtn.addEventListener('click', clearTemplate);
                     console.log('수업 생성 템플릿 클리어 버튼 이벤트 연결됨');
                 }
-                
+
                 // 수업 편집 폼의 템플릿 버튼들에 이벤트 연결
                 const editApplyBtn = document.getElementById('edit-apply-template-btn');
                 const editClearBtn = document.getElementById('edit-clear-template-btn');
-                
+
                 if (editApplyBtn) {
                     editApplyBtn.addEventListener('click', applyTemplate);
                     console.log('수업 편집 템플릿 적용 버튼 이벤트 연결됨');
                 }
-                
+
                 if (editClearBtn) {
                     editClearBtn.addEventListener('click', clearTemplate);
                     console.log('수업 편집 템플릿 클리어 버튼 이벤트 연결됨');
                 }
-                
+
                 // 과목 변경 시 템플릿 모드 버튼들 업데이트
                 const lessonSubjectSelect = document.getElementById('lesson-subject');
                 const editLessonSubjectSelect = document.getElementById('edit-lesson-subject');
-                
+
                 if (lessonSubjectSelect) {
                     console.log('수업 과목 선택 요소를 찾았음');
-                    
+
                     lessonSubjectSelect.addEventListener('change', (e) => {
                         const subject = e.target.value;
                         console.log('과목 변경됨:', subject);
@@ -4342,7 +4425,7 @@
                             '#lesson-ai-instructions'
                         );
                     });
-                    
+
                     // 초기 로드 시 현재 선택된 과목으로 템플릿 버튼들 생성
                     const currentSubject = lessonSubjectSelect.value;
                     if (currentSubject) {
@@ -4356,10 +4439,10 @@
                 } else {
                     console.log('수업 과목 선택 요소를 찾을 수 없음');
                 }
-                
+
                 if (editLessonSubjectSelect) {
                     console.log('수업 편집 과목 선택 요소를 찾았음');
-                    
+
                     editLessonSubjectSelect.addEventListener('change', (e) => {
                         const subject = e.target.value;
                         console.log('편집 모달 과목 변경됨:', subject);
@@ -4372,12 +4455,12 @@
                 } else {
                     console.log('수업 편집 과목 선택 요소를 찾을 수 없음');
                 }
-                
+
                 console.log('템플릿 UI 초기화 완료');
             }
-            
+
             // DOMContentLoaded 이벤트에서 템플릿 UI 초기화
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // 페이지 로드 후 약간의 지연을 두고 초기화 (다른 초기화가 완료된 후)
                 setTimeout(initTemplateUI, 500);
             });
@@ -4394,18 +4477,18 @@
                     }
                 }
             };
-            
+
             // 일괄 다운로드 기능
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // 드롭다운 메뉴 토글
                 const bulkDownloadBtn = document.getElementById('bulk-download-btn');
                 const bulkDownloadMenu = document.getElementById('bulk-download-menu');
-                
+
                 if (bulkDownloadBtn && bulkDownloadMenu) {
                     bulkDownloadBtn.addEventListener('click', () => {
                         bulkDownloadMenu.classList.toggle('hidden');
                     });
-                    
+
                     // 메뉴 외부 클릭 시 닫기
                     document.addEventListener('click', (e) => {
                         if (!e.target.closest('#bulk-download-dropdown')) {
@@ -4413,22 +4496,22 @@
                         }
                     });
                 }
-                
+
                 // 전체 수업 데이터 다운로드 (선택된 수업이 있으면 해당 수업만, 없으면 전체)
                 const downloadAllLessonsBtn = document.getElementById('download-all-lessons');
                 if (downloadAllLessonsBtn) {
                     downloadAllLessonsBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
                         bulkDownloadMenu.classList.add('hidden');
-                        
+
                         try {
                             if (currentSelectedLesson) {
                                 // 선택된 수업의 데이터만 다운로드
                                 showStatus(`'${currentSelectedLesson.title}' 수업 데이터를 생성하고 있습니다...`, 'info');
-                                
+
                                 const exportLessonData = httpsCallable(functions, 'exportLessonData');
                                 const result = await exportLessonData({ lessonId: currentSelectedLesson.id });
-                                
+
                                 if (result.data.success) {
                                     const fileName = `${currentSelectedLesson.title}_수업데이터_${new Date().toISOString().split('T')[0]}.csv`;
                                     downloadCSV(result.data.data, fileName);
@@ -4437,10 +4520,10 @@
                             } else {
                                 // 전체 수업 데이터 다운로드
                                 showStatus('전체 수업 데이터를 생성하고 있습니다...', 'info');
-                                
+
                                 const exportAllLessonsData = httpsCallable(functions, 'exportAllLessonsData');
                                 const result = await exportAllLessonsData();
-                                
+
                                 if (result.data.success) {
                                     downloadCSV(result.data.data, `전체수업데이터_${new Date().toISOString().split('T')[0]}.csv`);
                                     showStatus(`전체 ${result.data.totalRecords}건의 데이터를 다운로드했습니다.`, 'success');
@@ -4452,25 +4535,25 @@
                         }
                     });
                 }
-                
+
                 // 선택된 수업 요약 보고서 다운로드
                 const downloadLessonSummaryBtn = document.getElementById('download-lesson-summary');
                 if (downloadLessonSummaryBtn) {
                     downloadLessonSummaryBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
                         bulkDownloadMenu.classList.add('hidden');
-                        
+
                         if (!currentSelectedLesson) {
                             showStatus('수업을 먼저 선택해주세요.', 'warning');
                             return;
                         }
-                        
+
                         try {
                             showStatus(`'${currentSelectedLesson.title}' 수업 요약 보고서를 생성하고 있습니다...`, 'info');
-                            
+
                             const generateLessonSummaryReport = httpsCallable(functions, 'generateLessonSummaryReport');
                             const reportResult = await generateLessonSummaryReport({ lessonId: currentSelectedLesson.id });
-                            
+
                             if (reportResult.data.success) {
                                 const report = reportResult.data.report;
                                 const reportData = [{
@@ -4483,7 +4566,7 @@
                                     AI분석: report.aiAnalysis.replace(/\n/g, ' '),
                                     분석생성일: report.generatedAt
                                 }];
-                                
+
                                 const fileName = `${currentSelectedLesson.title}_요약보고서_${new Date().toISOString().split('T')[0]}.csv`;
                                 downloadCSV(reportData, fileName);
                                 showStatus(`'${currentSelectedLesson.title}' 수업의 요약 보고서를 다운로드했습니다.`, 'success');
@@ -4496,25 +4579,25 @@
                         }
                     });
                 }
-                
+
                 // 선택된 수업 학생 참여도 분석 다운로드
                 const downloadParticipationReportBtn = document.getElementById('download-participation-report');
                 if (downloadParticipationReportBtn) {
                     downloadParticipationReportBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
                         bulkDownloadMenu.classList.add('hidden');
-                        
+
                         if (!currentSelectedLesson) {
                             showStatus('수업을 먼저 선택해주세요.', 'warning');
                             return;
                         }
-                        
+
                         try {
                             showStatus(`'${currentSelectedLesson.title}' 수업의 학생 참여도 분석을 생성하고 있습니다...`, 'info');
-                            
+
                             const generateLessonParticipationReport = httpsCallable(functions, 'generateLessonParticipationReport');
                             const result = await generateLessonParticipationReport({ lessonId: currentSelectedLesson.id });
-                            
+
                             if (result.data.success) {
                                 const fileName = `${currentSelectedLesson.title}_학생참여도분석_${new Date().toISOString().split('T')[0]}.csv`;
                                 downloadCSV(result.data.data, fileName);
@@ -4527,18 +4610,18 @@
                     });
                 }
             });
-            
+
             // CSV 다운로드 유틸리티 함수
             function downloadCSV(data, filename) {
                 if (!data || data.length === 0) {
                     showStatus('다운로드할 데이터가 없습니다.', 'warning');
                     return;
                 }
-                
+
                 // CSV 헤더 생성
                 const headers = Object.keys(data[0]);
                 const csvContent = [headers.join(',')];
-                
+
                 // 데이터 행 생성
                 data.forEach(row => {
                     const values = headers.map(header => {
@@ -4551,11 +4634,11 @@
                     });
                     csvContent.push(values.join(','));
                 });
-                
+
                 // BOM 추가하여 한글 인코딩 문제 해결
                 const csvString = '\uFEFF' + csvContent.join('\n');
                 const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-                
+
                 // 다운로드 링크 생성
                 const link = document.createElement('a');
                 if (link.download !== undefined) {
