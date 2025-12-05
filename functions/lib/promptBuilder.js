@@ -397,31 +397,79 @@ class PromptBuilder {
      * @param {Array} conversationHistory - 대화 이력
      * @returns {Array} Gemini API 호출용 contents 배열
      */
+    // /**
+    //  * Gemini API 호출 형식으로 변환합니다
+    //  * @param {string} systemInstruction - 시스템 지시사항
+    //  * @param {string} userMessage - 사용자 메시지
+    //  * @param {Array} conversationHistory - 대화 이력
+    //  * @returns {Array} Gemini API 호출용 contents 배열
+    //  */
     static formatForGeminiApi(systemInstruction, userMessage, conversationHistory) {
-        const recentHistory = conversationHistory.slice(-6);
+        // 1. 대화 이력 정리 (최근 6개만 유지)
+        // 프론트엔드에서 이미 현재 메시지를 history에 넣어서 보냈을 수 있으므로,
+        // 마지막 메시지가 현재 userMessage와 같다면 중복 제거를 위해 제외합니다.
+        let cleanHistory = [...conversationHistory];
+        if (cleanHistory.length > 0) {
+            const lastMsg = cleanHistory[cleanHistory.length - 1];
+            if (lastMsg.role === 'user' && 
+                lastMsg.parts && 
+                lastMsg.parts[0].text === userMessage) {
+                cleanHistory.pop(); // 중복된 현재 메시지 제거
+            }
+        }
+        
+        // 최근 대화만 남김 (토큰 절약 및 집중력 향상)
+        const recentHistory = cleanHistory.slice(-30);
+        
         const contents = [];
         
-        // 시스템 지시사항과 첫 사용자 메시지 결합
+        // 2. 시스템 프롬프트 배치 전략 수정
+        // 시스템 지시사항을 첫 번째 메시지가 아니라, 별도의 구조 혹은 
+        // 맥락(Context)으로 명확히 분리하여 주입합니다.
+        
+        // Gemini는 system_instruction 파라미터를 지원하지만, 
+        // 여기서는 contents 배열의 첫 번째 User 메시지에 맥락을 주입하는 방식을 최적화합니다.
+        
         if (recentHistory.length === 0) {
+            // 대화 이력이 없는 경우: [시스템 지시사항 + 현재 질문]
             contents.push({
                 role: 'user',
                 parts: [{
-                    text: `${systemInstruction}\n\n### 학생의 현재 발화 ###\n${userMessage}`
+                    text: `${systemInstruction}\n\n### 학생의 질문 ###\n${userMessage}`
                 }]
             });
         } else {
-            // 대화 이력이 있는 경우
-            recentHistory.forEach((turn, index) => {
-                if (index === 0) {
-                    const userTextWithSystemPrompt = `${systemInstruction}\n\n### 학생의 현재 발화 ###\n${turn.parts[0].text}`;
-                    contents.push({ role: 'user', parts: [{ text: userTextWithSystemPrompt }] });
-                } else {
-                    contents.push(turn);
-                }
+            // 대화 이력이 있는 경우: 
+            // 1) [시스템 지시사항 (맥락)] -> User 역할로 가장 먼저 주입
+            // 2) [과거 대화 기록]
+            // 3) [현재 질문]
+            
+            // 시스템 지시사항을 가장 먼저 배치 (User 역할)
+            contents.push({
+                role: 'user',
+                parts: [{ 
+                    text: `[시스템 설정 및 역할]\n${systemInstruction}\n\n위의 설정을 기억하고 다음 대화를 이어가세요.` 
+                }]
+            });
+            
+            // AI가 설정을 확인했다는 가상의 응답 (대화 흐름 자연스럽게 유지)
+            contents.push({
+                role: 'model',
+                parts: [{ text: "네, 알겠습니다. 학생의 학습을 돕기 위해 설정된 역할대로 대화하겠습니다." }]
+            });
+
+            // 과거 대화 이력 추가
+            recentHistory.forEach(turn => {
+                contents.push(turn);
             });
             
             // 현재 사용자 메시지 추가
-            contents.push({ role: 'user', parts: [{ text: userMessage }] });
+            contents.push({ 
+                role: 'user', 
+                parts: [{ 
+                    text: `### 학생의 현재 질문 ###\n${userMessage}` 
+                }] 
+            });
         }
         
         return contents;

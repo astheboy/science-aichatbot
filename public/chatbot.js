@@ -23,7 +23,7 @@ let sessionId = "";
 let currentGameStats = {
   level: 1,
   exp: 0,
-  nextLevelExp: 50,
+  nextLevelExp: 10,
   currentTitle: { name: '탐구자', icon: '🌱' },
   achievements: []
 };
@@ -342,7 +342,7 @@ function updateGamificationStats(gamificationData) {
   // UI 업데이트
   updateGamificationDisplay();
   
-  // 경험치 획듍 알림
+  // 경험치 획득 알림
   if (gamificationData.expGained && gamificationData.expGained > 0) {
     showExpGainNotification(gamificationData.expGained);
   }
