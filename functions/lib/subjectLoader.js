@@ -52,7 +52,7 @@ class SubjectLoader {
      * @returns {Promise<void>}
      */
     static async preloadAllConfigs() {
-        const subjects = ['korean', 'math', 'science', 'social'];
+        const subjects = ['korean', 'math', 'science', 'social', 'counseling'];
         const loadPromises = subjects.map(subject => this.loadSubjectConfig(subject));
         
         try {
@@ -158,7 +158,7 @@ class SubjectLoader {
      * @returns {Array} 지원 과목 배열
      */
     static getSupportedSubjects() {
-        return ['korean', 'math', 'science', 'social'];
+        return ['korean', 'math', 'science', 'social', 'counseling'];
     }
     
     /**
@@ -171,7 +171,8 @@ class SubjectLoader {
             korean: '국어',
             math: '수학', 
             science: '과학',
-            social: '사회'
+            social: '사회',
+            counseling: '상담/감정케어'
         };
         return names[subject] || subject;
     }

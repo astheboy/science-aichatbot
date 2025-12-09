@@ -1033,7 +1033,7 @@ exports.analyzeStudentConversations = onCall(async (request) => {
       const existingAnalysisSnapshot = await db.collection('conversation_analyses')
         .where('sessionId', '==', sessionId)
         .where('teacherCode', '==', teacherCode)
-        .where('analysisType', '==', 'gifted_assessment')
+        // analysisType 필터 제거 (모든 유형의 분석 조회)
         .orderBy('generatedAt', 'desc')
         .limit(1)
         .get();
@@ -1056,6 +1056,7 @@ exports.analyzeStudentConversations = onCall(async (request) => {
             responseTypes: existingAnalysis.responseTypes || []
           },
           isExistingAnalysis: true, // 기존 분석임을 표시
+          analysisTitle: existingAnalysis.analysisTitle || '학생 영재성 평가 분석',
           generatedAt: existingAnalysis.generatedAt ? existingAnalysis.generatedAt.toDate() : new Date()
         };
       }
@@ -1100,8 +1101,68 @@ exports.analyzeStudentConversations = onCall(async (request) => {
         return `[${index + 1}번째 대화 - ${timestamp} - ${conv.responseType || 'DEFAULT'}]\n학생: ${conv.userMessage}\nAI 튜터: ${conv.aiResponse}\n`;
       }).join('\n');
       
-      // 영재성 평가를 위한 성장 추적 중심 분석 프롬프트
-      const giftedAnalysisPrompt = `학생의 AI 튜터 대화를 분석하여 성장 가능성과 발달 단계를 평가해주세요.
+      // 2. 수업 정보 가져오기 (과목 확인용)
+      let subject = 'science'; // 기본값
+      if (sessionData.lessonId) {
+        try {
+            const lessonDoc = await db.collection('lessons').doc(sessionData.lessonId).get();
+            if (lessonDoc.exists) {
+                const lessonData = lessonDoc.data();
+                subject = lessonData.subject || 'science';
+            }
+        } catch (error) {
+            console.warn(`수업 정보 조회 실패: ${sessionData.lessonId}`, error);
+        }
+      }
+
+      let analysisPrompt;
+      let analysisTitle;
+
+      if (subject === 'counseling') {
+        analysisTitle = '학생 상담 분석 보고서';
+        analysisPrompt = `학생의 상담 대화 내용을 분석하여 정서 상태와 심리적 안녕감을 평가해주세요.
+
+학생 정보:
+- 학생 이름: ${sessionData.studentName}
+- 총 대화 횟수: ${conversations.length}회
+- 주요 감정 표현: ${sessionData.responseTypes ? sessionData.responseTypes.join(', ') : '기록 없음'}
+
+대화 분석 대상:
+${conversationText}
+
+상담 분석 틀:
+
+1. 정서 상태 분석 (Emotional State)
+- 지배적 정서: 대화 전반에 나타난 주요 감정 (기쁨, 슬픔, 불안, 분노 등)
+- 감정의 강도 및 지속성: 감정 표현의 깊이와 변화 추이
+- 스트레스 요인: 학생이 호소하는 어려움이나 갈등 상황 (학업, 교우관계, 가정 등)
+
+2. 대처 방식 및 자원 (Coping & Resources)
+- 문제 해결 방식: 어려움에 직면했을 때의 태도 (회피, 직면, 도움 요청 등)
+- 내적 자원: 자기 이해, 회복 탄력성, 긍정적 사고 유무
+- 외적 자원: 주변의 지지 체계 (친구, 교사, 부모 등)에 대한 인식
+
+3. 상담 과정 평가 (Counseling Process)
+- 라포 형성: 상담 튜터와의 상호작용 및 신뢰 수준
+- 자기 개방: 자신의 생각과 감정을 솔직하게 표현하는 정도
+- 통찰 및 변화: 대화를 통해 얻은 깨달음이나 감정의 긍정적 변화
+
+4. 교사를 위한 제언 (Suggestions for Teacher)
+- 관심 가져야 할 영역: 교사가 주의 깊게 살펴봐야 할 학생의 행동이나 징후
+- 지도 방향: 학생의 정서적 안정을 위해 필요한 격려나 지지 방식
+- 연계 필요성: 전문적인 상담이나 추가적인 관찰이 필요한지 여부
+
+각 항목을 구체적인 대화 내용을 근거로 분석하고, 교사가 학생 지도에 활용할 수 있는 실질적인 조언을 포함해주세요.
+
+매우 중요한 응답 형식 지침:
+- 절대로 마크다운 문법을 사용하지 마세요 (*, **, #, ##, ###, [], (), \` 등 금지)
+- 제목이나 강조가 필요한 경우 단순히 대문자나 줄바꿈으로 구분하세요
+- 목록은 숫자나 하이픈(-)으로 시작하되, 별표(*)는 절대 사용하지 마세요
+- 모든 응답은 순수한 일반 텍스트로만 구성해주세요`;
+
+      } else {
+        analysisTitle = '학생 영재성 평가 분석';
+        analysisPrompt = `학생의 AI 튜터 대화를 분석하여 성장 가능성과 발달 단계를 평가해주세요.
 
 학생 정보:
 - 학생 이름: ${sessionData.studentName}
@@ -1153,13 +1214,14 @@ ${conversationText}
 - 제목이나 강조가 필요한 경우 단순히 대문자나 줄바꿈으로 구분하세요
 - 목록은 숫자나 하이픈(-)으로 시작하되, 별표(*)는 절대 사용하지 마세요
 - 모든 응답은 순수한 일반 텍스트로만 구성해주세요`;
+      }
       
       // Gemini API 호출하여 분석 생성
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: modelName });
       
       const result = await model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: giftedAnalysisPrompt }] }],
+        contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
         generationConfig: {
           "temperature": 0.2,
           "topP": 0.8,
@@ -1175,7 +1237,8 @@ ${conversationText}
         sessionId: sessionId,
         studentName: sessionData.studentName,
         teacherCode: teacherCode,
-        analysisType: 'gifted_assessment',
+        analysisType: subject === 'counseling' ? 'counseling_assessment' : 'gifted_assessment',
+        analysisTitle: analysisTitle,
         analysisText: analysisText,
         conversationCount: conversations.length,
         responseTypes: sessionData.responseTypes || [],
@@ -1189,6 +1252,7 @@ ${conversationText}
       return {
         analysisId: analysisRef.id,
         analysis: analysisText,
+        analysisTitle: analysisTitle,
         sessionInfo: {
           sessionId: sessionId,
           studentName: sessionData.studentName,
@@ -1220,7 +1284,7 @@ exports.createLesson = onCall(async (request) => {
     }
 
     // 지원되는 과목 목록
-    const validSubjects = ['korean', 'math', 'social', 'science'];
+    const validSubjects = SubjectLoader.getSupportedSubjects();
     if (!validSubjects.includes(subject)) {
         throw new HttpsError('invalid-argument', '지원되지 않는 과목입니다.');
     }

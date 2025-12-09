@@ -541,6 +541,7 @@
                                             <option value="math">수학</option>
                                             <option value="social">사회</option>
                                             <option value="science">과학</option>
+                                            <option value="counseling">상담/감정케어</option>
                                         </select>
                                     </div>
                                 </div>
@@ -807,6 +808,7 @@
                                         <option value="math">수학</option>
                                         <option value="social">사회</option>
                                         <option value="science">과학</option>
+                                        <option value="counseling">상담/감정케어</option>
                                     </select>
                                 </div>
 
@@ -1028,6 +1030,7 @@
                                     <option value="math">수학</option>
                                     <option value="social">사회</option>
                                     <option value="science">과학</option>
+                                    <option value="counseling">상담/감정케어</option>
                                 </select>
                             </div>
                             <p class="text-xs text-gray-600 mt-2">선택한 과목에 맞는 학생 응답 유형별 프롬프트를 설정할 수 있습니다.</p>
@@ -1389,7 +1392,8 @@
                 'korean': '국어',
                 'math': '수학',
                 'science': '과학',
-                'social': '사회'
+                'social': '사회',
+                'counseling': '상담/감정케어'
             };
 
             // 사고력 증진 템플릿 모드 데이터
@@ -1530,6 +1534,28 @@
 **상호작용 방식**: 항상 존댓말을 사용하며, 학생 선생님의 설명에 "아, 그렇구나!", "정말 설명 잘한다!" 와 같이 감탄하고 긍정적인 피드백을 주어 학생의 자신감을 북돋아 줘.
 
 **학습 내용**: 학생이 핵심 내용을 명확히 설명할 수 있는지 확인하는 데 모든 질문을 집중해줘.`
+                },
+                counseling_basic: {
+                    id: 'counseling_basic',
+                    name: '💕 공감 상담 모드',
+                    subtitle: 'Empathetic Counseling Mode',
+                    description: '학생의 감정을 읽어주고 공감하며 대화하는 상담가 역할',
+                    subjects: ['counseling'],
+                    difficulty: '초급',
+                    keywords: ['공감', '경청', '감정', '위로', '지지'],
+                    template: `**역할**: 너는 따뜻하고 공감 능력이 뛰어난 전문 심리 상담가야.
+
+**목표**: 학생이 자신의 감정을 편안하게 털어놓도록 하고, 그 감정을 있는 그대로 수용해주며 정서적 안정을 찾도록 도와야 해.
+
+**핵심 규칙**:
+1. 섣불리 조언하거나 해결책을 제시하려 하지 마. 먼저 충분히 들어주고 공감하는 것이 우선이야.
+2. "그랬구나", "많이 힘들었겠다"와 같은 공감적 대화 기법을 적극적으로 사용해.
+3. 학생이 자신의 감정을 구체적인 단어로 표현하도록 도와줘.
+4. 대화가 긍정적인 방향으로 마무리될 수 있도록 격려와 지지를 보내줘.
+
+**상호작용 방식**: 부드럽고 따뜻한 말투를 사용하며, 학생이 언제든 기댈 수 있는 안전한 대화 상대가 되어줘.
+
+**학습 내용**: 정서적 안정과 자기 이해를 돕는 것이 이 상담의 핵심이야.`
                 }
             };
 
@@ -1591,7 +1617,8 @@
                         'korean': '국어 템플릿 모드',
                         'math': '수학 템플릿 모드',
                         'science': '과학 탐구 템플릿 모드',
-                        'social': '사회 탐구 템플릿 모드'
+                        'social': '사회 탐구 템플릿 모드',
+                        'counseling': '상담 템플릿 모드'
                     };
 
                     // 컨테이너에 따라 적절한 섹션과 제목 요소 찾기
@@ -2422,7 +2449,8 @@
                         analysis: result.data.analysis,
                         sessionInfo: result.data.sessionInfo,
                         generatedAt: generatedTime,
-                        isExistingAnalysis: result.data.isExistingAnalysis || false
+                        isExistingAnalysis: result.data.isExistingAnalysis || false,
+                        analysisTitle: result.data.analysisTitle || '학생 영재성 평가 분석'
                     };
 
                     // 분석 결과 표시 (마크다운 없이 순수 텍스트로)
@@ -2458,14 +2486,14 @@
                 }
 
                 try {
-                    const textToCopy = `${currentAnalysisData.sessionInfo.studentName} 학생 영재성 평가 분석 (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
+                    const textToCopy = `${currentAnalysisData.sessionInfo.studentName} ${currentAnalysisData.analysisTitle} (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
 
                     await navigator.clipboard.writeText(textToCopy);
                     showStatus('분석 결과가 클립보드에 복사되었습니다!', 'success');
                 } catch (error) {
                     // 클립보드 API가 지원되지 않는 경우
                     const textArea = document.createElement('textarea');
-                    textArea.value = `${currentAnalysisData.sessionInfo.studentName} 학생 영재성 평가 분석 (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
+                    textArea.value = `${currentAnalysisData.sessionInfo.studentName} ${currentAnalysisData.analysisTitle} (생성시각: ${currentAnalysisData.generatedAt})\n\n${currentAnalysisData.analysis}`;
                     document.body.appendChild(textArea);
                     textArea.select();
                     document.execCommand('copy');
