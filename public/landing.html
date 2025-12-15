@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 교육 튜터 - 생각을 깨우는 맞춤형 학습 파트너</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+
+    <!-- Scripts & Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            600: '#7c3aed',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased text-slate-800 bg-white selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">AI Tutor</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                    <a href="#features" class="hover:text-blue-600 transition-colors">주요 기능</a>
+                    <a href="#how-it-works" class="hover:text-blue-600 transition-colors">사용 방법</a>
+                    <a href="#pedagogy" class="hover:text-blue-600 transition-colors">교육 철학</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html"
+                        class="text-sm font-medium text-slate-600 hover:text-blue-600 hidden sm:block">학생 입장</a>
+                    <a href="teacher.html"
+                        class="px-5 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-full hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        선생님 시작하기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 hero-gradient overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+
+            <div
+                class="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium mb-8 animate-fade-in-up">
+                <span class="flex h-2 w-2 rounded-full bg-blue-600 mr-2"></span>
+                Google Gemini Pro 기반 교육 플랫폼
+            </div>
+
+            <h1 class="text-5xl lg:text-7xl font-black tracking-tight mb-6 leading-tight animate-fade-in-up"
+                style="animation-delay: 0.1s;">
+                정답이 아닌 <br class="hidden sm:block" />
+                <span class="text-gradient">생각을 가르치는</span> AI 파트너
+            </h1>
+
+            <p class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up"
+                style="animation-delay: 0.2s;">
+                단순히 답을 알려주는 AI는 이제 그만. <br />
+                소크라테스식 문답법으로 학생의 사고력을 키우는 진정한 맞춤형 튜터를 만나보세요.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in-up"
+                style="animation-delay: 0.3s;">
+                <a href="teacher.html"
+                    class="px-8 py-4 bg-blue-600 text-white rounded-full text-lg font-bold shadow-blue-200/50 shadow-xl hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center">
+                    무료로 수업 만들기
+                    <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
+                </a>
+                <a href="#how-it-works"
+                    class="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-full text-lg font-semibold hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+                    <i data-lucide="play-circle" class="mr-2 w-5 h-5 text-slate-400"></i>
+                    동작 원리 보기
+                </a>
+            </div>
+
+            <!-- Dashboard Preview (Mockup) -->
+            <div class="mt-16 lg:mt-24 relative max-w-5xl mx-auto animate-fade-in-up" style="animation-delay: 0.5s;">
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-20 h-40 bottom-0 top-auto w-full">
+                </div>
+                <div
+                    class="rounded-2xl border-4 border-slate-900/5 shadow-2xl bg-white p-2 overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-700">
+                    <div
+                        class="bg-slate-50 rounded-xl overflow-hidden aspect-[16/9] flex items-center justify-center relative group cursor-default">
+                        <!-- Abstract UI Representation -->
+                        <div
+                            class="absolute inset-x-0 top-0 h-12 bg-white border-b border-slate-100 flex items-center px-4 space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                        <div class="text-center">
+                            <i data-lucide="layout-dashboard" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
+                            <p class="text-slate-500 font-medium">Teacher Dashboard Interface</p>
+                        </div>
+
+                        <!-- Floating Cards -->
+                        <div class="absolute top-20 right-10 bg-white p-4 rounded-xl shadow-lg border border-slate-100 w-64 animate-float"
+                            style="animation-delay: 1s;">
+                            <div class="flex items-center mb-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-2">
+                                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800">실시간 피드백</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">"학생이 분수 개념을 헷갈려하네요. 그림으로 설명하라고 조언했어요."</p>
+                        </div>
+
+                        <div class="absolute bottom-20 left-10 bg-white p-4 rounded-xl shadow-lg border border-slate-100 w-64 animate-float"
+                            style="animation-delay: 0s;">
+                            <div class="flex items-center mb-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800">학습 분석</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 mb-1">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <span class="text-xs text-slate-500">이해도 75% 달성</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logo Cloud -->
+    <section class="py-10 border-y border-slate-100 bg-white">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">Powered by Advanced
+                Technologies</p>
+            <div
+                class="flex justify-center items-center space-x-8 md:space-x-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Simple Text Logos for Tech Stack -->
+                <span class="text-2xl font-bold font-sans text-slate-600 flex items-center"><i data-lucide="cpu"
+                        class="mr-2"></i>Gemini Pro</span>
+                <span class="text-2xl font-bold font-sans text-slate-600 flex items-center"><i data-lucide="flame"
+                        class="mr-2"></i>Firebase</span>
+                <span class="text-2xl font-bold font-sans text-slate-600 flex items-center"><i data-lucide="code-2"
+                        class="mr-2"></i>Tailwind</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">선생님이 원하던 진짜 AI 도구</h2>
+                <p class="text-lg text-slate-600">통제 불가능한 AI 사용은 이제 그만. <br>학습 목표에 맞는 안전하고 체계적인 AI 수업을 설계하세요.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">안전한 통제 환경</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        교사의 승인 하에만 AI에 접근할 수 있습니다. 무분별한 사용을 막고 교육적 목적에 집중된 환경을 제공합니다.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div
+                        class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center text-violet-600 mb-6">
+                        <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">소크라테스 튜터</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        답을 바로 주지 않습니다. 단계적 발문(Scaffolding)을 통해 학생이 스스로 답을 찾도록 유도합니다.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-6">
+                        <i data-lucide="file-text" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">나만의 교재 연동 (RAG)</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        PDF 학습지나 교과서 이미지를 업로드하세요. AI가 그 내용을 바탕으로 정확하게 설명해줍니다.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 mb-6">
+                        <i data-lucide="monitor-play" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">실시간 모니터링</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        지금 누가 어떤 대화를 나누고 있는지 한눈에 파악하세요. 도움이 필요한 학생을 즉시 발견할 수 있습니다.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 mb-6">
+                        <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">학습 분석 리포트</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        수업 후 AI가 대화를 분석해줍니다. 학생의 이해도, 참여도, 사고 패턴을 시각화된 데이터로 확인하세요.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600 mb-6">
+                        <i data-lucide="layout" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">간편한 수업 관리</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        QR코드로 1초 만에 입장. 복잡한 가입 절차 없이 수업 코드 하나로 모든 학생을 연결합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Steps Section -->
+    <section id="how-it-works" class="py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+                        복잡한 준비 없이 <br />
+                        <span class="text-blue-600">3단계로 시작하세요</span>
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-12">기술적인 어려움은 없습니다. 선생님의 교육적 의도만 있으면 됩니다.</p>
+
+                    <div class="space-y-10">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                                    <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">수업 개설하기</h3>
+                                <p class="text-slate-600">수업 주제를 입력하고 AI에게 '어떤 선생님'이 되어야 할지 지시사항을 적어주세요.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">학생 초대하기</h3>
+                                <p class="text-slate-600">생성된 QR코드를 화면에 띄우세요. 학생들은 카메라로 찍고 바로 입장합니다.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                                    <i data-lucide="message-square" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">실시간 코칭하기</h3>
+                                <p class="text-slate-600">대시보드에서 학생들의 질문을 지켜보며, AI가 해결하기 어려운 부분만 선생님이 개입하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 relative">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-blue-100 to-violet-100 rounded-full blur-3xl opacity-50 transform rotate-12">
+                    </div>
+                    <div
+                        class="relative bg-white border border-slate-200 rounded-2xl shadow-2xl p-8 transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                        <!-- Code Snippet Mockup -->
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                        <div class="font-mono text-sm space-y-2">
+                            <div class="text-slate-400">// AI 튜터 시스템 설정 예시</div>
+                            <div class="text-blue-600">const <span class="text-slate-800">classroom</span> = {</div>
+                            <div class="pl-4 text-slate-600">subject: <span class="text-green-600">"과학 (중2)"</span>,
+                            </div>
+                            <div class="pl-4 text-slate-600">topic: <span class="text-green-600">"광합성의 원리"</span>,</div>
+                            <div class="pl-4 text-slate-600">aiPersona: <span class="text-green-600">"친절하지만 답을 바로 알려주지
+                                    않는 소크라테스 튜터"</span>,</div>
+                            <div class="pl-4 text-slate-600">restriction: <span class="text-green-600">"교과서 142p 내용 범위
+                                    내에서만 답변할 것"</span></div>
+                            <div class="text-slate-800">};</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pedagogical Foundation (TPACK) - Simplified -->
+    <section id="pedagogy" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl lg:text-4xl font-bold mb-12">교육학적 이론에 기반한 설계</h2>
+
+            <div class="grid md:grid-cols-3 gap-8 text-left">
+                <div class="bg-slate-800 p-8 rounded-2xl hover:bg-slate-750 transition-colors border border-slate-700">
+                    <div class="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-blue-400 mb-6">
+                        <i data-lucide="network" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Vygotsky의 ZPD</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        학생의 현재 수준보다 약간 높은 '근접발달영역'을 자극하여 최적의 학습 성장을 이끌어냅니다.
+                    </p>
+                </div>
+                <div class="bg-slate-800 p-8 rounded-2xl hover:bg-slate-750 transition-colors border border-slate-700">
+                    <div
+                        class="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-violet-400 mb-6">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Instructional Scaffolding</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        학습자가 스스로 문제를 해결할 수 있도록 AI가 적절한 힌트와 보조물(비계)을 제공합니다.
+                    </p>
+                </div>
+                <div class="bg-slate-800 p-8 rounded-2xl hover:bg-slate-750 transition-colors border border-slate-700">
+                    <div
+                        class="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-emerald-400 mb-6">
+                        <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Metacognition</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        "왜 그렇게 생각했니?"라는 질문을 통해 자신의 사고 과정을 되돌아보는 메타인지 능력을 키웁니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-blue-600 relative overflow-hidden">
+        <div class="absolute inset-0 bg-blue-600">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-violet-600 opacity-90"></div>
+            <!-- Decorative circles -->
+            <div class="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-white opacity-10 blur-3xl"></div>
+            <div class="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-white opacity-10 blur-3xl"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl lg:text-5xl font-bold text-white mb-6">
+                지금 바로 수업을 혁신하세요
+            </h2>
+            <p class="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
+                별도의 설치 없이 웹브라우저만 있으면 됩니다. <br>
+                선생님의 교육 철학을 AI라는 강력한 도구에 담아보세요.
+            </p>
+            <a href="teacher.html"
+                class="inline-block px-10 py-4 bg-white text-blue-600 text-lg font-bold rounded-full shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all transform">
+                선생님 대시보드 바로가기
+            </a>
+            <p class="mt-6 text-sm text-blue-200 opacity-80">
+                * Google 계정만 있으면 즉시 무료로 사용 가능합니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 py-12 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-bold text-lg text-slate-700">AI Tutor</span>
+                </div>
+                <div class="text-slate-500 text-sm text-center md:text-right">
+                    <p>&copy; 2025 SangCode. All rights reserved.</p>
+                    <p class="mt-1">Built with passion for education & technology.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

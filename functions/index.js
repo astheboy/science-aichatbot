@@ -680,15 +680,14 @@ exports.getTeacherSettings = onCall(async (request) => {
       return {
         hasApiKey: !!teacherData.apiKey,
         teacherCode: teacherData.teacherCode,
-        modelName: teacherData.modelName || 'gemini-2.0-flash',
+        modelName: teacherData.modelName || 'gemini-2.5-flash',
         customPrompts: teacherData.customPrompts || {},
         defaultPrompts: defaultPrompts,
         supportedSubjects: SubjectLoader.getSupportedSubjects(),
         availableModels: [
           
           'gemini-2.5-flash-lite',
-          'gemini-2.0-flash',
-          'gemini-2.0-flash-lite'
+          'gemini-2.5-flash'
         ]
       };
       
@@ -954,7 +953,7 @@ ${conversationText}
       
       // Gemini API 호출하여 분석 생성
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
@@ -1027,7 +1026,7 @@ exports.analyzeStudentConversations = onCall(async (request) => {
       const teacherData = teacherDoc.data();
       const teacherCode = teacherData.teacherCode;
       const apiKey = teacherData.apiKey;
-      const modelName = teacherData.modelName || 'gemini-2.0-flash';
+      const modelName = teacherData.modelName || 'gemini-2.5-flash';
       
       // 1. 먼저 기존 분석 결과가 있는지 확인
       const existingAnalysisSnapshot = await db.collection('conversation_analyses')
@@ -1218,16 +1217,44 @@ ${conversationText}
       
       // Gemini API 호출하여 분석 생성
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: modelName });
+      console.log(`[분석 생성] 모델 '${modelName}' 사용 시작`);
+      let model = genAI.getGenerativeModel({ model: modelName });
       
-      const result = await model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
-        generationConfig: {
-          "temperature": 0.2,
-          "topP": 0.8,
-          "maxOutputTokens": 2000
+      let result;
+      try {
+        result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
+            generationConfig: {
+            "temperature": 0.2,
+            "topP": 0.8,
+            "maxOutputTokens": 2000
+            }
+        });
+      } catch (apiError) {
+        console.warn(`[분석 생성] 모델 '${modelName}' 호출 실패. 기본 모델(gemini-2.5-flash)로 재시도합니다. 오류:`, apiError.message);
+        
+        // 폴백: 기본 모델로 재시도 (현재 모델이 기본 모델이 아닐 경우)
+        if (modelName !== 'gemini-2.5-flash') {
+            try {
+                model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+                result = await model.generateContent({
+                    contents: [{ role: 'user', parts: [{ text: analysisPrompt }] }],
+                    generationConfig: {
+                        "temperature": 0.2,
+                        "topP": 0.8,
+                        "maxOutputTokens": 2000
+                    }
+                });
+                console.log('[분석 생성] 기본 모델(gemini-2.5-flash)로 재시도 성공');
+            } catch (fallbackError) {
+                console.error('[분석 생성] 기본 모델 재시도 실패:', fallbackError);
+                throw new HttpsError('internal', `AI 모델 호출 실패: ${apiError.message}`);
+            }
+        } else {
+            // 이미 기본 모델을 사용했다면 오류 반환
+            throw new HttpsError('internal', `AI 모델 호출 실패: ${apiError.message}`);
         }
-      });
+      }
       
       const response = await result.response;
       const analysisText = response.text();
@@ -1838,7 +1865,7 @@ ${conversations.slice(-5).map(conv =>
         
         // Gemini API 호출
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: lessonData.modelName || 'gemini-2.0-flash-lite' });
+        const model = genAI.getGenerativeModel({ model: lessonData.modelName || 'gemini-2.5-flash-lite' });
         const result = await model.generateContent(analysisPrompt);
         const analysis = result.response.text();
         
